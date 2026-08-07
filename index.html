@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Ring For Me · Love Alarm</title>
-  <!-- Tailwind via CDN + custom golden theme -->
+  <!-- Tailwind + custom golden theme -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font & extra style -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700&display=swap" rel="stylesheet">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700&display=swap" rel="stylesheet" />
   <style>
-    * { font-family: 'Inter', sans-serif; margin:0; padding:0; box-sizing:border-box; }
+    * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #0b0a0c; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    /* main card – mobile first, no scroll, native feel */
     #app {
       width: 100%; max-width: 420px; height: 100vh; max-height: 780px;
       background: #141215; border-radius: 36px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
@@ -22,74 +24,66 @@
     .gold-text { color: #f3c96b; }
     .gold-border { border-color: #f3c96b; }
     .glass-card { background: rgba(20, 18, 21, 0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-    /* custom scroll none */
-    ::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    /* pulse animation for alarm */
+    ::-webkit-scrollbar { display: none; }
     @keyframes glowPulse {
-      0% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88, 0 0 40px #d9a44155; transform: scale(1); }
-      50% { box-shadow: 0 0 40px #f7d875, 0 0 80px #f3c96bcc, 0 0 120px #d9a441aa; transform: scale(1.02); }
-      100% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88, 0 0 40px #d9a44155; transform: scale(1); }
+      0% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88; transform: scale(1); }
+      50% { box-shadow: 0 0 40px #f7d875, 0 0 80px #f3c96bcc; transform: scale(1.02); }
+      100% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88; transform: scale(1); }
     }
-    .alarm-active {
-      animation: glowPulse 1.2s infinite ease-in-out;
-      background: rgba(243, 201, 107, 0.15);
-      border: 2px solid #f3c96b;
-    }
-    .heart-beat {
-      animation: heartBeat 1s infinite;
-    }
-    @keyframes heartBeat {
-      0%, 100% { transform: scale(1); }
-      15% { transform: scale(1.2); }
-      30% { transform: scale(1); }
-      45% { transform: scale(1.15); }
-      60% { transform: scale(1); }
-    }
-    .transition-smooth { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
-    /* tag chips */
+    .alarm-active { animation: glowPulse 1.2s infinite ease-in-out; background: rgba(243, 201, 107, 0.15); border: 2px solid #f3c96b; }
+    .heart-beat { animation: heartBeat 1s infinite; }
+    @keyframes heartBeat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.2); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
     .chip { background: #2a2529; color: #f3c96b; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; border: 1px solid #f3c96b40; }
+    .radar-ring { stroke: #f3c96b30; fill: none; }
+    .radar-dot { fill: #f3c96b; opacity: 0.7; }
+    .transition-smooth { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+    .badge { background: #2a2529; border: 1px solid #f3c96b60; border-radius: 20px; padding: 2px 10px; font-size: 0.6rem; color: #f3c96b; }
+    /* SVG icons inline */
+    .icon-heart { width: 24px; height: 24px; fill: none; stroke: #f3c96b; stroke-width: 2; }
+    .icon-star { width: 20px; height: 20px; fill: #f3c96b; }
   </style>
 </head>
 <body>
 <div id="app" class="flex flex-col text-white relative no-scrollbar">
 
-  <!-- header with golden line -->
+  <!-- header -->
   <div class="flex items-center justify-between px-6 pt-5 pb-2 flex-shrink-0">
     <span class="text-2xl font-light tracking-widest gold-text">✦ RING</span>
     <span class="text-[10px] uppercase tracking-[0.2em] text-[#f3c96b99]">for me</span>
+    <div class="flex gap-2">
+      <button id="ghostToggle" class="text-[#6b5e4e] text-xs border border-[#f3c96b30] rounded-full px-3 py-1">👻</button>
+      <button id="settingsToggle" class="text-[#6b5e4e] text-xs border border-[#f3c96b30] rounded-full px-3 py-1">⚙</button>
+    </div>
   </div>
   <div class="h-[2px] w-4/5 mx-auto gold-gradient opacity-50 rounded-full mb-2"></div>
 
-  <!-- main dynamic container (no overflow) -->
+  <!-- main container -->
   <div id="mainContainer" class="flex-1 px-5 pb-4 overflow-y-auto no-scrollbar transition-smooth relative">
-    <!-- onboarding view (multi-step) -->
+
+    <!-- onboarding -->
     <div id="onboardingView" class="space-y-5 pt-2">
-      <!-- step 1: name & vibe tags (simplified multi-step) -->
       <div id="step1" class="space-y-4">
         <div class="text-xs gold-text tracking-widest">STEP 1 · WHO ARE YOU</div>
-        <input id="userName" type="text" placeholder="Your name" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-4 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth text-base" value="Jisoo">
+        <input id="userName" type="text" placeholder="Your name" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-4 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth text-base" />
         <div>
           <div class="text-xs gold-text mb-2 tracking-wide">VIBE TAGS (select up to 4)</div>
           <div id="vibeTags" class="flex flex-wrap gap-2">
-            <span data-tag="romantic" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">❤️ romantic</span>
-            <span data-tag="playful" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">🌀 playful</span>
-            <span data-tag="cozy" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">☕ cozy</span>
-            <span data-tag="adventurous" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">🏔️ adventurous</span>
-            <span data-tag="chill" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">🌊 chill</span>
-            <span data-tag="nerdy" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">📚 nerdy</span>
+            <span data-tag="romantic" class="chip cursor-pointer">romantic</span>
+            <span data-tag="playful" class="chip cursor-pointer">playful</span>
+            <span data-tag="cozy" class="chip cursor-pointer">cozy</span>
+            <span data-tag="adventurous" class="chip cursor-pointer">adventurous</span>
+            <span data-tag="chill" class="chip cursor-pointer">chill</span>
+            <span data-tag="nerdy" class="chip cursor-pointer">nerdy</span>
           </div>
-          <div class="text-[10px] text-[#a0907a] mt-1">tap to toggle</div>
         </div>
         <button id="nextStep1" class="w-full gold-gradient text-[#141215] font-bold py-4 rounded-2xl text-base tracking-wide shadow-lg shadow-[#f3c96b30] transition-smooth hover:scale-[1.01] active:scale-95">next →</button>
       </div>
-
-      <!-- step 2: hobbies, fav foods, games -->
       <div id="step2" class="space-y-4 hidden">
         <div class="text-xs gold-text tracking-widest">STEP 2 · YOUR FAVES</div>
-        <input id="hobbies" type="text" placeholder="Hobbies (comma separated)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" value="photography, dancing, guitar">
-        <input id="favFoods" type="text" placeholder="Fav foods (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" value="ramen, sushi, chocolate">
-        <input id="favGames" type="text" placeholder="Fav games (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" value="stardew, zelda, persona">
+        <input id="hobbies" type="text" placeholder="Hobbies (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" />
+        <input id="favFoods" type="text" placeholder="Fav foods (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" />
+        <input id="favGames" type="text" placeholder="Fav games (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" />
         <div class="flex gap-3 pt-1">
           <button id="backStep2" class="flex-1 bg-[#2a2529] text-[#f3c96b] border border-[#f3c96b40] py-3 rounded-2xl transition-smooth active:scale-95">back</button>
           <button id="saveProfile" class="flex-1 gold-gradient text-[#141215] font-bold py-3 rounded-2xl transition-smooth active:scale-95">save & find</button>
@@ -97,69 +91,183 @@
       </div>
     </div>
 
-    <!-- profile card (after onboarding) -->
-    <div id="profileView" class="hidden space-y-4 pt-2">
+    <!-- main dashboard -->
+    <div id="dashboardView" class="hidden space-y-4 pt-2">
+      <!-- profile card -->
       <div class="glass-card rounded-3xl p-4 border border-[#f3c96b30]">
         <div class="flex items-center justify-between">
-          <span id="profileName" class="text-xl font-bold gold-text">Jisoo</span>
-          <span class="text-xs px-3 py-1 rounded-full bg-[#f3c96b20] border border-[#f3c96b40]">📍 live</span>
+          <span id="profileName" class="text-xl font-bold gold-text">—</span>
+          <span id="streakBadge" class="badge">🔥 0d</span>
         </div>
         <div class="flex flex-wrap gap-1 mt-2" id="profileTags"></div>
-        <div class="text-xs text-[#b8a68b] mt-2 flex flex-wrap gap-x-4"><span id="profileHobbies"></span> <span id="profileFoods"></span> <span id="profileGames"></span></div>
+        <div class="flex flex-wrap gap-2 mt-1" id="profileBadges"></div>
+        <div class="text-xs text-[#b8a68b] mt-2 flex flex-wrap gap-x-4">
+          <span id="profileHobbies"></span> <span id="profileFoods"></span> <span id="profileGames"></span>
+        </div>
       </div>
+
+      <!-- Radar ring -->
+      <div class="relative flex justify-center">
+        <svg width="180" height="180" viewBox="0 0 180 180" class="radar-ring">
+          <circle cx="90" cy="90" r="85" stroke="#f3c96b20" stroke-width="1" fill="none" />
+          <circle cx="90" cy="90" r="55" stroke="#f3c96b40" stroke-width="1" fill="none" />
+          <circle cx="90" cy="90" r="25" stroke="#f3c96b60" stroke-width="1.5" fill="none" />
+          <circle cx="90" cy="90" r="8" fill="#f3c96b" opacity="0.8" />
+          <!-- dots will be injected -->
+          <g id="radarDots"></g>
+        </svg>
+        <div class="absolute bottom-1 text-[10px] text-[#f3c96b80]">radar</div>
+      </div>
+
       <button id="refreshProximity" class="w-full gold-gradient text-[#141215] font-bold py-3 rounded-2xl text-sm tracking-wide transition-smooth active:scale-95">⟳ scan nearby</button>
-      <div id="nearbyList" class="space-y-2 max-h-[180px] overflow-y-auto no-scrollbar"></div>
+      
+      <!-- nearby list -->
+      <div id="nearbyList" class="space-y-2 max-h-[120px] overflow-y-auto no-scrollbar"></div>
+
+      <!-- ice breakers -->
+      <div id="iceBreakerContainer" class="hidden glass-card p-3 rounded-2xl border border-[#f3c96b30]">
+        <div class="text-xs gold-text mb-1">💬 ice breakers</div>
+        <div id="iceBreakerText" class="text-sm text-[#e8d5b0]"></div>
+      </div>
     </div>
 
-    <!-- ALARM overlay (full screen glow) -->
+    <!-- settings panel -->
+    <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px]">
+      <div class="flex justify-between"><span class="gold-text text-lg">settings</span><button id="closeSettings" class="text-[#6b5e4e]">✕</button></div>
+      <div class="mt-4 space-y-3">
+        <div><span class="text-sm text-[#b8a68b]">Alarm radius</span>
+          <select id="radiusSelect" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-xl p-2 text-white">
+            <option value="10">10m</option><option value="20" selected>20m</option><option value="50">50m</option>
+          </select>
+        </div>
+        <div><span class="text-sm text-[#b8a68b]">Ghost mode</span>
+          <button id="ghostSettingToggle" class="ml-2 bg-[#2a2529] px-4 py-1 rounded-full text-xs border border-[#f3c96b40]">off</button>
+        </div>
+        <div><span class="text-sm text-[#b8a68b]">Daily poll</span>
+          <div id="dailyPoll" class="text-xs text-[#f3c96b] mt-1">coffee or tea? ☕</div>
+        </div>
+        <div><span class="text-sm text-[#b8a68b]">Alarm history</span>
+          <div id="alarmHistory" class="text-xs text-[#6b5e4e] max-h-20 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- alarm overlay -->
     <div id="alarmOverlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-all duration-700 ease-in-out rounded-[36px] overflow-hidden" style="background: radial-gradient(circle at center, #f3c96b30, #141215 80%);">
       <div class="heart-beat text-8xl gold-text drop-shadow-[0_0_30px_#f3c96b]">❤️</div>
       <div class="text-3xl font-bold gold-text mt-2 tracking-widest">RING</div>
-      <div class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-2 rounded-full mt-2 backdrop-blur">✨ common: <span id="commonTagsDisplay">romantic, cozy</span></div>
+      <div class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-2 rounded-full mt-2 backdrop-blur">common: <span id="commonTagsDisplay">—</span></div>
       <div class="absolute bottom-10 text-[10px] text-[#f3c96b88]">❤️ alarm active</div>
     </div>
   </div>
 
-  <!-- audio alarm (hidden) -->
-  <audio id="alarmSound" preload="auto">
-    <source src="data:audio/wav;base64,U3RlcmVvIGlzIG5vdCBzdXBwb3J0ZWQgcGxlYXNlIHVzZSBhbiBhdWRpbyBmaWxlLg==" type="audio/wav">
-  </audio>
+  <audio id="alarmSound" preload="auto"><source src="data:audio/wav;base64,U3RlcmVvIGlzIG5vdCBzdXBwb3J0ZWQgcGxlYXNlIHVzZSBhbiBhdWRpbyBmaWxlLg==" type="audio/wav"></audio>
 </div>
+
 <script>
   (function() {
+    // ---------- Firebase init ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFGRsd1jTYLJKFzlJBuRo2t92A7XiSeDQ",
+      authDomain: "ring-for-me.firebaseapp.com",
+      projectId: "ring-for-me",
+      storageBucket: "ring-for-me.firebasestorage.app",
+      messagingSenderId: "739955467931",
+      appId: "1:739955467931:web:8dab49d87e5ce811e9483e",
+      measurementId: "G-27MMETQ5J7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
+
     // ---------- state ----------
-    let currentUser = null;
-    let nearbyUsers = [];
+    let currentUser = null;       // our user object
+    let myUID = null;
+    let watchId = null;
+    let ghostMode = false;
+    let alarmRadius = 20;        // meters
     let selectedVibes = [];
-    const STORAGE_KEY = 'ring_for_me_users';
-    const MAX_DIST_M = 10;
-    const MATCH_THRESHOLD = 0.7;
+    let nearbyUsers = [];
+    let alarmHistory = [];
+    let streakDays = 0;
 
     // DOM refs
-    const step1 = document.getElementById('step1');
-    const step2 = document.getElementById('step2');
-    const nextBtn = document.getElementById('nextStep1');
-    const backBtn = document.getElementById('backStep2');
-    const saveBtn = document.getElementById('saveProfile');
-    const userName = document.getElementById('userName');
-    const hobbies = document.getElementById('hobbies');
-    const favFoods = document.getElementById('favFoods');
-    const favGames = document.getElementById('favGames');
-    const profileView = document.getElementById('profileView');
-    const onboardingView = document.getElementById('onboardingView');
-    const profileName = document.getElementById('profileName');
-    const profileTags = document.getElementById('profileTags');
-    const profileHobbies = document.getElementById('profileHobbies');
-    const profileFoods = document.getElementById('profileFoods');
-    const profileGames = document.getElementById('profileGames');
-    const nearbyList = document.getElementById('nearbyList');
-    const alarmOverlay = document.getElementById('alarmOverlay');
-    const commonTagsDisplay = document.getElementById('commonTagsDisplay');
-    const alarmSound = document.getElementById('alarmSound');
+    const $ = id => document.getElementById(id);
+    const userName = $('userName');
+    const hobbies = $('hobbies');
+    const favFoods = $('favFoods');
+    const favGames = $('favGames');
+    const step1 = $('step1');
+    const step2 = $('step2');
+    const nextBtn = $('nextStep1');
+    const backBtn = $('backStep2');
+    const saveBtn = $('saveProfile');
+    const profileName = $('profileName');
+    const profileTags = $('profileTags');
+    const profileBadges = $('profileBadges');
+    const profileHobbies = $('profileHobbies');
+    const profileFoods = $('profileFoods');
+    const profileGames = $('profileGames');
+    const nearbyList = $('nearbyList');
+    const alarmOverlay = $('alarmOverlay');
+    const commonTagsDisplay = $('commonTagsDisplay');
+    const alarmSound = $('alarmSound');
+    const radarDots = $('radarDots');
+    const refreshBtn = $('refreshProximity');
+    const settingsPanel = $('settingsPanel');
+    const closeSettings = $('closeSettings');
+    const radiusSelect = $('radiusSelect');
+    const ghostSettingToggle = $('ghostSettingToggle');
+    const ghostToggle = $('ghostToggle');
+    const settingsToggle = $('settingsToggle');
+    const dailyPoll = $('dailyPoll');
+    const alarmHistoryEl = $('alarmHistory');
+    const iceBreakerContainer = $('iceBreakerContainer');
+    const iceBreakerText = $('iceBreakerText');
+    const streakBadge = $('streakBadge');
 
-    // tag toggles
+    // ---------- auth anonymous ----------
+    auth.signInAnonymously().catch(() => {});
+
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        myUID = user.uid;
+        // load user data
+        db.ref('users/' + myUID).once('value').then(snap => {
+          const data = snap.val();
+          if (data) {
+            currentUser = data;
+            currentUser.uid = myUID;
+            fillFormFromUser(data);
+            showDashboard(data);
+            startLocationWatch();
+          }
+        });
+      }
+    });
+
+    function fillFormFromUser(data) {
+      userName.value = data.name || '';
+      selectedVibes = data.vibeTags || [];
+      hobbies.value = (data.hobbies || []).join(', ');
+      favFoods.value = (data.favFoods || []).join(', ');
+      favGames.value = (data.favGames || []).join(', ');
+      // highlight tags
+      document.querySelectorAll('#vibeTags .chip').forEach(el => {
+        const tag = el.dataset.tag;
+        if (selectedVibes.includes(tag)) {
+          el.style.background = '#f3c96b40';
+          el.style.color = '#f7d875';
+        } else {
+          el.style.background = '#2a2529';
+          el.style.color = '#f3c96b';
+        }
+      });
+    }
+
+    // ---------- tag toggles ----------
     document.querySelectorAll('#vibeTags .chip').forEach(el => {
-      el.addEventListener('click', function(e) {
+      el.addEventListener('click', function() {
         const tag = this.dataset.tag;
         if (selectedVibes.includes(tag)) {
           selectedVibes = selectedVibes.filter(t => t !== tag);
@@ -186,218 +294,274 @@
       step2.classList.add('hidden');
     });
 
-    // ---------- geolocation + storage ----------
+    // ---------- save profile ----------
+    saveBtn.addEventListener('click', async function() {
+      if (!userName.value.trim()) { alert('name required'); return; }
+      if (!myUID) { alert('auth not ready'); return; }
+      const userObj = {
+        name: userName.value.trim(),
+        vibeTags: [...selectedVibes],
+        hobbies: hobbies.value.split(',').map(s => s.trim()).filter(Boolean),
+        favFoods: favFoods.value.split(',').map(s => s.trim()).filter(Boolean),
+        favGames: favGames.value.split(',').map(s => s.trim()).filter(Boolean),
+        lat: 0, lng: 0,
+        ghost: ghostMode,
+        timestamp: Date.now(),
+        streak: streakDays || 0,
+        badges: ['Coffee Lover', 'MBTI: ENFP'] // sample
+      };
+      // get position
+      try {
+        const pos = await getPosition();
+        userObj.lat = pos.coords.latitude;
+        userObj.lng = pos.coords.longitude;
+      } catch(e) {}
+      currentUser = userObj;
+      currentUser.uid = myUID;
+      await db.ref('users/' + myUID).set(userObj);
+      showDashboard(userObj);
+      startLocationWatch();
+    });
+
+    function showDashboard(user) {
+      document.getElementById('onboardingView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      profileName.textContent = user.name || '—';
+      profileTags.innerHTML = (user.vibeTags || []).map(t => `<span class="chip">${t}</span>`).join(' ');
+      profileBadges.innerHTML = (user.badges || []).map(b => `<span class="badge">${b}</span>`).join(' ');
+      profileHobbies.textContent = '🎯 ' + (user.hobbies || []).join(', ') || '—';
+      profileFoods.textContent = '🍜 ' + (user.favFoods || []).join(', ') || '—';
+      profileGames.textContent = '🎮 ' + (user.favGames || []).join(', ') || '—';
+      streakBadge.textContent = '🔥 ' + (user.streak || 0) + 'd';
+      // daily poll
+      dailyPoll.textContent = '☕ coffee or tea?  (vote)';
+      updateRadar([]);
+      scanNearby();
+    }
+
+    // ---------- geolocation watch ----------
     function getPosition() {
-      return new Promise((resolve) => {
-        if (!navigator.geolocation) {
-          resolve({ coords: { latitude: 37.5665, longitude: 126.9780 } }); // seoul fallback
-        } else {
-          navigator.geolocation.getCurrentPosition(
-            pos => resolve(pos),
-            () => resolve({ coords: { latitude: 37.5665, longitude: 126.9780 } }),
-            { enableHighAccuracy: true, timeout: 6000 }
-          );
-        }
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) reject('no geo');
+        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 });
       });
     }
 
-    function loadUsersFromStorage() {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
-        try { return JSON.parse(data); } catch(e) { return []; }
+    function startLocationWatch() {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+      watchId = navigator.geolocation.watchPosition(
+        async (pos) => {
+          if (!currentUser || !myUID) return;
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          currentUser.lat = lat;
+          currentUser.lng = lng;
+          currentUser.timestamp = Date.now();
+          if (!ghostMode) {
+            await db.ref('users/' + myUID + '/lat').set(lat);
+            await db.ref('users/' + myUID + '/lng').set(lng);
+            await db.ref('users/' + myUID + '/timestamp').set(Date.now());
+          }
+          scanNearby();
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 }
+      );
+    }
+
+    // ---------- scan nearby ----------
+    async function scanNearby() {
+      if (!currentUser || !myUID) return;
+      const usersSnap = await db.ref('users').once('value');
+      const allUsers = usersSnap.val();
+      if (!allUsers) return;
+      const results = [];
+      const myLat = currentUser.lat;
+      const myLng = currentUser.lng;
+      if (!myLat || !myLng) return;
+      for (let uid in allUsers) {
+        if (uid === myUID) continue;
+        const u = allUsers[uid];
+        if (!u.lat || !u.lng) continue;
+        const dist = haversine(myLat, myLng, u.lat, u.lng);
+        const match = calculateMatch(currentUser, u);
+        const matchPercent = Math.round(match * 100);
+        results.push({ uid, ...u, distance: dist, matchPercent });
       }
-      return [];
-    }
-
-    function saveUsers(users) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-    }
-
-    // create user object from form
-    function buildUserFromForm() {
-      const name = userName.value.trim();
-      const hobbiesArr = hobbies.value.split(',').map(s => s.trim()).filter(Boolean);
-      const foodsArr = favFoods.value.split(',').map(s => s.trim()).filter(Boolean);
-      const gamesArr = favGames.value.split(',').map(s => s.trim()).filter(Boolean);
-      return {
-        id: Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-        name,
-        vibeTags: [...selectedVibes],
-        hobbies: hobbiesArr,
-        favFoods: foodsArr,
-        favGames: gamesArr,
-        lat: 0, lng: 0,
-        timestamp: Date.now()
-      };
-    }
-
-    // show profile UI
-    function showProfile(user) {
-      currentUser = user;
-      profileName.textContent = user.name;
-      profileTags.innerHTML = user.vibeTags.map(t => `<span class="chip">${t}</span>`).join(' ');
-      profileHobbies.textContent = '🎯 ' + (user.hobbies.join(', ') || '—');
-      profileFoods.textContent = '🍜 ' + (user.favFoods.join(', ') || '—');
-      profileGames.textContent = '🎮 ' + (user.favGames.join(', ') || '—');
-      onboardingView.classList.add('hidden');
-      profileView.classList.remove('hidden');
-      // fetch nearby
-      scanNearby(user);
-    }
-
-    // ---------- match & proximity ----------
-    function calculateMatch(user1, user2) {
-      const tags1 = user1.vibeTags || [];
-      const tags2 = user2.vibeTags || [];
-      if (!tags1.length || !tags2.length) return 0;
-      const common = tags1.filter(t => tags2.includes(t));
-      const union = [...new Set([...tags1, ...tags2])];
-      return common.length / union.length;
+      results.sort((a,b) => a.distance - b.distance);
+      nearbyUsers = results;
+      renderNearby(results);
+      updateRadar(results);
+      checkAlarm(results);
+      // ice breakers for closest match
+      if (results.length && results[0].distance < 50 && results[0].matchPercent > 50) {
+        iceBreakerContainer.classList.remove('hidden');
+        const msgs = ['Hey! Love your vibe ✨', 'Coffee sometime? ☕', 'You seem interesting!'];
+        iceBreakerText.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      } else {
+        iceBreakerContainer.classList.add('hidden');
+      }
     }
 
     function haversine(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
       const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
-      const Δφ = (lat2-lat1)*Math.PI/180;
-      const Δλ = (lon2-lon1)*Math.PI/180;
+      const Δφ = (lat2-lat1)*Math.PI/180, Δλ = (lon2-lon1)*Math.PI/180;
       const a = Math.sin(Δφ/2)*Math.sin(Δφ/2) + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
-      const c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
-    async function scanNearby(user) {
-      const pos = await getPosition();
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      user.lat = lat;
-      user.lng = lng;
-
-      let allUsers = loadUsersFromStorage();
-      // remove old entries (> 5 min)
-      allUsers = allUsers.filter(u => (Date.now() - u.timestamp) < 300000);
-      // add current user
-      const existingIdx = allUsers.findIndex(u => u.id === user.id);
-      if (existingIdx !== -1) allUsers[existingIdx] = user;
-      else allUsers.push(user);
-      saveUsers(allUsers);
-
-      // compute distances & matches
-      const others = allUsers.filter(u => u.id !== user.id && u.lat && u.lng);
-      const results = [];
-      for (let other of others) {
-        const dist = haversine(lat, lng, other.lat, other.lng);
-        const match = calculateMatch(user, other);
-        results.push({ ...other, distance: dist, matchPercent: Math.round(match*100) });
-      }
-      results.sort((a,b) => a.distance - b.distance);
-      nearbyUsers = results;
-      renderNearby(results, user);
-      // check alarm condition
-      checkAlarm(results, user);
+    function calculateMatch(u1, u2) {
+      const t1 = u1.vibeTags || [], t2 = u2.vibeTags || [];
+      if (!t1.length || !t2.length) return 0;
+      const common = t1.filter(t => t2.includes(t));
+      return common.length / [...new Set([...t1, ...t2])].length;
     }
 
-    function renderNearby(results, user) {
+    function renderNearby(results) {
       if (!results.length) {
-        nearbyList.innerHTML = `<div class="text-center text-[#6b5e4e] text-sm py-4">✨ no nearby alarms yet</div>`;
+        nearbyList.innerHTML = `<div class="text-center text-[#6b5e4e] text-sm py-4">✨ no one nearby</div>`;
         return;
       }
-      nearbyList.innerHTML = results.slice(0, 6).map(r => `
-        <div class="glass-card rounded-2xl p-3 border border-[#f3c96b20] flex justify-between items-center transition-smooth">
-          <div>
-            <span class="font-medium gold-text">${r.name}</span>
-            <div class="flex flex-wrap gap-1 mt-1">
-              ${r.vibeTags.slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}
-            </div>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span>
-            <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : (r.distance < 50 ? '📍 nearby' : '📡 ' + Math.round(r.distance)+'m')}</div>
-          </div>
-        </div>
-      `).join('');
+      nearbyList.innerHTML = results.slice(0, 5).map(r => {
+        const distLabel = r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : '📡 ' + Math.round(r.distance) + 'm';
+        return `<div class="glass-card rounded-2xl p-3 border border-[#f3c96b20] flex justify-between items-center">
+          <div><span class="font-medium gold-text">${r.name}</span>
+          <div class="flex flex-wrap gap-1 mt-1">${(r.vibeTags||[]).slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}</div></div>
+          <div class="text-right"><span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span><div class="text-[10px] text-[#6b5e4e]">${distLabel}</div></div>
+        </div>`;
+      }).join('');
     }
 
-    function checkAlarm(results, user) {
-      const trigger = results.find(r => r.distance < MAX_DIST_M && r.matchPercent >= 70);
-      if (trigger) {
-        // show alarm overlay
-        alarmOverlay.classList.remove('opacity-0');
-        alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
-        // common tags
-        const common = user.vibeTags.filter(t => trigger.vibeTags.includes(t));
-        commonTagsDisplay.textContent = common.join(', ') || '❤️';
-        // play sound
-        try {
-          alarmSound.play().catch(() => {});
-        } catch(e) {}
-        // vibrate
-        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
-        // auto-dismiss after 6 sec
-        clearTimeout(window.alarmTimer);
-        window.alarmTimer = setTimeout(() => {
-          alarmOverlay.classList.remove('opacity-100', 'pointer-events-auto');
-          alarmOverlay.classList.add('opacity-0');
-        }, 6000);
-      } else {
+    function updateRadar(results) {
+      radarDots.innerHTML = '';
+      const close = results.filter(r => r.distance < 10);
+      const nearby = results.filter(r => r.distance >= 10 && r.distance < 50);
+      const far = results.filter(r => r.distance >= 50 && r.distance < 200);
+      const dots = [...close.map(r => ({...r, zone: 'close'})), ...nearby.map(r => ({...r, zone: 'nearby'})), ...far.map(r => ({...r, zone: 'far'}))];
+      dots.slice(0, 8).forEach((r, i) => {
+        const angle = (i / dots.length) * 2 * Math.PI + Math.random() * 0.5;
+        const radius = r.zone === 'close' ? 20 : r.zone === 'nearby' ? 45 : 75;
+        const cx = 90 + radius * Math.cos(angle);
+        const cy = 90 + radius * Math.sin(angle);
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('cx', cx);
+        dot.setAttribute('cy', cy);
+        dot.setAttribute('r', r.zone === 'close' ? 5 : 3);
+        dot.setAttribute('fill', r.zone === 'close' ? '#f3c96b' : '#f3c96b80');
+        dot.setAttribute('opacity', '0.8');
+        radarDots.appendChild(dot);
+      });
+    }
+
+    // ---------- alarm check with secret like system ----------
+    async function checkAlarm(results) {
+      if (!currentUser || !myUID) return;
+      const radius = parseInt(radiusSelect.value);
+      for (let r of results) {
+        if (r.distance < radius && r.matchPercent >= 70) {
+          // check if current user liked this person and vice versa (secret like)
+          const likeRef = db.ref('likes/' + myUID + '/' + r.uid);
+          const snap = await likeRef.once('value');
+          const iLiked = snap.val() === true;
+          const otherLikeRef = db.ref('likes/' + r.uid + '/' + myUID);
+          const otherSnap = await otherLikeRef.once('value');
+          const theyLiked = otherSnap.val() === true;
+          if (iLiked && theyLiked) {
+            triggerAlarm(r);
+            // history
+            alarmHistory.push({ name: r.name, time: new Date().toLocaleTimeString(), dist: Math.round(r.distance) + 'm' });
+            alarmHistoryEl.innerHTML = alarmHistory.slice(-5).map(h => `<div>${h.time} · ${h.name} ${h.dist}</div>`).join('');
+            // notification-like
+            if (Notification.permission === 'granted') {
+              new Notification('💖 Ring!', { body: `${r.name} is near!` });
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    function triggerAlarm(user) {
+      alarmOverlay.classList.remove('opacity-0');
+      alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
+      const common = (currentUser.vibeTags || []).filter(t => (user.vibeTags || []).includes(t));
+      commonTagsDisplay.textContent = common.join(', ') || '❤️';
+      alarmSound.play().catch(() => {});
+      if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+      clearTimeout(window.alarmTimer);
+      window.alarmTimer = setTimeout(() => {
         alarmOverlay.classList.remove('opacity-100', 'pointer-events-auto');
         alarmOverlay.classList.add('opacity-0');
-      }
+      }, 6000);
     }
 
-    // ---------- save & init ----------
-    saveBtn.addEventListener('click', async function() {
-      if (!userName.value.trim()) { alert('name required'); return; }
-      const user = buildUserFromForm();
-      const pos = await getPosition();
-      user.lat = pos.coords.latitude;
-      user.lng = pos.coords.longitude;
-      showProfile(user);
-      // refresh after 2 sec
-      setTimeout(() => scanNearby(user), 500);
-    });
-
-    document.getElementById('refreshProximity').addEventListener('click', function() {
-      if (currentUser) scanNearby(currentUser);
-    });
-
-    // ---- auto load if user exists ----
-    (async function init() {
-      const stored = loadUsersFromStorage();
-      if (stored.length) {
-        // find last user by timestamp
-        const last = stored.reduce((a,b) => a.timestamp > b.timestamp ? a : b);
-        // fill form
-        userName.value = last.name || '';
-        selectedVibes = last.vibeTags || [];
-        hobbies.value = (last.hobbies || []).join(', ');
-        favFoods.value = (last.favFoods || []).join(', ');
-        favGames.value = (last.favGames || []).join(', ');
-        // highlight tags
-        document.querySelectorAll('#vibeTags .chip').forEach(el => {
-          const tag = el.dataset.tag;
-          if (selectedVibes.includes(tag)) {
-            el.style.background = '#f3c96b40';
-            el.style.color = '#f7d875';
-          } else {
-            el.style.background = '#2a2529';
-            el.style.color = '#f3c96b';
-          }
-        });
-        // auto show profile
-        const pos = await getPosition();
-        last.lat = pos.coords.latitude;
-        last.lng = pos.coords.longitude;
-        showProfile(last);
+    // ---------- like system (secret) ----------
+    // double tap on user in nearby list to like
+    nearbyList.addEventListener('dblclick', async (e) => {
+      const item = e.target.closest('.glass-card');
+      if (!item) return;
+      const nameEl = item.querySelector('.gold-text');
+      if (!nameEl) return;
+      const name = nameEl.textContent;
+      const user = nearbyUsers.find(u => u.name === name);
+      if (!user || !myUID) return;
+      await db.ref('likes/' + myUID + '/' + user.uid).set(true);
+      // push notification simulation (like)
+      if (Notification.permission === 'granted') {
+        new Notification('❤️ Like sent!', { body: `You liked ${user.name}` });
       }
-    })();
+      // also if they liked back, alarm may trigger on next scan
+    });
 
-    // tap alarm to dismiss
+    // request notification permission
+    if (Notification.permission === 'default') Notification.requestPermission();
+
+    // ---------- ghost mode ----------
+    ghostToggle.addEventListener('click', () => {
+      ghostMode = !ghostMode;
+      ghostToggle.textContent = ghostMode ? '👻 on' : '👻';
+      ghostSettingToggle.textContent = ghostMode ? 'on' : 'off';
+      if (ghostMode && myUID) {
+        db.ref('users/' + myUID + '/lat').remove();
+        db.ref('users/' + myUID + '/lng').remove();
+      }
+    });
+    ghostSettingToggle.addEventListener('click', () => {
+      ghostMode = !ghostMode;
+      ghostToggle.textContent = ghostMode ? '👻 on' : '👻';
+      ghostSettingToggle.textContent = ghostMode ? 'on' : 'off';
+    });
+
+    // settings
+    settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
+    closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
+    radiusSelect.addEventListener('change', (e) => { alarmRadius = parseInt(e.target.value); });
+
+    // refresh
+    refreshBtn.addEventListener('click', scanNearby);
+
+    // close alarm on tap
     alarmOverlay.addEventListener('click', function() {
       this.classList.remove('opacity-100', 'pointer-events-auto');
       this.classList.add('opacity-0');
       clearTimeout(window.alarmTimer);
     });
 
+    // simulate streak (daily open)
+    setTimeout(() => {
+      if (currentUser) {
+        streakDays = (currentUser.streak || 0) + 1;
+        if (myUID) db.ref('users/' + myUID + '/streak').set(streakDays);
+        streakBadge.textContent = '🔥 ' + streakDays + 'd';
+      }
+    }, 3000);
+
+    // bootstrap: if no user, show onboarding
+    if (!currentUser) {
+      document.getElementById('onboardingView').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+    }
   })();
 </script>
 </body>
