@@ -11,16 +11,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700&display=swap" rel="stylesheet" />
   <style>
     * { font-family: 'Inter', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0b0a0c; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    body { background: #0b0a0c; min-height: 100vh; display: flex; align-items: center; justify-content: center; transition: background 0.3s, color 0.3s; }
+    body.light-mode { background: #f5f0eb; }
     #app {
       width: 100%; max-width: 420px; height: 100vh; max-height: 780px;
       background: #141215; border-radius: 36px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
       overflow: hidden; position: relative; display: flex; flex-direction: column;
       border: 1px solid #f5b56b30;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
     }
+    body.light-mode #app { background: #f8f4f0; border-color: #d4c5b0; }
     .gold-gradient { background: linear-gradient(145deg, #f7d875, #d9a441); }
     .gold-text { color: #f3c96b; }
-    .glass-card { background: rgba(20, 18, 21, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    body.light-mode .gold-text { color: #c4902a; }
+    .glass-card { background: rgba(20, 18, 21, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background 0.3s; }
+    body.light-mode .glass-card { background: rgba(255, 252, 248, 0.9); }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     ::-webkit-scrollbar { display: none; }
     @keyframes glowPulse {
@@ -30,43 +35,66 @@
     }
     .heart-beat { animation: heartBeat 1s infinite; }
     @keyframes heartBeat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.2); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
-    .chip { background: #2a2529; color: #f3c96b; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; border: 1px solid #f3c96b40; }
+    .chip { background: #2a2529; color: #f3c96b; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; border: 1px solid #f3c96b40; transition: background 0.3s, color 0.3s; }
+    body.light-mode .chip { background: #e8e0d8; color: #c4902a; border-color: #c4902a40; }
     .btn-primary { background: linear-gradient(145deg, #f7d875, #d9a441); color: #141215; font-weight: 700; padding: 14px; border-radius: 16px; transition: all 0.2s; border: none; width: 100%; font-size: 1rem; cursor: pointer; }
     .btn-primary:hover { transform: scale(1.02); opacity: 0.9; }
     .btn-secondary { background: #2a2529; color: #f3c96b; border: 1px solid #f3c96b40; padding: 14px; border-radius: 16px; transition: all 0.2s; width: 100%; font-size: 1rem; cursor: pointer; }
+    body.light-mode .btn-secondary { background: #e8e0d8; color: #c4902a; border-color: #c4902a40; }
     .btn-secondary:hover { background: #3a3539; }
+    body.light-mode .btn-secondary:hover { background: #ddd5cd; }
     .btn-danger { background: #2a2529; color: #ef4444; border: 1px solid #ef444430; padding: 14px; border-radius: 16px; transition: all 0.2s; width: 100%; font-size: 1rem; cursor: pointer; }
+    body.light-mode .btn-danger { background: #f5eee8; }
     .btn-danger:hover { background: #3a3539; }
-    input, select, textarea { background: #1f1b1e; border: 1px solid #f3c96b50; border-radius: 16px; padding: 14px 18px; color: #ffffff; width: 100%; outline: none; transition: border 0.2s; font-size: 1rem; }
+    body.light-mode .btn-danger:hover { background: #ede5dd; }
+    input, select, textarea { background: #1f1b1e; border: 1px solid #f3c96b50; border-radius: 16px; padding: 14px 18px; color: #ffffff; width: 100%; outline: none; transition: border 0.2s, background 0.3s, color 0.3s; font-size: 1rem; }
+    body.light-mode input, body.light-mode select, body.light-mode textarea { background: #ffffff; color: #1a1a1a; border-color: #c4902a50; }
     input:focus, select:focus, textarea:focus { border-color: #f3c96b; }
+    body.light-mode input:focus, body.light-mode select:focus, body.light-mode textarea:focus { border-color: #c4902a; }
     input::placeholder, textarea::placeholder { color: #6b5e4e; }
+    body.light-mode input::placeholder, body.light-mode textarea::placeholder { color: #a09080; }
     textarea { resize: vertical; min-height: 60px; }
     .text-white-important { color: #ffffff !important; }
+    body.light-mode .text-white-important { color: #1a1a1a !important; }
     .nav-icon { width: 28px; height: 28px; fill: none; stroke: #6b5e4e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.3s; }
+    body.light-mode .nav-icon { stroke: #8a7a6a; }
     .nav-icon.active { stroke: #f3c96b; }
+    body.light-mode .nav-icon.active { stroke: #c4902a; }
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 4px 12px; border-radius: 12px; transition: background 0.2s; }
     .nav-item:hover { background: #2a2529; }
+    body.light-mode .nav-item:hover { background: #e8e0d8; }
     .nav-label { font-size: 0.55rem; color: #6b5e4e; transition: color 0.3s; }
+    body.light-mode .nav-label { color: #8a7a6a; }
     .nav-label.active { color: #f3c96b; }
-    .bottom-nav { background: #141215; border-top: 1px solid #f3c96b20; padding: 6px 8px 10px; display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; }
+    body.light-mode .nav-label.active { color: #c4902a; }
+    .bottom-nav { background: #141215; border-top: 1px solid #f3c96b20; padding: 6px 8px 10px; display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; transition: background 0.3s, border-color 0.3s; }
+    body.light-mode .bottom-nav { background: #f8f4f0; border-top-color: #d4c5b0; }
     .page { display: none; height: 100%; overflow-y: auto; padding-bottom: 4px; }
     .page.active { display: block; }
     .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(145deg, #f7d875, #d9a441); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #141215; font-weight: bold; }
     .ring-card { background: #1f1b1e; border: 1px solid #f3c96b30; border-radius: 16px; padding: 12px; transition: all 0.3s; }
+    body.light-mode .ring-card { background: #ffffff; border-color: #d4c5b0; }
     .ring-card:hover { border-color: #f3c96b60; }
+    body.light-mode .ring-card:hover { border-color: #c4902a60; }
     .badge-gold { background: #f3c96b20; color: #f3c96b; padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; border: 1px solid #f3c96b40; }
+    body.light-mode .badge-gold { background: #c4902a20; color: #c4902a; border-color: #c4902a40; }
     .match-heart { color: #f3c96b; font-size: 1.2rem; }
+    body.light-mode .match-heart { color: #c4902a; }
     .profile-header { display: flex; justify-content: flex-end; align-items: center; padding-right: 4px; }
     .settings-gear { cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
     .settings-gear:hover { background: #2a2529; }
+    body.light-mode .settings-gear:hover { background: #e8e0d8; }
     .settings-gear svg { stroke: #f3c96b; }
+    body.light-mode .settings-gear svg { stroke: #c4902a; }
     .mt-auto { margin-top: auto; }
     .ring-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; text-align: left; font-size: 0.7rem; }
     .ring-btn { cursor: pointer; transition: all 0.2s; padding: 4px 12px; border-radius: 20px; border: 1px solid #f3c96b40; background: #f3c96b20; color: #f3c96b; font-size: 0.7rem; }
+    body.light-mode .ring-btn { border-color: #c4902a40; background: #c4902a20; color: #c4902a; }
     .ring-btn:hover { background: #f3c96b40; }
+    body.light-mode .ring-btn:hover { background: #c4902a40; }
     .ring-btn.ringed { opacity: 0.6; cursor: default; }
     .ring-btn.ringed:hover { background: #f3c96b20; }
-    .ring-btn.mutual { border-color: #f3c96b; background: #f3c96b30; }
+    body.light-mode .ring-btn.ringed:hover { background: #c4902a20; }
     .ghost-toggle {
       display: inline-flex;
       align-items: center;
@@ -80,8 +108,34 @@
       color: #f3c96b;
       font-size: 0.9rem;
     }
+    body.light-mode .ghost-toggle { background: #e8e0d8; color: #c4902a; border-color: #c4902a40; }
     .ghost-toggle:hover { background: #3a3539; }
+    body.light-mode .ghost-toggle:hover { background: #ddd5cd; }
     .ghost-toggle.active { border-color: #f3c96b; background: #f3c96b20; }
+    body.light-mode .ghost-toggle.active { border-color: #c4902a; background: #c4902a20; }
+    .text-dark { color: #1a1a1a; }
+    body.light-mode .text-dark { color: #1a1a1a; }
+    .bg-light-card { background: #f8f4f0; }
+    .border-light { border-color: #d4c5b0; }
+    .text-muted-light { color: #6b5e4e; }
+    body.light-mode .text-muted-light { color: #6b5e4e; }
+    .text-white-80 { color: rgba(255,255,255,0.8); }
+    body.light-mode .text-white-80 { color: rgba(0,0,0,0.8); }
+    .text-bg-light { color: #1a1a1a; }
+    body.light-mode .text-bg-light { color: #1a1a1a; }
+    .text-gold-light { color: #c4902a; }
+    .lang-btn { padding: 8px 14px; border-radius: 20px; border: 1px solid #f3c96b40; background: transparent; color: #f3c96b; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; }
+    body.light-mode .lang-btn { border-color: #c4902a40; color: #c4902a; }
+    .lang-btn:hover { background: #f3c96b20; }
+    body.light-mode .lang-btn:hover { background: #c4902a20; }
+    .lang-btn.active { background: #f3c96b30; border-color: #f3c96b; }
+    body.light-mode .lang-btn.active { background: #c4902a30; border-color: #c4902a; }
+    .setting-section { border-bottom: 1px solid #f3c96b20; padding-bottom: 12px; margin-bottom: 12px; }
+    body.light-mode .setting-section { border-bottom-color: #d4c5b0; }
+    .contact-link { color: #f3c96b; text-decoration: none; transition: color 0.2s; }
+    body.light-mode .contact-link { color: #c4902a; }
+    .contact-link:hover { color: #f7d875; }
+    body.light-mode .contact-link:hover { color: #d9a441; }
   </style>
 </head>
 <body>
@@ -89,8 +143,8 @@
 
   <!-- header -->
   <div id="mainHeader" class="flex items-center justify-between px-6 pt-5 pb-2 flex-shrink-0 hidden">
-    <span class="text-2xl font-light tracking-widest gold-text">✦ RING</span>
-    <span class="text-[10px] uppercase tracking-[0.2em] text-[#f3c96b99]">for me</span>
+    <span class="text-2xl font-light tracking-widest gold-text" data-i18n="app_name">✦ RING</span>
+    <span class="text-[10px] uppercase tracking-[0.2em] text-[#f3c96b99]" data-i18n="app_subtitle">for me</span>
   </div>
   <div id="headerLine" class="h-[2px] w-4/5 mx-auto gold-gradient opacity-50 rounded-full mb-2 hidden"></div>
 
@@ -103,54 +157,54 @@
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       </div>
-      <div class="text-xl gold-text tracking-widest">RING FOR ME</div>
+      <div class="text-xl gold-text tracking-widest" data-i18n="loading_title">RING FOR ME</div>
       <div class="w-12 h-12 border-4 border-[#f3c96b] border-t-transparent rounded-full animate-spin"></div>
     </div>
 
     <!-- login -->
     <div id="loginView" class="hidden flex flex-col justify-center h-full space-y-6 pt-4">
       <div class="text-4xl gold-text font-light tracking-wider text-center">✦ RING</div>
-      <div class="text-center text-[#f3c96b99] text-sm tracking-widest">sign in to your world</div>
+      <div class="text-center text-[#f3c96b99] text-sm tracking-widest" data-i18n="login_subtitle">sign in to your world</div>
       <div class="space-y-4 mt-2">
-        <input id="loginEmail" type="email" placeholder="Email address" class="text-white-important text-base" />
-        <input id="loginPassword" type="password" placeholder="Password" class="text-white-important text-base" />
-        <button id="loginBtn" class="btn-primary text-base">Sign In</button>
-        <button id="showSignupBtn" class="btn-secondary text-base">Create New Account →</button>
+        <input id="loginEmail" type="email" placeholder="Email address" class="text-white-important text-base" data-i18n-placeholder="login_email" />
+        <input id="loginPassword" type="password" placeholder="Password" class="text-white-important text-base" data-i18n-placeholder="login_password" />
+        <button id="loginBtn" class="btn-primary text-base" data-i18n="login_btn">Sign In</button>
+        <button id="showSignupBtn" class="btn-secondary text-base" data-i18n="signup_btn">Create New Account →</button>
       </div>
     </div>
 
     <!-- signup -->
     <div id="signupView" class="hidden flex-col justify-center h-full space-y-3 pt-2 overflow-y-auto no-scrollbar">
-      <div class="text-2xl gold-text font-light tracking-wider text-center">✦ create account</div>
+      <div class="text-2xl gold-text font-light tracking-wider text-center" data-i18n="signup_title">✦ create account</div>
       <div class="space-y-3">
-        <input id="signupName" type="text" placeholder="Full Name" class="text-white-important text-base" />
-        <input id="signupEmail" type="email" placeholder="Email address" class="text-white-important text-base" />
-        <input id="signupPassword" type="password" placeholder="Password (min 6 characters)" class="text-white-important text-base" />
-        <textarea id="signupBio" placeholder="Bio (tell us about yourself)" class="text-white-important text-base"></textarea>
-        <input id="signupAge" type="number" placeholder="Real Age" class="text-white-important text-base" />
+        <input id="signupName" type="text" placeholder="Full Name" class="text-white-important text-base" data-i18n-placeholder="signup_name" />
+        <input id="signupEmail" type="email" placeholder="Email address" class="text-white-important text-base" data-i18n-placeholder="signup_email" />
+        <input id="signupPassword" type="password" placeholder="Password (min 6 characters)" class="text-white-important text-base" data-i18n-placeholder="signup_password" />
+        <textarea id="signupBio" placeholder="Bio (tell us about yourself)" class="text-white-important text-base" data-i18n-placeholder="signup_bio"></textarea>
+        <input id="signupAge" type="number" placeholder="Real Age" class="text-white-important text-base" data-i18n-placeholder="signup_age" />
         <select id="signupGender" class="text-white-important text-base">
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Non-binary">Non-binary</option>
-          <option value="Prefer not to say">Prefer not to say</option>
+          <option value="" data-i18n="gender_select">Select Gender</option>
+          <option value="Male" data-i18n="gender_male">Male</option>
+          <option value="Female" data-i18n="gender_female">Female</option>
+          <option value="Non-binary" data-i18n="gender_nonbinary">Non-binary</option>
+          <option value="Prefer not to say" data-i18n="gender_prefer">Prefer not to say</option>
         </select>
-        <input id="signupHobbies" type="text" placeholder="Hobbies (e.g. reading, music)" class="text-white-important text-base" />
-        <input id="signupInterest" type="text" placeholder="Interests (e.g. art, travel)" class="text-white-important text-base" />
-        <input id="signupPlace" type="text" placeholder="Where do you belong?" class="text-white-important text-base" />
+        <input id="signupHobbies" type="text" placeholder="Hobbies (e.g. reading, music)" class="text-white-important text-base" data-i18n-placeholder="signup_hobbies" />
+        <input id="signupInterest" type="text" placeholder="Interests (e.g. art, travel)" class="text-white-important text-base" data-i18n-placeholder="signup_interests" />
+        <input id="signupPlace" type="text" placeholder="Where do you belong?" class="text-white-important text-base" data-i18n-placeholder="signup_place" />
         <div>
-          <div class="text-xs gold-text mb-2">Vibe Tags (select up to 4)</div>
+          <div class="text-xs gold-text mb-2" data-i18n="vibe_tags_label">Vibe Tags (select up to 4)</div>
           <div id="signupVibeTags" class="flex flex-wrap gap-2">
-            <span data-tag="romantic" class="chip cursor-pointer">romantic</span>
-            <span data-tag="playful" class="chip cursor-pointer">playful</span>
-            <span data-tag="cozy" class="chip cursor-pointer">cozy</span>
-            <span data-tag="adventurous" class="chip cursor-pointer">adventurous</span>
-            <span data-tag="chill" class="chip cursor-pointer">chill</span>
-            <span data-tag="nerdy" class="chip cursor-pointer">nerdy</span>
+            <span data-tag="romantic" class="chip cursor-pointer" data-i18n="tag_romantic">romantic</span>
+            <span data-tag="playful" class="chip cursor-pointer" data-i18n="tag_playful">playful</span>
+            <span data-tag="cozy" class="chip cursor-pointer" data-i18n="tag_cozy">cozy</span>
+            <span data-tag="adventurous" class="chip cursor-pointer" data-i18n="tag_adventurous">adventurous</span>
+            <span data-tag="chill" class="chip cursor-pointer" data-i18n="tag_chill">chill</span>
+            <span data-tag="nerdy" class="chip cursor-pointer" data-i18n="tag_nerdy">nerdy</span>
           </div>
         </div>
-        <button id="signupBtn" class="btn-primary text-base">Create Account</button>
-        <button id="backToLoginBtn" class="btn-secondary text-base">← Back to Sign In</button>
+        <button id="signupBtn" class="btn-primary text-base" data-i18n="create_account_btn">Create Account</button>
+        <button id="backToLoginBtn" class="btn-secondary text-base" data-i18n="back_login_btn">← Back to Sign In</button>
       </div>
     </div>
 
@@ -163,9 +217,9 @@
             <div class="flex items-center justify-between">
               <span class="text-sm gold-text">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"/></svg>
-                live radar
+                <span data-i18n="live_radar">live radar</span>
               </span>
-              <span id="scanStatus" class="text-xs text-[#6b5e4e]">scanning...</span>
+              <span id="scanStatus" class="text-xs text-[#6b5e4e]" data-i18n="scanning">scanning...</span>
             </div>
             <div class="relative flex justify-center my-2">
               <svg width="160" height="160" viewBox="0 0 160 160">
@@ -176,13 +230,13 @@
                 <g id="radarDots"></g>
               </svg>
             </div>
-            <button id="refreshProximity" class="btn-primary text-sm py-3">⟳ scan now</button>
+            <button id="refreshProximity" class="btn-primary text-sm py-3" data-i18n="scan_now">⟳ scan now</button>
           </div>
           <div id="nearbyList" class="space-y-2 max-h-[200px] overflow-y-auto no-scrollbar"></div>
           <div id="iceBreakerContainer" class="hidden glass-card p-3 rounded-2xl border border-[#f3c96b30]">
             <div class="text-xs gold-text mb-1">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              ice breaker
+              <span data-i18n="ice_breaker">ice breaker</span>
             </div>
             <div id="iceBreakerText" class="text-sm text-white-important"></div>
           </div>
@@ -192,7 +246,7 @@
         <div id="pageRinged" class="page space-y-3 pt-2">
           <div class="text-sm gold-text mb-1">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            people who ringed you
+            <span data-i18n="ring_history">ring history</span>
           </div>
           <div id="ringedList" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
         </div>
@@ -201,7 +255,7 @@
         <div id="pageHistory" class="page space-y-3 pt-2">
           <div class="text-sm gold-text mb-1">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            alarm history
+            <span data-i18n="alarm_history">alarm history</span>
           </div>
           <div id="alarmHistoryList" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
         </div>
@@ -266,95 +320,145 @@
       <div class="bottom-nav">
         <div class="nav-item" data-page="pageScan">
           <svg class="nav-icon active" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"/></svg>
-          <span class="nav-label active">Scan</span>
+          <span class="nav-label active" data-i18n="nav_scan">Scan</span>
         </div>
         <div class="nav-item" data-page="pageRinged">
           <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          <span class="nav-label">Ringed</span>
+          <span class="nav-label" data-i18n="nav_ringed">Ringed</span>
         </div>
         <div class="nav-item" data-page="pageHistory">
           <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span class="nav-label">History</span>
+          <span class="nav-label" data-i18n="nav_history">History</span>
         </div>
         <div class="nav-item" data-page="pageProfile">
           <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <span class="nav-label">Profile</span>
+          <span class="nav-label" data-i18n="nav_profile">Profile</span>
         </div>
       </div>
     </div>
 
     <!-- settings panel -->
-    <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col">
-      <div class="flex justify-between">
+    <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col overflow-y-auto">
+      <div class="flex justify-between flex-shrink-0">
         <span class="gold-text text-lg">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          settings
+          <span data-i18n="settings_title">settings</span>
         </span>
         <button id="closeSettings" class="text-[#f3c96b] text-xl">✕</button>
       </div>
       <div class="mt-4 space-y-4 flex-1 overflow-y-auto">
-        <div>
-          <span class="text-sm text-white-important">Alarm radius</span>
-          <select id="radiusSelect" class="text-white-important mt-1">
-            <option value="10">10m</option><option value="20" selected>20m</option><option value="50">50m</option>
-          </select>
-        </div>
-        <div>
-          <span class="text-sm text-white-important block mb-2">Ghost mode</span>
-          <div id="ghostToggle" class="ghost-toggle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-6 6c0 4 3 7 6 9 3-2 6-5 6-9a6 6 0 0 0-6-6z"/><circle cx="12" cy="9" r="2"/></svg>
-            <span id="ghostStatus">Off</span>
+        <!-- Light Mode -->
+        <div class="setting-section">
+          <span class="text-sm text-white-important block mb-2" data-i18n="light_mode">Light mode</span>
+          <div id="lightModeToggle" class="ghost-toggle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span id="lightModeStatus" data-i18n="off">Off</span>
           </div>
         </div>
-        <button id="editProfileBtn" class="btn-secondary text-sm">
+
+        <!-- Alarm Radius -->
+        <div class="setting-section">
+          <span class="text-sm text-white-important block mb-2" data-i18n="alarm_radius">Alarm radius</span>
+          <select id="radiusSelect" class="text-white-important mt-1">
+            <option value="10" data-i18n="radius_10">10m</option>
+            <option value="20" selected data-i18n="radius_20">20m</option>
+            <option value="50" data-i18n="radius_50">50m</option>
+          </select>
+        </div>
+
+        <!-- Ghost Mode -->
+        <div class="setting-section">
+          <span class="text-sm text-white-important block mb-2" data-i18n="ghost_mode">Ghost mode</span>
+          <div id="ghostToggle" class="ghost-toggle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-6 6c0 4 3 7 6 9 3-2 6-5 6-9a6 6 0 0 0-6-6z"/><circle cx="12" cy="9" r="2"/></svg>
+            <span id="ghostStatus" data-i18n="off">Off</span>
+          </div>
+        </div>
+
+        <!-- Language -->
+        <div class="setting-section">
+          <span class="text-sm text-white-important block mb-2" data-i18n="language">Language</span>
+          <div id="languageOptions" class="flex flex-wrap gap-2">
+            <button class="lang-btn active" data-lang="en">English</button>
+            <button class="lang-btn" data-lang="hi">हिन्दी</button>
+            <button class="lang-btn" data-lang="zh">中文</button>
+            <button class="lang-btn" data-lang="ko">한국어</button>
+            <button class="lang-btn" data-lang="ja">日本語</button>
+            <button class="lang-btn" data-lang="gu">ગુજરાતી</button>
+            <button class="lang-btn" data-lang="bn">বাংলা</button>
+            <button class="lang-btn" data-lang="ur">اردو</button>
+          </div>
+        </div>
+
+        <!-- Contact Us -->
+        <div class="setting-section">
+          <span class="text-sm text-white-important block mb-2" data-i18n="contact_us">Contact us</span>
+          <div class="space-y-2 text-sm">
+            <div class="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <a href="mailto:Support.stardustofficial@gmail.com" class="contact-link">Support.stardustofficial@gmail.com</a>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2"><path d="M4 4l11.73 16h.27L20 4"/><path d="M4 20l11.73-16h.27L20 20"/></svg>
+              <a href="https://twitter.com/zishanstardust" target="_blank" class="contact-link">@zishanstardust</a>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+              <a href="https://github.com/stardustofficial" target="_blank" class="contact-link">@stardustofficial</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Profile -->
+        <button id="editProfileBtn" class="btn-secondary text-sm" data-i18n="edit_profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit Profile
+          <span data-i18n="edit_profile">Edit Profile</span>
         </button>
-        <button id="privacyPolicyBtn" class="btn-secondary text-sm">
+        <button id="privacyPolicyBtn" class="btn-secondary text-sm" data-i18n="privacy_policy">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-          Privacy Policy
+          <span data-i18n="privacy_policy">Privacy Policy</span>
         </button>
-        <button id="termsServiceBtn" class="btn-secondary text-sm">
+        <button id="termsServiceBtn" class="btn-secondary text-sm" data-i18n="terms_service">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          Terms of Service
+          <span data-i18n="terms_service">Terms of Service</span>
         </button>
         <div class="mt-auto pt-4 border-t border-[#f3c96b20] space-y-3">
-          <button id="deleteAccountBtn" class="btn-danger text-sm">
+          <button id="deleteAccountBtn" class="btn-danger text-sm" data-i18n="delete_account">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" class="inline"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-            Delete Account
+            <span data-i18n="delete_account">Delete Account</span>
           </button>
-          <button id="logoutBtn" class="btn-secondary text-sm">
+          <button id="logoutBtn" class="btn-secondary text-sm" data-i18n="sign_out">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Sign Out
+            <span data-i18n="sign_out">Sign Out</span>
           </button>
         </div>
       </div>
     </div>
 
     <!-- edit profile panel -->
-    <div id="editProfilePanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col">
-      <div class="flex justify-between">
+    <div id="editProfilePanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col overflow-y-auto">
+      <div class="flex justify-between flex-shrink-0">
         <span class="gold-text text-lg">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          Edit Profile
+          <span data-i18n="edit_profile_title">Edit Profile</span>
         </span>
         <button id="closeEditProfile" class="text-[#f3c96b] text-xl">✕</button>
       </div>
       <div class="mt-4 space-y-3 flex-1 overflow-y-auto">
-        <input id="editName" type="text" placeholder="Full Name" class="text-white-important text-base" />
-        <textarea id="editBio" placeholder="Bio" class="text-white-important text-base"></textarea>
-        <input id="editAge" type="number" placeholder="Real Age" class="text-white-important text-base" />
+        <input id="editName" type="text" placeholder="Full Name" class="text-white-important text-base" data-i18n-placeholder="signup_name" />
+        <textarea id="editBio" placeholder="Bio" class="text-white-important text-base" data-i18n-placeholder="signup_bio"></textarea>
+        <input id="editAge" type="number" placeholder="Real Age" class="text-white-important text-base" data-i18n-placeholder="signup_age" />
         <select id="editGender" class="text-white-important text-base">
-          <option value="">Select Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Non-binary">Non-binary</option>
-          <option value="Prefer not to say">Prefer not to say</option>
+          <option value="" data-i18n="gender_select">Select Gender</option>
+          <option value="Male" data-i18n="gender_male">Male</option>
+          <option value="Female" data-i18n="gender_female">Female</option>
+          <option value="Non-binary" data-i18n="gender_nonbinary">Non-binary</option>
+          <option value="Prefer not to say" data-i18n="gender_prefer">Prefer not to say</option>
         </select>
-        <input id="editHobbies" type="text" placeholder="Hobbies" class="text-white-important text-base" />
-        <input id="editInterest" type="text" placeholder="Interests" class="text-white-important text-base" />
-        <input id="editPlace" type="text" placeholder="Where do you belong?" class="text-white-important text-base" />
-        <button id="saveEditProfile" class="btn-primary text-base">Save Changes</button>
+        <input id="editHobbies" type="text" placeholder="Hobbies" class="text-white-important text-base" data-i18n-placeholder="signup_hobbies" />
+        <input id="editInterest" type="text" placeholder="Interests" class="text-white-important text-base" data-i18n-placeholder="signup_interests" />
+        <input id="editPlace" type="text" placeholder="Where do you belong?" class="text-white-important text-base" data-i18n-placeholder="signup_place" />
+        <button id="saveEditProfile" class="btn-primary text-base" data-i18n="save_changes">Save Changes</button>
       </div>
     </div>
 
@@ -393,19 +497,196 @@
 
 <script>
   (function() {
-    const firebaseConfig = {
-      apiKey: "AIzaSyBFGRsd1jTYLJKFzlJBuRo2t92A7XiSeDQ",
-      authDomain: "ring-for-me.firebaseapp.com",
-      projectId: "ring-for-me",
-      storageBucket: "ring-for-me.firebasestorage.app",
-      messagingSenderId: "739955467931",
-      appId: "1:739955467931:web:8dab49d87e5ce811e9483e",
-      measurementId: "G-27MMETQ5J7"
+    // ============ TRANSLATIONS ============
+    const translations = {
+      en: {
+        app_name: "✦ RING", app_subtitle: "for me", loading_title: "RING FOR ME",
+        login_subtitle: "sign in to your world", login_email: "Email address",
+        login_password: "Password", login_btn: "Sign In", signup_btn: "Create New Account →",
+        signup_title: "✦ create account", signup_name: "Full Name", signup_email: "Email address",
+        signup_password: "Password (min 6 characters)", signup_bio: "Bio (tell us about yourself)",
+        signup_age: "Real Age", gender_select: "Select Gender", gender_male: "Male",
+        gender_female: "Female", gender_nonbinary: "Non-binary", gender_prefer: "Prefer not to say",
+        signup_hobbies: "Hobbies (e.g. reading, music)", signup_interests: "Interests (e.g. art, travel)",
+        signup_place: "Where do you belong?", vibe_tags_label: "Vibe Tags (select up to 4)",
+        tag_romantic: "romantic", tag_playful: "playful", tag_cozy: "cozy",
+        tag_adventurous: "adventurous", tag_chill: "chill", tag_nerdy: "nerdy",
+        create_account_btn: "Create Account", back_login_btn: "← Back to Sign In",
+        live_radar: "live radar", scanning: "scanning...", scan_now: "⟳ scan now",
+        ice_breaker: "ice breaker", ring_history: "ring history", alarm_history: "alarm history",
+        nav_scan: "Scan", nav_ringed: "Ringed", nav_history: "History", nav_profile: "Profile",
+        settings_title: "settings", light_mode: "Light mode", off: "Off", on: "On",
+        alarm_radius: "Alarm radius", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "Ghost mode", language: "Language", contact_us: "Contact us",
+        edit_profile: "Edit Profile", privacy_policy: "Privacy Policy", terms_service: "Terms of Service",
+        delete_account: "Delete Account", sign_out: "Sign Out", edit_profile_title: "Edit Profile",
+        save_changes: "Save Changes"
+      },
+      hi: {
+        app_name: "✦ रिंग", app_subtitle: "मेरे लिए", loading_title: "रिंग फॉर मी",
+        login_subtitle: "अपनी दुनिया में साइन इन करें", login_email: "ईमेल पता",
+        login_password: "पासवर्ड", login_btn: "साइन इन", signup_btn: "नया खाता बनाएं →",
+        signup_title: "✦ खाता बनाएं", signup_name: "पूरा नाम", signup_email: "ईमेल पता",
+        signup_password: "पासवर्ड (कम से कम 6 अक्षर)", signup_bio: "जीवनी (अपने बारे में बताएं)",
+        signup_age: "वास्तविक आयु", gender_select: "लिंग चुनें", gender_male: "पुरुष",
+        gender_female: "महिला", gender_nonbinary: "गैर-बाइनरी", gender_prefer: "नहीं बताना चाहते",
+        signup_hobbies: "शौक (जैसे पढ़ना, संगीत)", signup_interests: "रुचियां (जैसे कला, यात्रा)",
+        signup_place: "आप कहाँ से हैं?", vibe_tags_label: "वाइब टैग (अधिकतम 4 चुनें)",
+        tag_romantic: "रोमांटिक", tag_playful: "चंचल", tag_cozy: "आरामदायक",
+        tag_adventurous: "साहसी", tag_chill: "शांत", tag_nerdy: "बुद्धिमान",
+        create_account_btn: "खाता बनाएं", back_login_btn: "← साइन इन पर वापस जाएं",
+        live_radar: "लाइव रडार", scanning: "स्कैन हो रहा...", scan_now: "⟳ अभी स्कैन करें",
+        ice_breaker: "बातचीत शुरू करें", ring_history: "रिंग इतिहास", alarm_history: "अलार्म इतिहास",
+        nav_scan: "स्कैन", nav_ringed: "रिंगेड", nav_history: "इतिहास", nav_profile: "प्रोफ़ाइल",
+        settings_title: "सेटिंग्स", light_mode: "लाइट मोड", off: "बंद", on: "चालू",
+        alarm_radius: "अलार्म दायरा", radius_10: "10मी", radius_20: "20मी", radius_50: "50मी",
+        ghost_mode: "गोस्ट मोड", language: "भाषा", contact_us: "संपर्क करें",
+        edit_profile: "प्रोफ़ाइल संपादित करें", privacy_policy: "गोपनीयता नीति", terms_service: "सेवा की शर्तें",
+        delete_account: "खाता हटाएं", sign_out: "साइन आउट", edit_profile_title: "प्रोफ़ाइल संपादित करें",
+        save_changes: "परिवर्तन सहेजें"
+      },
+      zh: {
+        app_name: "✦ 铃声", app_subtitle: "为我", loading_title: "为我响起",
+        login_subtitle: "登录你的世界", login_email: "电子邮箱",
+        login_password: "密码", login_btn: "登录", signup_btn: "创建新账号 →",
+        signup_title: "✦ 创建账号", signup_name: "全名", signup_email: "电子邮箱",
+        signup_password: "密码（至少6个字符）", signup_bio: "个人简介（介绍一下你自己）",
+        signup_age: "真实年龄", gender_select: "选择性别", gender_male: "男",
+        gender_female: "女", gender_nonbinary: "非二元", gender_prefer: "不愿透露",
+        signup_hobbies: "爱好（如阅读、音乐）", signup_interests: "兴趣（如艺术、旅行）",
+        signup_place: "你来自哪里？", vibe_tags_label: "氛围标签（最多选4个）",
+        tag_romantic: "浪漫", tag_playful: "俏皮", tag_cozy: "舒适",
+        tag_adventurous: "冒险", tag_chill: "放松", tag_nerdy: "书呆子",
+        create_account_btn: "创建账号", back_login_btn: "← 返回登录",
+        live_radar: "实时雷达", scanning: "扫描中...", scan_now: "⟳ 立即扫描",
+        ice_breaker: "破冰话题", ring_history: "铃声历史", alarm_history: "闹钟历史",
+        nav_scan: "扫描", nav_ringed: "已响", nav_history: "历史", nav_profile: "个人资料",
+        settings_title: "设置", light_mode: "亮色模式", off: "关", on: "开",
+        alarm_radius: "闹钟半径", radius_10: "10米", radius_20: "20米", radius_50: "50米",
+        ghost_mode: "隐身模式", language: "语言", contact_us: "联系我们",
+        edit_profile: "编辑资料", privacy_policy: "隐私政策", terms_service: "服务条款",
+        delete_account: "删除账号", sign_out: "退出登录", edit_profile_title: "编辑资料",
+        save_changes: "保存更改"
+      },
+      ko: {
+        app_name: "✦ 링", app_subtitle: "나를 위해", loading_title: "링 포 미",
+        login_subtitle: "당신의 세계에 로그인", login_email: "이메일 주소",
+        login_password: "비밀번호", login_btn: "로그인", signup_btn: "새 계정 만들기 →",
+        signup_title: "✦ 계정 만들기", signup_name: "이름", signup_email: "이메일 주소",
+        signup_password: "비밀번호 (최소 6자)", signup_bio: "자기소개",
+        signup_age: "나이", gender_select: "성별 선택", gender_male: "남성",
+        gender_female: "여성", gender_nonbinary: "논바이너리", gender_prefer: "말하고 싶지 않음",
+        signup_hobbies: "취미 (예: 독서, 음악)", signup_interests: "관심사 (예: 예술, 여행)",
+        signup_place: "어디 출신인가요?", vibe_tags_label: "바이브 태그 (최대 4개 선택)",
+        tag_romantic: "로맨틱", tag_playful: "장난기", tag_cozy: "아늑한",
+        tag_adventurous: "모험심", tag_chill: "편안한", tag_nerdy: "덕후",
+        create_account_btn: "계정 만들기", back_login_btn: "← 로그인으로 돌아가기",
+        live_radar: "실시간 레이더", scanning: "스캔 중...", scan_now: "⟳ 지금 스캔",
+        ice_breaker: "아이스브레이커", ring_history: "링 기록", alarm_history: "알람 기록",
+        nav_scan: "스캔", nav_ringed: "링됨", nav_history: "기록", nav_profile: "프로필",
+        settings_title: "설정", light_mode: "라이트 모드", off: "끄기", on: "켜기",
+        alarm_radius: "알람 반경", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "고스트 모드", language: "언어", contact_us: "문의하기",
+        edit_profile: "프로필 수정", privacy_policy: "개인정보처리방침", terms_service: "서비스 이용약관",
+        delete_account: "계정 삭제", sign_out: "로그아웃", edit_profile_title: "프로필 수정",
+        save_changes: "변경사항 저장"
+      },
+      ja: {
+        app_name: "✦ リング", app_subtitle: "私のために", loading_title: "リング・フォー・ミー",
+        login_subtitle: "あなたの世界にサインイン", login_email: "メールアドレス",
+        login_password: "パスワード", login_btn: "サインイン", signup_btn: "新規アカウント作成 →",
+        signup_title: "✦ アカウント作成", signup_name: "フルネーム", signup_email: "メールアドレス",
+        signup_password: "パスワード（6文字以上）", signup_bio: "自己紹介",
+        signup_age: "年齢", gender_select: "性別を選択", gender_male: "男性",
+        gender_female: "女性", gender_nonbinary: "ノンバイナリー", gender_prefer: "答えたくない",
+        signup_hobbies: "趣味（例：読書、音楽）", signup_interests: "興味（例：アート、旅行）",
+        signup_place: "出身はどこですか？", vibe_tags_label: "バイブタグ（最大4つ選択）",
+        tag_romantic: "ロマンチック", tag_playful: "遊び心", tag_cozy: "居心地が良い",
+        tag_adventurous: "冒険心", tag_chill: "リラックス", tag_nerdy: "オタク",
+        create_account_btn: "アカウント作成", back_login_btn: "← サインインに戻る",
+        live_radar: "ライブレーダー", scanning: "スキャン中...", scan_now: "⟳ 今すぐスキャン",
+        ice_breaker: "アイスブレイカー", ring_history: "リング履歴", alarm_history: "アラーム履歴",
+        nav_scan: "スキャン", nav_ringed: "リング済み", nav_history: "履歴", nav_profile: "プロフィール",
+        settings_title: "設定", light_mode: "ライトモード", off: "オフ", on: "オン",
+        alarm_radius: "アラーム半径", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "ゴーストモード", language: "言語", contact_us: "お問い合わせ",
+        edit_profile: "プロフィール編集", privacy_policy: "プライバシーポリシー", terms_service: "利用規約",
+        delete_account: "アカウント削除", sign_out: "サインアウト", edit_profile_title: "プロフィール編集",
+        save_changes: "変更を保存"
+      },
+      gu: {
+        app_name: "✦ રિંગ", app_subtitle: "મારા માટે", loading_title: "રિંગ ફોર મી",
+        login_subtitle: "તમારી દુનિયામાં સાઇન ઇન કરો", login_email: "ઇમેઇલ સરનામું",
+        login_password: "પાસવર્ડ", login_btn: "સાઇન ઇન", signup_btn: "નવું ખાતું બનાવો →",
+        signup_title: "✦ ખાતું બનાવો", signup_name: "પૂરું નામ", signup_email: "ઇમેઇલ સરનામું",
+        signup_password: "પાસવર્ડ (ઓછામાં ઓછા 6 અક્ષરો)", signup_bio: "જીવનકથા (તમારા વિશે જણાવો)",
+        signup_age: "વાસ્તવિક ઉંમર", gender_select: "લિંગ પસંદ કરો", gender_male: "પુરુષ",
+        gender_female: "સ્ત્રી", gender_nonbinary: "નોન-બાઇનરી", gender_prefer: "કહેવું નથી ઇચ્છતા",
+        signup_hobbies: "શોખ (દા.ત. વાંચન, સંગીત)", signup_interests: "રુચિઓ (દા.ત. કળા, મુસાફરી)",
+        signup_place: "તમે ક્યાંના છો?", vibe_tags_label: "વાઇબ ટૅગ્સ (અધિકતમ 4 પસંદ કરો)",
+        tag_romantic: "રોમેન્ટિક", tag_playful: "ચંચળ", tag_cozy: "આરામદાયક",
+        tag_adventurous: "સાહસિક", tag_chill: "શાંત", tag_nerdy: "વિદ્વાન",
+        create_account_btn: "ખાતું બનાવો", back_login_btn: "← સાઇન ઇન પર પાછા જાઓ",
+        live_radar: "લાઇવ રડાર", scanning: "સ્કેન થઈ રહ્યું...", scan_now: "⟳ હવે સ્કેન કરો",
+        ice_breaker: "વાતચીત શરૂ કરો", ring_history: "રિંગ ઇતિહાસ", alarm_history: "અલાર્મ ઇતિહાસ",
+        nav_scan: "સ્કેન", nav_ringed: "રિંગ્ડ", nav_history: "ઇતિહાસ", nav_profile: "પ્રોફાઇલ",
+        settings_title: "સેટિંગ્સ", light_mode: "લાઇટ મોડ", off: "બંધ", on: "ચાલુ",
+        alarm_radius: "અલાર્મ ત્રિજ્યા", radius_10: "10મી", radius_20: "20મી", radius_50: "50મી",
+        ghost_mode: "ઘોસ્ટ મોડ", language: "ભાષા", contact_us: "સંપર્ક કરો",
+        edit_profile: "પ્રોફાઇલ સંપાદિત કરો", privacy_policy: "ગોપનીયતા નીતિ", terms_service: "સેવાની શરતો",
+        delete_account: "ખાતું કાઢી નાખો", sign_out: "સાઇન આઉટ", edit_profile_title: "પ્રોફાઇલ સંપાદિત કરો",
+        save_changes: "ફેરફારો સાચવો"
+      },
+      bn: {
+        app_name: "✦ রিং", app_subtitle: "আমার জন্য", loading_title: "রিং ফর মি",
+        login_subtitle: "আপনার জগতে সাইন ইন করুন", login_email: "ইমেইল ঠিকানা",
+        login_password: "পাসওয়ার্ড", login_btn: "সাইন ইন", signup_btn: "নতুন অ্যাকাউন্ট তৈরি করুন →",
+        signup_title: "✦ অ্যাকাউন্ট তৈরি করুন", signup_name: "পুরো নাম", signup_email: "ইমেইল ঠিকানা",
+        signup_password: "পাসওয়ার্ড (কমপক্ষে 6 অক্ষর)", signup_bio: "জীবনী (আপনার সম্পর্কে বলুন)",
+        signup_age: "প্রকৃত বয়স", gender_select: "লিঙ্গ নির্বাচন করুন", gender_male: "পুরুষ",
+        gender_female: "মহিলা", gender_nonbinary: "নন-বাইনারী", gender_prefer: "বলতে চাই না",
+        signup_hobbies: "শখ (যেমন পড়া, সঙ্গীত)", signup_interests: "আগ্রহ (যেমন শিল্প, ভ্রমণ)",
+        signup_place: "আপনি কোথা থেকে?", vibe_tags_label: "ভাইব ট্যাগ (সর্বোচ্চ 4টি নির্বাচন করুন)",
+        tag_romantic: "রোমান্টিক", tag_playful: "চঞ্চল", tag_cozy: "আরামদায়ক",
+        tag_adventurous: "দুঃসাহসিক", tag_chill: "শান্ত", tag_nerdy: "বুদ্ধিমান",
+        create_account_btn: "অ্যাকাউন্ট তৈরি করুন", back_login_btn: "← সাইন ইন-এ ফিরে যান",
+        live_radar: "লাইভ রাডার", scanning: "স্ক্যান করা হচ্ছে...", scan_now: "⟳ এখন স্ক্যান করুন",
+        ice_breaker: "আলোচনা শুরু করুন", ring_history: "রিং ইতিহাস", alarm_history: "অ্যালার্ম ইতিহাস",
+        nav_scan: "স্ক্যান", nav_ringed: "রিংড", nav_history: "ইতিহাস", nav_profile: "প্রোফাইল",
+        settings_title: "সেটিংস", light_mode: "লাইট মোড", off: "বন্ধ", on: "চালু",
+        alarm_radius: "অ্যালার্ম ব্যাসার্ধ", radius_10: "১০মি", radius_20: "২০মি", radius_50: "৫০মি",
+        ghost_mode: "ঘোস্ট মোড", language: "ভাষা", contact_us: "যোগাযোগ করুন",
+        edit_profile: "প্রোফাইল সম্পাদনা করুন", privacy_policy: "গোপনীয়তা নীতি", terms_service: "সেবার শর্তাবলী",
+        delete_account: "অ্যাকাউন্ট মুছুন", sign_out: "সাইন আউট", edit_profile_title: "প্রোফাইল সম্পাদনা করুন",
+        save_changes: "পরিবর্তন সংরক্ষণ করুন"
+      },
+      ur: {
+        app_name: "✦ رنگ", app_subtitle: "میرے لیے", loading_title: "رنگ فار می",
+        login_subtitle: "اپنی دنیا میں سائن ان کریں", login_email: "ای میل پتہ",
+        login_password: "پاس ورڈ", login_btn: "سائن ان", signup_btn: "نیا اکاؤنٹ بنائیں →",
+        signup_title: "✦ اکاؤنٹ بنائیں", signup_name: "پورا نام", signup_email: "ای میل پتہ",
+        signup_password: "پاس ورڈ (کم از کم 6 حروف)", signup_bio: "سوانح (اپنے بارے میں بتائیں)",
+        signup_age: "اصل عمر", gender_select: "صنف منتخب کریں", gender_male: "مرد",
+        gender_female: "خاتون", gender_nonbinary: "نان بائنری", gender_prefer: "نہیں بتانا چاہتے",
+        signup_hobbies: "شوق (مثال: پڑھنا، موسیقی)", signup_interests: "دلچسپیاں (مثال: آرٹ، سفر)",
+        signup_place: "آپ کہاں سے ہیں؟", vibe_tags_label: "وائب ٹیگز (زیادہ سے زیادہ 4 منتخب کریں)",
+        tag_romantic: "رومانٹک", tag_playful: "چنچل", tag_cozy: "آرام دہ",
+        tag_adventurous: "مہم جو", tag_chill: "پرسکون", tag_nerdy: "ذہین",
+        create_account_btn: "اکاؤنٹ بنائیں", back_login_btn: "← سائن ان پر واپس جائیں",
+        live_radar: "لائیو ریڈار", scanning: "اسکین ہو رہا...", scan_now: "⟳ ابھی اسکین کریں",
+        ice_breaker: "گفتگو شروع کریں", ring_history: "رنگ تاریخ", alarm_history: "الارم تاریخ",
+        nav_scan: "اسکین", nav_ringed: "رنگڈ", nav_history: "تاریخ", nav_profile: "پروفائل",
+        settings_title: "ترتیبات", light_mode: "لائٹ موڈ", off: "بند", on: "آن",
+        alarm_radius: "الارم کا دائرہ", radius_10: "10م", radius_20: "20م", radius_50: "50م",
+        ghost_mode: "گوسٹ موڈ", language: "زبان", contact_us: "رابطہ کریں",
+        edit_profile: "پروفائل میں ترمیم کریں", privacy_policy: "رازداری کی پالیسی", terms_service: "خدمت کی شرائط",
+        delete_account: "اکاؤنٹ حذف کریں", sign_out: "سائن آؤٹ", edit_profile_title: "پروفائل میں ترمیم کریں",
+        save_changes: "تبدیلیاں محفوظ کریں"
+      }
     };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
 
+    let currentLang = 'en';
+    let lightMode = false;
     let currentUser = null, myUID = null, watchId = null;
     let selectedVibes = [], nearbyUsers = [], alarmHistory = [];
     let alarmTimer = null;
@@ -416,7 +697,31 @@
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
-    // DOM refs
+    // ============ I18N FUNCTIONS ============
+    function translate(key) {
+      return translations[currentLang] && translations[currentLang][key] ? translations[currentLang][key] : key;
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = translate(key);
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.placeholder = translate(key);
+      });
+      document.querySelectorAll('[data-i18n-value]').forEach(el => {
+        const key = el.getAttribute('data-i18n-value');
+        el.value = translate(key);
+      });
+      // Update language buttons
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+      });
+    }
+
+    // ============ DOM REFS ============
     const loadingView = $('loadingView'), loginView = $('loginView'), signupView = $('signupView');
     const pagesContainer = $('pagesContainer'), mainHeader = $('mainHeader'), headerLine = $('headerLine');
     const loginEmail = $('loginEmail'), loginPassword = $('loginPassword'), loginBtn = $('loginBtn');
@@ -446,6 +751,84 @@
     const saveEditProfile = $('saveEditProfile'), editProfileBtn = $('editProfileBtn');
     const privacyPolicyBtn = $('privacyPolicyBtn'), termsServiceBtn = $('termsServiceBtn');
     const ghostToggle = $('ghostToggle'), ghostStatus = $('ghostStatus');
+    const lightModeToggle = $('lightModeToggle'), lightModeStatus = $('lightModeStatus');
+
+    // ============ LIGHT MODE ============
+    function toggleLightMode() {
+      lightMode = !lightMode;
+      document.body.classList.toggle('light-mode', lightMode);
+      localStorage.setItem('ring_light_mode', lightMode ? 'on' : 'off');
+      lightModeStatus.textContent = translate(lightMode ? 'on' : 'off');
+      lightModeToggle.classList.toggle('active', lightMode);
+    }
+
+    // Load light mode preference
+    const savedLightMode = localStorage.getItem('ring_light_mode');
+    if (savedLightMode === 'on') {
+      lightMode = true;
+      document.body.classList.add('light-mode');
+      lightModeStatus.textContent = translate('on');
+      lightModeToggle.classList.add('active');
+    }
+
+    lightModeToggle.addEventListener('click', toggleLightMode);
+
+    // ============ LANGUAGE ============
+    function setLanguage(lang) {
+      if (translations[lang]) {
+        currentLang = lang;
+        localStorage.setItem('ring_language', lang);
+        applyTranslations();
+        // Update UI texts that need refresh
+        if (lightModeStatus) lightModeStatus.textContent = translate(lightMode ? 'on' : 'off');
+        if (ghostStatus) ghostStatus.textContent = translate(isGhostMode ? 'on' : 'off');
+      }
+    }
+
+    // Load language preference
+    const savedLang = localStorage.getItem('ring_language');
+    if (savedLang && translations[savedLang]) {
+      currentLang = savedLang;
+    }
+    applyTranslations();
+
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        setLanguage(this.dataset.lang);
+      });
+    });
+
+    // ============ GHOST MODE ============
+    ghostToggle.addEventListener('click', function() {
+      isGhostMode = !isGhostMode;
+      this.classList.toggle('active');
+      ghostStatus.textContent = translate(isGhostMode ? 'on' : 'off');
+      if (isGhostMode && myUID) {
+        db.ref('users/' + myUID + '/lat').remove();
+        db.ref('users/' + myUID + '/lng').remove();
+        db.ref('users/' + myUID + '/ghost').set(true);
+      } else if (myUID) {
+        db.ref('users/' + myUID + '/ghost').set(false);
+        if (currentUser && currentUser.lat && currentUser.lng) {
+          db.ref('users/' + myUID + '/lat').set(currentUser.lat);
+          db.ref('users/' + myUID + '/lng').set(currentUser.lng);
+        }
+      }
+    });
+
+    // ============ FIREBASE ============
+    const firebaseConfig = {
+      apiKey: "AIzaSyBFGRsd1jTYLJKFzlJBuRo2t92A7XiSeDQ",
+      authDomain: "ring-for-me.firebaseapp.com",
+      projectId: "ring-for-me",
+      storageBucket: "ring-for-me.firebasestorage.app",
+      messagingSenderId: "739955467931",
+      appId: "1:739955467931:web:8dab49d87e5ce811e9483e",
+      measurementId: "G-27MMETQ5J7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const auth = firebase.auth();
 
     function showView(view) {
       [loadingView, loginView, signupView, pagesContainer].forEach(v => v.classList.add('hidden'));
@@ -475,24 +858,6 @@
       el.addEventListener('click', () => navigateTo(el.dataset.page));
     });
 
-    // Ghost mode toggle
-    ghostToggle.addEventListener('click', function() {
-      isGhostMode = !isGhostMode;
-      this.classList.toggle('active');
-      ghostStatus.textContent = isGhostMode ? 'On' : 'Off';
-      if (isGhostMode && myUID) {
-        db.ref('users/' + myUID + '/lat').remove();
-        db.ref('users/' + myUID + '/lng').remove();
-        db.ref('users/' + myUID + '/ghost').set(true);
-      } else if (myUID) {
-        db.ref('users/' + myUID + '/ghost').set(false);
-        if (currentUser && currentUser.lat && currentUser.lng) {
-          db.ref('users/' + myUID + '/lat').set(currentUser.lat);
-          db.ref('users/' + myUID + '/lng').set(currentUser.lng);
-        }
-      }
-    });
-
     // Auth
     auth.onAuthStateChanged(async user => {
       if (user) {
@@ -503,7 +868,7 @@
           currentUser = data; currentUser.uid = myUID;
           isGhostMode = data.ghost || false;
           if (isGhostMode) {
-            ghostStatus.textContent = 'On';
+            ghostStatus.textContent = translate('on');
             ghostToggle.classList.add('active');
           }
           showView(pagesContainer);
@@ -535,16 +900,12 @@
         if (otherUid === myUID) return;
         if (snap.val() === true) {
           mutualRings[otherUid] = true;
-          const userSnap = await db.ref('users/' + otherUid).once('value');
-          const user = userSnap.val();
-          if (user && !isAlarmActive) {
-            showAlarmWithFullDetails(user, true);
-          }
+          loadRinged();
         }
       });
     }
 
-    // ============ RING LISTENER - ONLY FOR INCOMING RINGS ============
+    // ============ RING LISTENER ============
     function listenForRings() {
       if (!myUID) return;
       const ringRef = db.ref('rings/' + myUID);
@@ -553,17 +914,8 @@
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
-          // Check if already processed
-          const key = fromUid + '_' + Date.now();
-          if (processedRingKeys.has(fromUid)) {
-            return;
-          }
+          if (processedRingKeys.has(fromUid)) return;
           processedRingKeys.add(fromUid);
-          
-          // Check if mutual
-          if (mutualRings[fromUid]) {
-            return;
-          }
           
           const userSnap = await db.ref('users/' + fromUid).once('value');
           const user = userSnap.val();
@@ -572,32 +924,33 @@
             const myRingSnap = await myRingRef.once('value');
             const iRangThem = myRingSnap.val() === true;
             
-            if (iRangThem) {
+            if (iRangThem && !mutualRings[fromUid]) {
               await db.ref('mutualRings/' + myUID + '/' + fromUid).set(true);
               await db.ref('mutualRings/' + fromUid + '/' + myUID).set(true);
               mutualRings[fromUid] = true;
+              loadRinged();
             }
             
-            dismissAlarm();
-            showAlarmWithFullDetails(user, iRangThem);
-            
-            alarmHistory.push({ 
-              name: user.name, 
-              time: new Date().toLocaleTimeString(), 
-              dist: 'incoming ring',
-              isMutual: iRangThem 
-            });
-            loadHistory();
-            
-            if (iRangThem) {
-              alarmMutualBadge.classList.remove('hidden');
-              if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+            // Only show alarm if this is an incoming ring (someone rang me)
+            if (!iRangThem || mutualRings[fromUid]) {
+              dismissAlarm();
+              showAlarmWithFullDetails(user, mutualRings[fromUid] || false);
+              
+              alarmHistory.push({ 
+                name: user.name, 
+                time: new Date().toLocaleTimeString(), 
+                dist: 'incoming ring',
+                isMutual: mutualRings[fromUid] || false
+              });
+              loadHistory();
+              
+              if (mutualRings[fromUid]) {
+                alarmMutualBadge.classList.remove('hidden');
+                if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+              }
             }
             
-            // Clear from processed after 5 seconds
-            setTimeout(() => {
-              processedRingKeys.delete(fromUid);
-            }, 5000);
+            setTimeout(() => { processedRingKeys.delete(fromUid); }, 5000);
           }
         }
       });
@@ -631,9 +984,7 @@
       if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
       
       clearTimeout(alarmTimer);
-      alarmTimer = setTimeout(() => {
-        dismissAlarm();
-      }, 30000);
+      alarmTimer = setTimeout(() => { dismissAlarm(); }, 30000);
     }
 
     function dismissAlarm() {
@@ -646,6 +997,7 @@
       clearTimeout(alarmTimer);
     }
 
+    // ============ LOGIN / SIGNUP ============
     loginBtn.addEventListener('click', async () => {
       try { await auth.signInWithEmailAndPassword(loginEmail.value.trim(), loginPassword.value.trim()); }
       catch(e) { alert('Login failed: ' + e.message); }
@@ -716,12 +1068,8 @@
     }
 
     // Edit profile
-    editProfileBtn.addEventListener('click', () => {
-      editProfilePanel.classList.remove('hidden');
-    });
-    closeEditProfile.addEventListener('click', () => {
-      editProfilePanel.classList.add('hidden');
-    });
+    editProfileBtn.addEventListener('click', () => { editProfilePanel.classList.remove('hidden'); });
+    closeEditProfile.addEventListener('click', () => { editProfilePanel.classList.add('hidden'); });
     saveEditProfile.addEventListener('click', async () => {
       if (!myUID) return;
       const updates = {
@@ -748,7 +1096,7 @@
       window.open('https://github.com/stardustofficial/ringforme/blob/main/TERMS_OF_SERVICE.md', '_blank');
     });
 
-    // Geolocation
+    // ============ GEOLOCATION ============
     function startLocationWatch() {
       if (watchId) navigator.geolocation.clearWatch(watchId);
       watchId = navigator.geolocation.watchPosition(
@@ -793,7 +1141,10 @@
         const u = allUsers[uid];
         if (!u.lat || !u.lng || u.ghost) continue;
         const dist = haversine(myLat, myLng, u.lat, u.lng);
+        // Only show users within 50m
         if (dist > 50) continue;
+        // Skip mutual users - they go to ringed section
+        if (mutualRings[uid]) continue;
         const match = calculateMatch(currentUser, u);
         results.push({ uid, ...u, distance: dist, matchPercent: Math.round(match * 100) });
       }
@@ -806,16 +1157,14 @@
 
     function renderNearby(results) {
       if (!results.length) {
-        nearbyList.innerHTML = `<div class="text-center text-[#6b5e4e] text-sm py-4">✨ no one nearby</div>`;
+        nearbyList.innerHTML = `<div class="text-center text-[#6b5e4e] text-sm py-4" data-i18n="no_one_nearby">✨ no one nearby</div>`;
         return;
       }
       nearbyList.innerHTML = results.slice(0, 6).map(r => {
         const isMatch = r.distance < parseInt(radiusSelect.value) && r.matchPercent >= 70;
-        const isMutual = mutualRings[r.uid] || false;
         return `<div class="ring-card flex justify-between items-center" data-uid="${r.uid}">
           <div>
             <span class="font-medium gold-text">${r.name}</span>
-            ${isMutual ? '<span class="text-[10px] gold-text ml-1">💞</span>' : ''}
             <div class="flex flex-wrap gap-1 mt-1">${(r.vibeTags||[]).slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}</div>
           </div>
           <div class="text-right">
@@ -824,7 +1173,7 @@
               ${isMatch ? '<span class="match-heart">❤️</span>' : ''}
             </div>
             <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
-            <button class="ring-btn mt-1 ${isMutual ? 'mutual' : ''}" data-uid="${r.uid}">${isMutual ? '💞 Mutual' : 'Ring ❤️'}</button>
+            ${isMatch ? `<button class="ring-btn mt-1" data-uid="${r.uid}">Ring ❤️</button>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -834,9 +1183,7 @@
           const uid = this.dataset.uid;
           if (!uid || !myUID) return;
           
-          if (mutualRings[uid]) {
-            return;
-          }
+          if (mutualRings[uid]) return;
           
           await db.ref('rings/' + uid + '/' + myUID).set(true);
           
@@ -868,8 +1215,8 @@
               if (Notification.permission === 'granted') {
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
               }
-              this.textContent = '💞 Mutual';
-              this.classList.add('mutual');
+              loadRinged();
+              scanNearby(); // Refresh nearby list
             } else {
               if (Notification.permission === 'granted') {
                 new Notification('❤️ Ring sent!', { body: `You rang ${user.name}` });
@@ -909,7 +1256,7 @@
       if (!myUID) return;
       const snap = await db.ref('rings/' + myUID).once('value');
       const data = snap.val();
-      if (!data) { ringedList.innerHTML = '<div class="text-center text-[#6b5e4e] text-sm py-4">no rings yet</div>'; return; }
+      if (!data) { ringedList.innerHTML = '<div class="text-center text-[#6b5e4e] text-sm py-4" data-i18n="no_rings">no rings yet</div>'; return; }
       const uids = Object.keys(data);
       let html = '';
       for (let uid of uids) {
@@ -943,10 +1290,11 @@
       ).join('') || '<div class="text-center text-[#6b5e4e] text-sm py-4">no history</div>';
     }
 
-    // Settings
+    // ============ SETTINGS ============
     settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
     closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
     radiusSelect.addEventListener('change', () => scanNearby());
+    
     logoutBtn.addEventListener('click', () => { 
       auth.signOut(); 
       showView(loginView); 
@@ -958,6 +1306,7 @@
       dismissAlarm();
       processedRingKeys.clear();
     });
+    
     deleteAccountBtn.addEventListener('click', async () => {
       if (confirm('Delete your account permanently? This cannot be undone.')) {
         const user = auth.currentUser;
@@ -965,11 +1314,9 @@
         showView(loginView);
       }
     });
+    
     refreshBtn.addEventListener('click', scanNearby);
-
-    alarmOverlay.addEventListener('click', function() {
-      dismissAlarm();
-    });
+    alarmOverlay.addEventListener('click', function() { dismissAlarm(); });
 
     if (Notification.permission === 'default') Notification.requestPermission();
 
