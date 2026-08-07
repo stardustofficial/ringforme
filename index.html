@@ -23,7 +23,7 @@
     .gold-gradient { background: linear-gradient(145deg, #f7d875, #d9a441); }
     .gold-text { color: #f3c96b; }
     .gold-border { border-color: #f3c96b; }
-    .glass-card { background: rgba(20, 18, 21, 0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .glass-card { background: rgba(20, 18, 21, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     ::-webkit-scrollbar { display: none; }
     @keyframes glowPulse {
@@ -39,36 +39,67 @@
     .radar-dot { fill: #f3c96b; opacity: 0.7; }
     .transition-smooth { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
     .badge { background: #2a2529; border: 1px solid #f3c96b60; border-radius: 20px; padding: 2px 10px; font-size: 0.6rem; color: #f3c96b; }
-    /* SVG icons inline */
-    .icon-heart { width: 24px; height: 24px; fill: none; stroke: #f3c96b; stroke-width: 2; }
-    .icon-star { width: 20px; height: 20px; fill: #f3c96b; }
+    .btn-primary { background: linear-gradient(145deg, #f7d875, #d9a441); color: #141215; font-weight: 700; padding: 12px; border-radius: 16px; transition: all 0.2s; border: none; width: 100%; }
+    .btn-primary:hover { transform: scale(1.02); opacity: 0.9; }
+    .btn-secondary { background: #2a2529; color: #f3c96b; border: 1px solid #f3c96b40; padding: 12px; border-radius: 16px; transition: all 0.2s; width: 100%; }
+    .btn-secondary:hover { background: #3a3539; }
+    input, select { background: #1f1b1e; border: 1px solid #f3c96b50; border-radius: 16px; padding: 14px 18px; color: #ffffff; width: 100%; outline: none; transition: border 0.2s; }
+    input:focus, select:focus { border-color: #f3c96b; }
+    input::placeholder { color: #6b5e4e; }
+    .like-hint { color: #f3c96b88; font-size: 0.6rem; text-align: center; padding: 4px; border-top: 1px solid #f3c96b20; margin-top: 6px; }
+    /* white text on dark bg */
+    .text-white-important { color: #ffffff !important; }
+    .text-white-80 { color: rgba(255,255,255,0.8); }
   </style>
 </head>
 <body>
 <div id="app" class="flex flex-col text-white relative no-scrollbar">
 
-  <!-- header -->
-  <div class="flex items-center justify-between px-6 pt-5 pb-2 flex-shrink-0">
+  <!-- header (only shown when logged in) -->
+  <div id="mainHeader" class="flex items-center justify-between px-6 pt-5 pb-2 flex-shrink-0 hidden">
     <span class="text-2xl font-light tracking-widest gold-text">✦ RING</span>
     <span class="text-[10px] uppercase tracking-[0.2em] text-[#f3c96b99]">for me</span>
-    <div class="flex gap-2">
-      <button id="ghostToggle" class="text-[#6b5e4e] text-xs border border-[#f3c96b30] rounded-full px-3 py-1">👻</button>
-      <button id="settingsToggle" class="text-[#6b5e4e] text-xs border border-[#f3c96b30] rounded-full px-3 py-1">⚙</button>
-    </div>
+    <button id="settingsToggle" class="text-[#f3c96b] text-xs border border-[#f3c96b30] rounded-full px-3 py-1 hover:bg-[#f3c96b20]">⚙</button>
   </div>
-  <div class="h-[2px] w-4/5 mx-auto gold-gradient opacity-50 rounded-full mb-2"></div>
+  <div id="headerLine" class="h-[2px] w-4/5 mx-auto gold-gradient opacity-50 rounded-full mb-2 hidden"></div>
 
   <!-- main container -->
   <div id="mainContainer" class="flex-1 px-5 pb-4 overflow-y-auto no-scrollbar transition-smooth relative">
 
-    <!-- onboarding -->
-    <div id="onboardingView" class="space-y-5 pt-2">
-      <div id="step1" class="space-y-4">
-        <div class="text-xs gold-text tracking-widest">STEP 1 · WHO ARE YOU</div>
-        <input id="userName" type="text" placeholder="Your name" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-4 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth text-base" />
+    <!-- loading screen -->
+    <div id="loadingView" class="flex flex-col items-center justify-center h-full space-y-4">
+      <div class="text-6xl gold-text heart-beat">❤️</div>
+      <div class="text-xl gold-text tracking-widest">RING FOR ME</div>
+      <div class="w-12 h-12 border-4 border-[#f3c96b] border-t-transparent rounded-full animate-spin"></div>
+      <div class="text-[#f3c96b80] text-sm">loading your world...</div>
+    </div>
+
+    <!-- login view -->
+    <div id="loginView" class="hidden flex flex-col justify-center h-full space-y-5 pt-4">
+      <div class="text-3xl gold-text font-light tracking-wider text-center">✦ RING</div>
+      <div class="text-center text-[#f3c96b99] text-sm tracking-widest">sign in to your world</div>
+      <div class="space-y-3 mt-4">
+        <input id="loginEmail" type="email" placeholder="Email" class="text-white-important" />
+        <input id="loginPassword" type="password" placeholder="Password" class="text-white-important" />
+        <button id="loginBtn" class="btn-primary">Sign In</button>
+        <button id="showSignupBtn" class="btn-secondary">Create New Account →</button>
+      </div>
+    </div>
+
+    <!-- signup view -->
+    <div id="signupView" class="hidden flex-col justify-center h-full space-y-3 pt-2 overflow-y-auto no-scrollbar">
+      <div class="text-xl gold-text font-light tracking-wider text-center">✦ create account</div>
+      <div class="space-y-2">
+        <input id="signupName" type="text" placeholder="Full Name" class="text-white-important" />
+        <input id="signupEmail" type="email" placeholder="Email" class="text-white-important" />
+        <input id="signupPassword" type="password" placeholder="Password (min 6)" class="text-white-important" />
+        <input id="signupHobbies" type="text" placeholder="Hobbies (comma separated)" class="text-white-important" />
+        <input id="signupInterest" type="text" placeholder="Interests (comma)" class="text-white-important" />
+        <input id="signupFavPlace" type="text" placeholder="Favorite Place" class="text-white-important" />
+        <input id="signupGame" type="text" placeholder="Favorite Game" class="text-white-important" />
         <div>
-          <div class="text-xs gold-text mb-2 tracking-wide">VIBE TAGS (select up to 4)</div>
-          <div id="vibeTags" class="flex flex-wrap gap-2">
+          <div class="text-xs gold-text mb-1">Vibe Tags (select up to 4)</div>
+          <div id="signupVibeTags" class="flex flex-wrap gap-2">
             <span data-tag="romantic" class="chip cursor-pointer">romantic</span>
             <span data-tag="playful" class="chip cursor-pointer">playful</span>
             <span data-tag="cozy" class="chip cursor-pointer">cozy</span>
@@ -77,17 +108,8 @@
             <span data-tag="nerdy" class="chip cursor-pointer">nerdy</span>
           </div>
         </div>
-        <button id="nextStep1" class="w-full gold-gradient text-[#141215] font-bold py-4 rounded-2xl text-base tracking-wide shadow-lg shadow-[#f3c96b30] transition-smooth hover:scale-[1.01] active:scale-95">next →</button>
-      </div>
-      <div id="step2" class="space-y-4 hidden">
-        <div class="text-xs gold-text tracking-widest">STEP 2 · YOUR FAVES</div>
-        <input id="hobbies" type="text" placeholder="Hobbies (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" />
-        <input id="favFoods" type="text" placeholder="Fav foods (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" />
-        <input id="favGames" type="text" placeholder="Fav games (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" />
-        <div class="flex gap-3 pt-1">
-          <button id="backStep2" class="flex-1 bg-[#2a2529] text-[#f3c96b] border border-[#f3c96b40] py-3 rounded-2xl transition-smooth active:scale-95">back</button>
-          <button id="saveProfile" class="flex-1 gold-gradient text-[#141215] font-bold py-3 rounded-2xl transition-smooth active:scale-95">save & find</button>
-        </div>
+        <button id="signupBtn" class="btn-primary">Create Account</button>
+        <button id="backToLoginBtn" class="btn-secondary">← Back to Sign In</button>
       </div>
     </div>
 
@@ -104,6 +126,7 @@
         <div class="text-xs text-[#b8a68b] mt-2 flex flex-wrap gap-x-4">
           <span id="profileHobbies"></span> <span id="profileFoods"></span> <span id="profileGames"></span>
         </div>
+        <div class="like-hint">❤️ Double tap any card below to send Secret Like</div>
       </div>
 
       <!-- Radar ring -->
@@ -113,13 +136,12 @@
           <circle cx="90" cy="90" r="55" stroke="#f3c96b40" stroke-width="1" fill="none" />
           <circle cx="90" cy="90" r="25" stroke="#f3c96b60" stroke-width="1.5" fill="none" />
           <circle cx="90" cy="90" r="8" fill="#f3c96b" opacity="0.8" />
-          <!-- dots will be injected -->
           <g id="radarDots"></g>
         </svg>
         <div class="absolute bottom-1 text-[10px] text-[#f3c96b80]">radar</div>
       </div>
 
-      <button id="refreshProximity" class="w-full gold-gradient text-[#141215] font-bold py-3 rounded-2xl text-sm tracking-wide transition-smooth active:scale-95">⟳ scan nearby</button>
+      <button id="refreshProximity" class="btn-primary">⟳ scan nearby</button>
       
       <!-- nearby list -->
       <div id="nearbyList" class="space-y-2 max-h-[120px] overflow-y-auto no-scrollbar"></div>
@@ -127,28 +149,29 @@
       <!-- ice breakers -->
       <div id="iceBreakerContainer" class="hidden glass-card p-3 rounded-2xl border border-[#f3c96b30]">
         <div class="text-xs gold-text mb-1">💬 ice breakers</div>
-        <div id="iceBreakerText" class="text-sm text-[#e8d5b0]"></div>
+        <div id="iceBreakerText" class="text-sm text-white-important"></div>
       </div>
     </div>
 
     <!-- settings panel -->
     <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px]">
-      <div class="flex justify-between"><span class="gold-text text-lg">settings</span><button id="closeSettings" class="text-[#6b5e4e]">✕</button></div>
-      <div class="mt-4 space-y-3">
-        <div><span class="text-sm text-[#b8a68b]">Alarm radius</span>
-          <select id="radiusSelect" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-xl p-2 text-white">
+      <div class="flex justify-between"><span class="gold-text text-lg">⚙ settings</span><button id="closeSettings" class="text-[#f3c96b] text-xl">✕</button></div>
+      <div class="mt-4 space-y-4">
+        <div><span class="text-sm text-white-important">Alarm radius</span>
+          <select id="radiusSelect" class="text-white-important mt-1">
             <option value="10">10m</option><option value="20" selected>20m</option><option value="50">50m</option>
           </select>
         </div>
-        <div><span class="text-sm text-[#b8a68b]">Ghost mode</span>
-          <button id="ghostSettingToggle" class="ml-2 bg-[#2a2529] px-4 py-1 rounded-full text-xs border border-[#f3c96b40]">off</button>
+        <div><span class="text-sm text-white-important">Ghost mode</span>
+          <button id="ghostSettingToggle" class="ml-2 bg-[#2a2529] px-4 py-1 rounded-full text-xs border border-[#f3c96b40] text-white-important">off</button>
         </div>
-        <div><span class="text-sm text-[#b8a68b]">Daily poll</span>
+        <div><span class="text-sm text-white-important">Daily poll</span>
           <div id="dailyPoll" class="text-xs text-[#f3c96b] mt-1">coffee or tea? ☕</div>
         </div>
-        <div><span class="text-sm text-[#b8a68b]">Alarm history</span>
-          <div id="alarmHistory" class="text-xs text-[#6b5e4e] max-h-20 overflow-y-auto"></div>
+        <div><span class="text-sm text-white-important">Alarm history</span>
+          <div id="alarmHistory" class="text-xs text-[#b8a68b] max-h-20 overflow-y-auto"></div>
         </div>
+        <button id="logoutBtn" class="btn-secondary text-center">Sign Out</button>
       </div>
     </div>
 
@@ -161,7 +184,9 @@
     </div>
   </div>
 
-  <audio id="alarmSound" preload="auto"><source src="data:audio/wav;base64,U3RlcmVvIGlzIG5vdCBzdXBwb3J0ZWQgcGxlYXNlIHVzZSBhbiBhdWRpbyBmaWxlLg==" type="audio/wav"></audio>
+  <audio id="alarmSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+  </audio>
 </div>
 
 <script>
@@ -181,11 +206,11 @@
     const auth = firebase.auth();
 
     // ---------- state ----------
-    let currentUser = null;       // our user object
+    let currentUser = null;
     let myUID = null;
     let watchId = null;
     let ghostMode = false;
-    let alarmRadius = 20;        // meters
+    let alarmRadius = 20;
     let selectedVibes = [];
     let nearbyUsers = [];
     let alarmHistory = [];
@@ -193,15 +218,25 @@
 
     // DOM refs
     const $ = id => document.getElementById(id);
-    const userName = $('userName');
-    const hobbies = $('hobbies');
-    const favFoods = $('favFoods');
-    const favGames = $('favGames');
-    const step1 = $('step1');
-    const step2 = $('step2');
-    const nextBtn = $('nextStep1');
-    const backBtn = $('backStep2');
-    const saveBtn = $('saveProfile');
+    const loadingView = $('loadingView');
+    const loginView = $('loginView');
+    const signupView = $('signupView');
+    const dashboardView = $('dashboardView');
+    const mainHeader = $('mainHeader');
+    const headerLine = $('headerLine');
+    const loginEmail = $('loginEmail');
+    const loginPassword = $('loginPassword');
+    const loginBtn = $('loginBtn');
+    const showSignupBtn = $('showSignupBtn');
+    const signupName = $('signupName');
+    const signupEmail = $('signupEmail');
+    const signupPassword = $('signupPassword');
+    const signupHobbies = $('signupHobbies');
+    const signupInterest = $('signupInterest');
+    const signupFavPlace = $('signupFavPlace');
+    const signupGame = $('signupGame');
+    const signupBtn = $('signupBtn');
+    const backToLoginBtn = $('backToLoginBtn');
     const profileName = $('profileName');
     const profileTags = $('profileTags');
     const profileBadges = $('profileBadges');
@@ -218,55 +253,115 @@
     const closeSettings = $('closeSettings');
     const radiusSelect = $('radiusSelect');
     const ghostSettingToggle = $('ghostSettingToggle');
-    const ghostToggle = $('ghostToggle');
     const settingsToggle = $('settingsToggle');
     const dailyPoll = $('dailyPoll');
     const alarmHistoryEl = $('alarmHistory');
     const iceBreakerContainer = $('iceBreakerContainer');
     const iceBreakerText = $('iceBreakerText');
     const streakBadge = $('streakBadge');
+    const logoutBtn = $('logoutBtn');
 
-    // ---------- auth anonymous ----------
-    auth.signInAnonymously().catch(() => {});
+    // ---------- UI Helpers ----------
+    function showView(view) {
+      [loadingView, loginView, signupView, dashboardView].forEach(v => v.classList.add('hidden'));
+      if (view) view.classList.remove('hidden');
+      if (view === dashboardView) {
+        mainHeader.classList.remove('hidden');
+        headerLine.classList.remove('hidden');
+      } else {
+        mainHeader.classList.add('hidden');
+        headerLine.classList.add('hidden');
+      }
+    }
 
-    auth.onAuthStateChanged(user => {
+    // ---------- Auth state ----------
+    auth.onAuthStateChanged(async user => {
       if (user) {
         myUID = user.uid;
-        // load user data
-        db.ref('users/' + myUID).once('value').then(snap => {
-          const data = snap.val();
-          if (data) {
-            currentUser = data;
-            currentUser.uid = myUID;
-            fillFormFromUser(data);
-            showDashboard(data);
-            startLocationWatch();
-          }
-        });
+        // check if profile exists
+        const snap = await db.ref('users/' + myUID).once('value');
+        const data = snap.val();
+        if (data) {
+          currentUser = data;
+          currentUser.uid = myUID;
+          showView(dashboardView);
+          fillDashboard(data);
+          startLocationWatch();
+          scanNearby();
+          // update streak
+          streakDays = (data.streak || 0) + 1;
+          db.ref('users/' + myUID + '/streak').set(streakDays);
+          streakBadge.textContent = '🔥 ' + streakDays + 'd';
+        } else {
+          // user exists in auth but no profile -> show signup with email
+          signupEmail.value = user.email || '';
+          showView(signupView);
+        }
+      } else {
+        showView(loginView);
+        if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
       }
     });
 
-    function fillFormFromUser(data) {
-      userName.value = data.name || '';
-      selectedVibes = data.vibeTags || [];
-      hobbies.value = (data.hobbies || []).join(', ');
-      favFoods.value = (data.favFoods || []).join(', ');
-      favGames.value = (data.favGames || []).join(', ');
-      // highlight tags
-      document.querySelectorAll('#vibeTags .chip').forEach(el => {
-        const tag = el.dataset.tag;
-        if (selectedVibes.includes(tag)) {
-          el.style.background = '#f3c96b40';
-          el.style.color = '#f7d875';
-        } else {
-          el.style.background = '#2a2529';
-          el.style.color = '#f3c96b';
-        }
-      });
-    }
+    // ---------- Login ----------
+    loginBtn.addEventListener('click', async () => {
+      const email = loginEmail.value.trim();
+      const pass = loginPassword.value.trim();
+      if (!email || !pass) { alert('Enter email and password'); return; }
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch(e) { alert('Login failed: ' + e.message); }
+    });
 
-    // ---------- tag toggles ----------
-    document.querySelectorAll('#vibeTags .chip').forEach(el => {
+    showSignupBtn.addEventListener('click', () => {
+      showView(signupView);
+      signupEmail.value = '';
+      signupPassword.value = '';
+    });
+
+    backToLoginBtn.addEventListener('click', () => showView(loginView));
+
+    // ---------- Signup ----------
+    signupBtn.addEventListener('click', async () => {
+      const name = signupName.value.trim();
+      const email = signupEmail.value.trim();
+      const pass = signupPassword.value.trim();
+      const hobbies = signupHobbies.value.split(',').map(s => s.trim()).filter(Boolean);
+      const interest = signupInterest.value.split(',').map(s => s.trim()).filter(Boolean);
+      const favPlace = signupFavPlace.value.trim();
+      const game = signupGame.value.trim();
+      if (!name || !email || !pass || pass.length < 6) { alert('Please fill all fields (password min 6)'); return; }
+      if (selectedVibes.length < 2) { alert('Select at least 2 vibe tags'); return; }
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        const uid = cred.user.uid;
+        const userObj = {
+          name, email,
+          vibeTags: [...selectedVibes],
+          hobbies: hobbies,
+          interests: interest,
+          favPlace: favPlace,
+          game: game,
+          badges: ['Coffee Lover', 'MBTI: ENFP'],
+          streak: 1,
+          lat: 0, lng: 0,
+          ghost: false,
+          timestamp: Date.now()
+        };
+        await db.ref('users/' + uid).set(userObj);
+        // auto login
+        currentUser = userObj;
+        currentUser.uid = uid;
+        showView(dashboardView);
+        fillDashboard(userObj);
+        startLocationWatch();
+        scanNearby();
+        streakBadge.textContent = '🔥 1d';
+      } catch(e) { alert('Signup failed: ' + e.message); }
+    });
+
+    // ---------- signup vibe tags ----------
+    document.querySelectorAll('#signupVibeTags .chip').forEach(el => {
       el.addEventListener('click', function() {
         const tag = this.dataset.tag;
         if (selectedVibes.includes(tag)) {
@@ -282,71 +377,18 @@
       });
     });
 
-    // step nav
-    nextBtn.addEventListener('click', () => {
-      if (!userName.value.trim()) { alert('name required'); return; }
-      if (selectedVibes.length < 2) { alert('select at least 2 vibe tags'); return; }
-      step1.classList.add('hidden');
-      step2.classList.remove('hidden');
-    });
-    backBtn.addEventListener('click', () => {
-      step1.classList.remove('hidden');
-      step2.classList.add('hidden');
-    });
-
-    // ---------- save profile ----------
-    saveBtn.addEventListener('click', async function() {
-      if (!userName.value.trim()) { alert('name required'); return; }
-      if (!myUID) { alert('auth not ready'); return; }
-      const userObj = {
-        name: userName.value.trim(),
-        vibeTags: [...selectedVibes],
-        hobbies: hobbies.value.split(',').map(s => s.trim()).filter(Boolean),
-        favFoods: favFoods.value.split(',').map(s => s.trim()).filter(Boolean),
-        favGames: favGames.value.split(',').map(s => s.trim()).filter(Boolean),
-        lat: 0, lng: 0,
-        ghost: ghostMode,
-        timestamp: Date.now(),
-        streak: streakDays || 0,
-        badges: ['Coffee Lover', 'MBTI: ENFP'] // sample
-      };
-      // get position
-      try {
-        const pos = await getPosition();
-        userObj.lat = pos.coords.latitude;
-        userObj.lng = pos.coords.longitude;
-      } catch(e) {}
-      currentUser = userObj;
-      currentUser.uid = myUID;
-      await db.ref('users/' + myUID).set(userObj);
-      showDashboard(userObj);
-      startLocationWatch();
-    });
-
-    function showDashboard(user) {
-      document.getElementById('onboardingView').classList.add('hidden');
-      document.getElementById('dashboardView').classList.remove('hidden');
+    // ---------- Dashboard fill ----------
+    function fillDashboard(user) {
       profileName.textContent = user.name || '—';
       profileTags.innerHTML = (user.vibeTags || []).map(t => `<span class="chip">${t}</span>`).join(' ');
       profileBadges.innerHTML = (user.badges || []).map(b => `<span class="badge">${b}</span>`).join(' ');
       profileHobbies.textContent = '🎯 ' + (user.hobbies || []).join(', ') || '—';
-      profileFoods.textContent = '🍜 ' + (user.favFoods || []).join(', ') || '—';
-      profileGames.textContent = '🎮 ' + (user.favGames || []).join(', ') || '—';
-      streakBadge.textContent = '🔥 ' + (user.streak || 0) + 'd';
-      // daily poll
+      profileFoods.textContent = '📍 ' + (user.favPlace || '—');
+      profileGames.textContent = '🎮 ' + (user.game || '—');
       dailyPoll.textContent = '☕ coffee or tea?  (vote)';
-      updateRadar([]);
-      scanNearby();
     }
 
     // ---------- geolocation watch ----------
-    function getPosition() {
-      return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) reject('no geo');
-        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 });
-      });
-    }
-
     function startLocationWatch() {
       if (watchId) navigator.geolocation.clearWatch(watchId);
       watchId = navigator.geolocation.watchPosition(
@@ -356,7 +398,6 @@
           const lng = pos.coords.longitude;
           currentUser.lat = lat;
           currentUser.lng = lng;
-          currentUser.timestamp = Date.now();
           if (!ghostMode) {
             await db.ref('users/' + myUID + '/lat').set(lat);
             await db.ref('users/' + myUID + '/lng').set(lng);
@@ -393,7 +434,6 @@
       renderNearby(results);
       updateRadar(results);
       checkAlarm(results);
-      // ice breakers for closest match
       if (results.length && results[0].distance < 50 && results[0].matchPercent > 50) {
         iceBreakerContainer.classList.remove('hidden');
         const msgs = ['Hey! Love your vibe ✨', 'Coffee sometime? ☕', 'You seem interesting!'];
@@ -425,12 +465,26 @@
       }
       nearbyList.innerHTML = results.slice(0, 5).map(r => {
         const distLabel = r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : '📡 ' + Math.round(r.distance) + 'm';
-        return `<div class="glass-card rounded-2xl p-3 border border-[#f3c96b20] flex justify-between items-center">
+        return `<div class="glass-card rounded-2xl p-3 border border-[#f3c96b20] flex justify-between items-center cursor-pointer hover:border-[#f3c96b60] transition-smooth" data-uid="${r.uid}">
           <div><span class="font-medium gold-text">${r.name}</span>
           <div class="flex flex-wrap gap-1 mt-1">${(r.vibeTags||[]).slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}</div></div>
           <div class="text-right"><span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span><div class="text-[10px] text-[#6b5e4e]">${distLabel}</div></div>
         </div>`;
       }).join('');
+      // double tap like
+      document.querySelectorAll('#nearbyList .glass-card').forEach(el => {
+        el.addEventListener('dblclick', async function() {
+          const uid = this.dataset.uid;
+          if (!uid || !myUID) return;
+          await db.ref('likes/' + myUID + '/' + uid).set(true);
+          if (Notification.permission === 'granted') {
+            const user = nearbyUsers.find(u => u.uid === uid);
+            new Notification('❤️ Like sent!', { body: `You liked ${user?.name || 'someone'}` });
+          }
+          this.style.borderColor = '#f3c96b';
+          setTimeout(() => this.style.borderColor = '', 1000);
+        });
+      });
     }
 
     function updateRadar(results) {
@@ -440,7 +494,7 @@
       const far = results.filter(r => r.distance >= 50 && r.distance < 200);
       const dots = [...close.map(r => ({...r, zone: 'close'})), ...nearby.map(r => ({...r, zone: 'nearby'})), ...far.map(r => ({...r, zone: 'far'}))];
       dots.slice(0, 8).forEach((r, i) => {
-        const angle = (i / dots.length) * 2 * Math.PI + Math.random() * 0.5;
+        const angle = (i / Math.max(dots.length, 1)) * 2 * Math.PI + Math.random() * 0.3;
         const radius = r.zone === 'close' ? 20 : r.zone === 'nearby' ? 45 : 75;
         const cx = 90 + radius * Math.cos(angle);
         const cy = 90 + radius * Math.sin(angle);
@@ -454,13 +508,12 @@
       });
     }
 
-    // ---------- alarm check with secret like system ----------
+    // ---------- alarm check ----------
     async function checkAlarm(results) {
       if (!currentUser || !myUID) return;
       const radius = parseInt(radiusSelect.value);
       for (let r of results) {
         if (r.distance < radius && r.matchPercent >= 70) {
-          // check if current user liked this person and vice versa (secret like)
           const likeRef = db.ref('likes/' + myUID + '/' + r.uid);
           const snap = await likeRef.once('value');
           const iLiked = snap.val() === true;
@@ -469,10 +522,8 @@
           const theyLiked = otherSnap.val() === true;
           if (iLiked && theyLiked) {
             triggerAlarm(r);
-            // history
             alarmHistory.push({ name: r.name, time: new Date().toLocaleTimeString(), dist: Math.round(r.distance) + 'm' });
             alarmHistoryEl.innerHTML = alarmHistory.slice(-5).map(h => `<div>${h.time} · ${h.name} ${h.dist}</div>`).join('');
-            // notification-like
             if (Notification.permission === 'granted') {
               new Notification('💖 Ring!', { body: `${r.name} is near!` });
             }
@@ -496,72 +547,42 @@
       }, 6000);
     }
 
-    // ---------- like system (secret) ----------
-    // double tap on user in nearby list to like
-    nearbyList.addEventListener('dblclick', async (e) => {
-      const item = e.target.closest('.glass-card');
-      if (!item) return;
-      const nameEl = item.querySelector('.gold-text');
-      if (!nameEl) return;
-      const name = nameEl.textContent;
-      const user = nearbyUsers.find(u => u.name === name);
-      if (!user || !myUID) return;
-      await db.ref('likes/' + myUID + '/' + user.uid).set(true);
-      // push notification simulation (like)
-      if (Notification.permission === 'granted') {
-        new Notification('❤️ Like sent!', { body: `You liked ${user.name}` });
-      }
-      // also if they liked back, alarm may trigger on next scan
-    });
-
-    // request notification permission
-    if (Notification.permission === 'default') Notification.requestPermission();
-
-    // ---------- ghost mode ----------
-    ghostToggle.addEventListener('click', () => {
+    // ---------- settings ----------
+    settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
+    closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
+    radiusSelect.addEventListener('change', (e) => { alarmRadius = parseInt(e.target.value); });
+    
+    ghostSettingToggle.addEventListener('click', () => {
       ghostMode = !ghostMode;
-      ghostToggle.textContent = ghostMode ? '👻 on' : '👻';
       ghostSettingToggle.textContent = ghostMode ? 'on' : 'off';
       if (ghostMode && myUID) {
         db.ref('users/' + myUID + '/lat').remove();
         db.ref('users/' + myUID + '/lng').remove();
       }
     });
-    ghostSettingToggle.addEventListener('click', () => {
-      ghostMode = !ghostMode;
-      ghostToggle.textContent = ghostMode ? '👻 on' : '👻';
-      ghostSettingToggle.textContent = ghostMode ? 'on' : 'off';
+
+    logoutBtn.addEventListener('click', () => {
+      auth.signOut();
+      showView(loginView);
+      if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
     });
 
-    // settings
-    settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
-    closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
-    radiusSelect.addEventListener('change', (e) => { alarmRadius = parseInt(e.target.value); });
-
-    // refresh
     refreshBtn.addEventListener('click', scanNearby);
 
-    // close alarm on tap
     alarmOverlay.addEventListener('click', function() {
       this.classList.remove('opacity-100', 'pointer-events-auto');
       this.classList.add('opacity-0');
       clearTimeout(window.alarmTimer);
     });
 
-    // simulate streak (daily open)
-    setTimeout(() => {
-      if (currentUser) {
-        streakDays = (currentUser.streak || 0) + 1;
-        if (myUID) db.ref('users/' + myUID + '/streak').set(streakDays);
-        streakBadge.textContent = '🔥 ' + streakDays + 'd';
-      }
-    }, 3000);
+    if (Notification.permission === 'default') Notification.requestPermission();
 
-    // bootstrap: if no user, show onboarding
-    if (!currentUser) {
-      document.getElementById('onboardingView').classList.remove('hidden');
-      document.getElementById('dashboardView').classList.add('hidden');
-    }
+    // initial loading -> check auth state
+    showView(loadingView);
+    setTimeout(() => {
+      if (!auth.currentUser) showView(loginView);
+    }, 1500);
+
   })();
 </script>
 </body>
