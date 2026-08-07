@@ -31,10 +31,12 @@
     .heart-beat { animation: heartBeat 1s infinite; }
     @keyframes heartBeat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.2); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
     .chip { background: #2a2529; color: #f3c96b; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; border: 1px solid #f3c96b40; }
-    .btn-primary { background: linear-gradient(145deg, #f7d875, #d9a441); color: #141215; font-weight: 700; padding: 14px; border-radius: 16px; transition: all 0.2s; border: none; width: 100%; font-size: 1rem; }
+    .btn-primary { background: linear-gradient(145deg, #f7d875, #d9a441); color: #141215; font-weight: 700; padding: 14px; border-radius: 16px; transition: all 0.2s; border: none; width: 100%; font-size: 1rem; cursor: pointer; }
     .btn-primary:hover { transform: scale(1.02); opacity: 0.9; }
-    .btn-secondary { background: #2a2529; color: #f3c96b; border: 1px solid #f3c96b40; padding: 14px; border-radius: 16px; transition: all 0.2s; width: 100%; font-size: 1rem; }
+    .btn-secondary { background: #2a2529; color: #f3c96b; border: 1px solid #f3c96b40; padding: 14px; border-radius: 16px; transition: all 0.2s; width: 100%; font-size: 1rem; cursor: pointer; }
     .btn-secondary:hover { background: #3a3539; }
+    .btn-danger { background: #2a2529; color: #ef4444; border: 1px solid #ef444430; padding: 14px; border-radius: 16px; transition: all 0.2s; width: 100%; font-size: 1rem; cursor: pointer; }
+    .btn-danger:hover { background: #3a3539; }
     input, select, textarea { background: #1f1b1e; border: 1px solid #f3c96b50; border-radius: 16px; padding: 14px 18px; color: #ffffff; width: 100%; outline: none; transition: border 0.2s; font-size: 1rem; }
     input:focus, select:focus, textarea:focus { border-color: #f3c96b; }
     input::placeholder, textarea::placeholder { color: #6b5e4e; }
@@ -61,8 +63,9 @@
     .mt-auto { margin-top: auto; }
     .ring-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; text-align: left; font-size: 0.7rem; }
     .ring-btn { cursor: pointer; transition: all 0.2s; }
-    .ring-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .ring-btn:hover:not(:disabled) { background: #f3c96b40; }
+    .ring-btn:hover { background: #f3c96b40; }
+    .ring-btn.ringed { opacity: 0.6; cursor: default; }
+    .ring-btn.ringed:hover { background: #f3c96b20; }
   </style>
 </head>
 <body>
@@ -280,17 +283,6 @@
             <option value="10">10m</option><option value="20" selected>20m</option><option value="50">50m</option>
           </select>
         </div>
-        <div>
-          <span class="text-sm text-white-important">Ghost mode</span>
-          <button id="ghostSettingToggle" class="ml-2 bg-[#2a2529] px-4 py-1 rounded-full text-xs border border-[#f3c96b40] text-white-important">off</button>
-        </div>
-        <div>
-          <span class="text-sm text-white-important">Daily poll</span>
-          <div id="dailyPoll" class="text-xs text-[#f3c96b] mt-1">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            coffee or tea? (vote)
-          </div>
-        </div>
         <button id="editProfileBtn" class="btn-secondary text-sm">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           Edit Profile
@@ -304,7 +296,7 @@
           Terms of Service
         </button>
         <div class="mt-auto pt-4 border-t border-[#f3c96b20] space-y-3">
-          <button id="deleteAccountBtn" class="btn-secondary text-sm text-red-400 border-red-400/30">
+          <button id="deleteAccountBtn" class="btn-danger text-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" class="inline"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
             Delete Account
           </button>
@@ -391,11 +383,9 @@
     const db = firebase.database();
     const auth = firebase.auth();
 
-    let currentUser = null, myUID = null, watchId = null, ghostMode = false;
+    let currentUser = null, myUID = null, watchId = null;
     let selectedVibes = [], nearbyUsers = [], alarmHistory = [];
     let alarmTimer = null;
-    let isAlarmActive = false;
-    let alarmSoundPlaying = false;
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
@@ -413,14 +403,14 @@
     const profileHobbies = $('profileHobbies'), profileInterest = $('profileInterest'), profilePlace = $('profilePlace');
     const nearbyList = $('nearbyList'), ringedList = $('ringedList'), alarmHistoryList = $('alarmHistoryList');
     const alarmOverlay = $('alarmOverlay'), commonTagsDisplay = $('commonTagsDisplay'), alarmSound = $('alarmSound');
-    const alarmUserName = $('alarmUserName'), alarmUserBio = $('alarmUserBio'), alarmUserDetails = $('alarmUserDetails');
+    const alarmUserName = $('alarmUserName'), alarmUserBio = $('alarmUserBio');
     const alarmUserAge = $('alarmUserAge'), alarmUserGender = $('alarmUserGender');
     const alarmUserHobbies = $('alarmUserHobbies'), alarmUserInterests = $('alarmUserInterests');
     const alarmUserPlace = $('alarmUserPlace'), alarmMutualBadge = $('alarmMutualBadge');
     const radarDots = $('radarDots'), refreshBtn = $('refreshProximity');
     const settingsPanel = $('settingsPanel'), closeSettings = $('closeSettings'), radiusSelect = $('radiusSelect');
-    const ghostSettingToggle = $('ghostSettingToggle'), settingsToggle = $('settingsToggle');
-    const dailyPoll = $('dailyPoll'), streakBadge = $('streakBadge'), logoutBtn = $('logoutBtn');
+    const settingsToggle = $('settingsToggle');
+    const streakBadge = $('streakBadge'), logoutBtn = $('logoutBtn');
     const deleteAccountBtn = $('deleteAccountBtn'), iceBreakerContainer = $('iceBreakerContainer');
     const iceBreakerText = $('iceBreakerText'), scanStatus = $('scanStatus'), profileAvatar = $('profileAvatar');
     const editProfilePanel = $('editProfilePanel'), closeEditProfile = $('closeEditProfile');
@@ -484,7 +474,7 @@
       }
     });
 
-    // Listen for incoming rings - only for other users ringing ME
+    // ============ RING LISTENER - ONLY FOR INCOMING RINGS ============
     function listenForRings() {
       if (!myUID) return;
       const ringRef = db.ref('rings/' + myUID);
@@ -493,6 +483,7 @@
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
+          // SOMEONE RANG ME! - This is where alarm should play
           const userSnap = await db.ref('users/' + fromUid).once('value');
           const user = userSnap.val();
           if (user) {
@@ -501,6 +492,7 @@
             const myRingSnap = await myRingRef.once('value');
             const iRangThem = myRingSnap.val() === true;
             
+            // ONLY HERE we call showAlarmWithFullDetails
             showAlarmWithFullDetails(user, iRangThem);
             
             alarmHistory.push({ 
@@ -543,10 +535,8 @@
       
       alarmSound.loop = true;
       alarmSound.play().catch(() => {});
-      alarmSoundPlaying = true;
       
       if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
-      isAlarmActive = true;
       
       clearTimeout(alarmTimer);
       alarmTimer = setTimeout(() => {
@@ -560,8 +550,6 @@
       alarmSound.pause();
       alarmSound.currentTime = 0;
       alarmSound.loop = false;
-      alarmSoundPlaying = false;
-      isAlarmActive = false;
       clearTimeout(alarmTimer);
     }
 
@@ -599,7 +587,7 @@
         const cred = await auth.createUserWithEmailAndPassword(email, pass);
         const uid = cred.user.uid;
         const userObj = { name, email, bio, age, gender, hobbies, interests, place,
-          vibeTags: [...selectedVibes], badges: ['✨ Explorer'], streak: 1, lat: 0, lng: 0, ghost: false, timestamp: Date.now() };
+          vibeTags: [...selectedVibes], badges: ['✨ Explorer'], streak: 1, lat: 0, lng: 0, timestamp: Date.now() };
         await db.ref('users/' + uid).set(userObj);
         currentUser = userObj; currentUser.uid = uid;
         showView(pagesContainer);
@@ -624,7 +612,6 @@
       profilePlace.textContent = '📍 ' + (user.place || '—');
       profileTags.innerHTML = (user.vibeTags || []).map(t => `<span class="chip">${t}</span>`).join(' ');
       profileBadges.textContent = (user.badges || []).join(' ');
-      dailyPoll.textContent = '☕ coffee or tea?  (vote)';
       editName.value = user.name || '';
       editBio.value = user.bio || '';
       editAge.value = user.age || '';
@@ -674,11 +661,9 @@
         async (pos) => {
           if (!currentUser || !myUID) return;
           currentUser.lat = pos.coords.latitude; currentUser.lng = pos.coords.longitude;
-          if (!ghostMode) {
-            await db.ref('users/' + myUID + '/lat').set(pos.coords.latitude);
-            await db.ref('users/' + myUID + '/lng').set(pos.coords.longitude);
-            await db.ref('users/' + myUID + '/timestamp').set(Date.now());
-          }
+          await db.ref('users/' + myUID + '/lat').set(pos.coords.latitude);
+          await db.ref('users/' + myUID + '/lng').set(pos.coords.longitude);
+          await db.ref('users/' + myUID + '/timestamp').set(Date.now());
           scanNearby();
         },
         () => { scanStatus.textContent = '⚠️ location off'; },
@@ -740,7 +725,7 @@
               ${isMatch ? '<span class="match-heart">❤️</span>' : ''}
             </div>
             <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
-            ${isMatch ? `<button class="ring-btn text-xs gold-text bg-[#f3c96b20] px-3 py-1 rounded-full mt-1 border border-[#f3c96b40] hover:bg-[#f3c96b40] transition-all">Ring ❤️</button>` : ''}
+            ${isMatch ? `<button class="ring-btn text-xs gold-text bg-[#f3c96b20] px-3 py-1 rounded-full mt-1 border border-[#f3c96b40]">Ring ❤️</button>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -751,7 +736,8 @@
           const uid = card.dataset.uid;
           if (!uid || !myUID) return;
           
-          // Send ring to other user (NOT to myself!)
+          // ============ ONLY SAVE TO FIREBASE - NO ALARM PLAYED HERE ============
+          // Send ring to other user - this will trigger their listener
           await db.ref('rings/' + uid + '/' + myUID).set(true);
           
           const user = nearbyUsers.find(u => u.uid === uid);
@@ -775,8 +761,7 @@
             const theyRangMe = theirRingSnap.val() === true;
             
             if (theyRangMe) {
-              // Mutual ring - trigger alarm for me too
-              showAlarmWithFullDetails(user, true);
+              // Mutual ring - save mutual status
               await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
               await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
               alarmHistory.push({ name: user.name, time: new Date().toLocaleTimeString(), dist: 'mutual ring!', isMutual: true });
@@ -791,10 +776,12 @@
             }
             loadRinged();
           }
-          // Don't disable the button - allow multiple rings
+          // Reset button after 3 seconds
           this.textContent = '✅ Ringed!';
+          this.classList.add('ringed');
           setTimeout(() => {
             this.textContent = 'Ring ❤️';
+            this.classList.remove('ringed');
           }, 3000);
         });
       });
@@ -860,14 +847,6 @@
     settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
     closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
     radiusSelect.addEventListener('change', () => scanNearby());
-    ghostSettingToggle.addEventListener('click', () => {
-      ghostMode = !ghostMode;
-      ghostSettingToggle.textContent = ghostMode ? 'on' : 'off';
-      if (ghostMode && myUID) {
-        db.ref('users/' + myUID + '/lat').remove();
-        db.ref('users/' + myUID + '/lng').remove();
-      }
-    });
     logoutBtn.addEventListener('click', () => { 
       auth.signOut(); 
       showView(loginView); 
@@ -886,7 +865,6 @@
     });
     refreshBtn.addEventListener('click', scanNearby);
 
-    // Alarm overlay tap to dismiss
     alarmOverlay.addEventListener('click', function() {
       dismissAlarm();
     });
