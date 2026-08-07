@@ -113,17 +113,6 @@
     body.light-mode .ghost-toggle:hover { background: #ddd5cd; }
     .ghost-toggle.active { border-color: #f3c96b; background: #f3c96b20; }
     body.light-mode .ghost-toggle.active { border-color: #c4902a; background: #c4902a20; }
-    .text-dark { color: #1a1a1a; }
-    body.light-mode .text-dark { color: #1a1a1a; }
-    .bg-light-card { background: #f8f4f0; }
-    .border-light { border-color: #d4c5b0; }
-    .text-muted-light { color: #6b5e4e; }
-    body.light-mode .text-muted-light { color: #6b5e4e; }
-    .text-white-80 { color: rgba(255,255,255,0.8); }
-    body.light-mode .text-white-80 { color: rgba(0,0,0,0.8); }
-    .text-bg-light { color: #1a1a1a; }
-    body.light-mode .text-bg-light { color: #1a1a1a; }
-    .text-gold-light { color: #c4902a; }
     .lang-btn { padding: 8px 14px; border-radius: 20px; border: 1px solid #f3c96b40; background: transparent; color: #f3c96b; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; }
     body.light-mode .lang-btn { border-color: #c4902a40; color: #c4902a; }
     .lang-btn:hover { background: #f3c96b20; }
@@ -136,6 +125,21 @@
     body.light-mode .contact-link { color: #c4902a; }
     .contact-link:hover { color: #f7d875; }
     body.light-mode .contact-link:hover { color: #d9a441; }
+    .lang-panel {
+      position: absolute;
+      inset: 0;
+      background: #141215dd;
+      backdrop-filter: blur(8px);
+      z-index: 45;
+      padding: 24px;
+      border-radius: 36px;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    body.light-mode .lang-panel { background: #f8f4f0dd; }
+    .lang-panel.active { display: flex; }
+    .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
   </style>
 </head>
 <body>
@@ -375,19 +379,14 @@
           </div>
         </div>
 
-        <!-- Language -->
+        <!-- Language Button -->
         <div class="setting-section">
           <span class="text-sm text-white-important block mb-2" data-i18n="language">Language</span>
-          <div id="languageOptions" class="flex flex-wrap gap-2">
-            <button class="lang-btn active" data-lang="en">English</button>
-            <button class="lang-btn" data-lang="hi">हिन्दी</button>
-            <button class="lang-btn" data-lang="zh">中文</button>
-            <button class="lang-btn" data-lang="ko">한국어</button>
-            <button class="lang-btn" data-lang="ja">日本語</button>
-            <button class="lang-btn" data-lang="gu">ગુજરાતી</button>
-            <button class="lang-btn" data-lang="bn">বাংলা</button>
-            <button class="lang-btn" data-lang="ur">اردو</button>
-          </div>
+          <button id="openLanguagePanel" class="btn-secondary text-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="2"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+            <span data-i18n="select_language">Select Language</span>
+            <span id="currentLangDisplay" class="ml-2 text-xs">(English)</span>
+          </button>
         </div>
 
         <!-- Contact Us -->
@@ -432,6 +431,32 @@
             <span data-i18n="sign_out">Sign Out</span>
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Language Panel -->
+    <div id="languagePanel" class="lang-panel">
+      <div class="flex justify-between flex-shrink-0">
+        <span class="gold-text text-lg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="2"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+          <span data-i18n="select_language">Select Language</span>
+        </span>
+        <button id="closeLanguagePanel" class="text-[#f3c96b] text-xl">✕</button>
+      </div>
+      <div class="lang-grid">
+        <button class="lang-btn" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="hi">हिन्दी</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+        <button class="lang-btn" data-lang="ko">한국어</button>
+        <button class="lang-btn" data-lang="ja">日本語</button>
+        <button class="lang-btn" data-lang="gu">ગુજરાતી</button>
+        <button class="lang-btn" data-lang="bn">বাংলা</button>
+        <button class="lang-btn" data-lang="ur">اردو</button>
+        <button class="lang-btn" data-lang="th">ไทย</button>
+        <button class="lang-btn" data-lang="vi">Tiếng Việt</button>
+        <button class="lang-btn" data-lang="ro">Română</button>
+        <button class="lang-btn" data-lang="ru">Русский</button>
+        <button class="lang-btn" data-lang="ar">العربية</button>
       </div>
     </div>
 
@@ -520,7 +545,8 @@
         ghost_mode: "Ghost mode", language: "Language", contact_us: "Contact us",
         edit_profile: "Edit Profile", privacy_policy: "Privacy Policy", terms_service: "Terms of Service",
         delete_account: "Delete Account", sign_out: "Sign Out", edit_profile_title: "Edit Profile",
-        save_changes: "Save Changes"
+        save_changes: "Save Changes", select_language: "Select Language", no_one_nearby: "no one nearby",
+        no_rings: "no rings yet"
       },
       hi: {
         app_name: "✦ रिंग", app_subtitle: "मेरे लिए", loading_title: "रिंग फॉर मी",
@@ -543,7 +569,8 @@
         ghost_mode: "गोस्ट मोड", language: "भाषा", contact_us: "संपर्क करें",
         edit_profile: "प्रोफ़ाइल संपादित करें", privacy_policy: "गोपनीयता नीति", terms_service: "सेवा की शर्तें",
         delete_account: "खाता हटाएं", sign_out: "साइन आउट", edit_profile_title: "प्रोफ़ाइल संपादित करें",
-        save_changes: "परिवर्तन सहेजें"
+        save_changes: "परिवर्तन सहेजें", select_language: "भाषा चुनें", no_one_nearby: "कोई आस-पास नहीं",
+        no_rings: "अभी तक कोई रिंग नहीं"
       },
       zh: {
         app_name: "✦ 铃声", app_subtitle: "为我", loading_title: "为我响起",
@@ -566,7 +593,8 @@
         ghost_mode: "隐身模式", language: "语言", contact_us: "联系我们",
         edit_profile: "编辑资料", privacy_policy: "隐私政策", terms_service: "服务条款",
         delete_account: "删除账号", sign_out: "退出登录", edit_profile_title: "编辑资料",
-        save_changes: "保存更改"
+        save_changes: "保存更改", select_language: "选择语言", no_one_nearby: "附近没有人",
+        no_rings: "还没有铃声"
       },
       ko: {
         app_name: "✦ 링", app_subtitle: "나를 위해", loading_title: "링 포 미",
@@ -589,7 +617,8 @@
         ghost_mode: "고스트 모드", language: "언어", contact_us: "문의하기",
         edit_profile: "프로필 수정", privacy_policy: "개인정보처리방침", terms_service: "서비스 이용약관",
         delete_account: "계정 삭제", sign_out: "로그아웃", edit_profile_title: "프로필 수정",
-        save_changes: "변경사항 저장"
+        save_changes: "변경사항 저장", select_language: "언어 선택", no_one_nearby: "주변에 없음",
+        no_rings: "아직 링 없음"
       },
       ja: {
         app_name: "✦ リング", app_subtitle: "私のために", loading_title: "リング・フォー・ミー",
@@ -612,7 +641,8 @@
         ghost_mode: "ゴーストモード", language: "言語", contact_us: "お問い合わせ",
         edit_profile: "プロフィール編集", privacy_policy: "プライバシーポリシー", terms_service: "利用規約",
         delete_account: "アカウント削除", sign_out: "サインアウト", edit_profile_title: "プロフィール編集",
-        save_changes: "変更を保存"
+        save_changes: "変更を保存", select_language: "言語を選択", no_one_nearby: "近くに誰もいません",
+        no_rings: "まだリングがありません"
       },
       gu: {
         app_name: "✦ રિંગ", app_subtitle: "મારા માટે", loading_title: "રિંગ ફોર મી",
@@ -635,7 +665,8 @@
         ghost_mode: "ઘોસ્ટ મોડ", language: "ભાષા", contact_us: "સંપર્ક કરો",
         edit_profile: "પ્રોફાઇલ સંપાદિત કરો", privacy_policy: "ગોપનીયતા નીતિ", terms_service: "સેવાની શરતો",
         delete_account: "ખાતું કાઢી નાખો", sign_out: "સાઇન આઉટ", edit_profile_title: "પ્રોફાઇલ સંપાદિત કરો",
-        save_changes: "ફેરફારો સાચવો"
+        save_changes: "ફેરફારો સાચવો", select_language: "ભાષા પસંદ કરો", no_one_nearby: "નજીક કોઈ નથી",
+        no_rings: "હજી સુધી કોઈ રિંગ નથી"
       },
       bn: {
         app_name: "✦ রিং", app_subtitle: "আমার জন্য", loading_title: "রিং ফর মি",
@@ -658,7 +689,8 @@
         ghost_mode: "ঘোস্ট মোড", language: "ভাষা", contact_us: "যোগাযোগ করুন",
         edit_profile: "প্রোফাইল সম্পাদনা করুন", privacy_policy: "গোপনীয়তা নীতি", terms_service: "সেবার শর্তাবলী",
         delete_account: "অ্যাকাউন্ট মুছুন", sign_out: "সাইন আউট", edit_profile_title: "প্রোফাইল সম্পাদনা করুন",
-        save_changes: "পরিবর্তন সংরক্ষণ করুন"
+        save_changes: "পরিবর্তন সংরক্ষণ করুন", select_language: "ভাষা নির্বাচন করুন", no_one_nearby: "কাছাকাছি কেউ নেই",
+        no_rings: "এখনও কোন রিং নেই"
       },
       ur: {
         app_name: "✦ رنگ", app_subtitle: "میرے لیے", loading_title: "رنگ فار می",
@@ -681,7 +713,128 @@
         ghost_mode: "گوسٹ موڈ", language: "زبان", contact_us: "رابطہ کریں",
         edit_profile: "پروفائل میں ترمیم کریں", privacy_policy: "رازداری کی پالیسی", terms_service: "خدمت کی شرائط",
         delete_account: "اکاؤنٹ حذف کریں", sign_out: "سائن آؤٹ", edit_profile_title: "پروفائل میں ترمیم کریں",
-        save_changes: "تبدیلیاں محفوظ کریں"
+        save_changes: "تبدیلیاں محفوظ کریں", select_language: "زبان منتخب کریں", no_one_nearby: "آس پاس کوئی نہیں",
+        no_rings: "ابھی تک کوئی رنگ نہیں"
+      },
+      th: {
+        app_name: "✦ ริง", app_subtitle: "เพื่อฉัน", loading_title: "ริง ฟอร์ มี",
+        login_subtitle: "เข้าสู่โลกของคุณ", login_email: "ที่อยู่อีเมล",
+        login_password: "รหัสผ่าน", login_btn: "เข้าสู่ระบบ", signup_btn: "สร้างบัญชีใหม่ →",
+        signup_title: "✦ สร้างบัญชี", signup_name: "ชื่อเต็ม", signup_email: "ที่อยู่อีเมล",
+        signup_password: "รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)", signup_bio: "ประวัติย่อ (บอกเกี่ยวกับตัวคุณ)",
+        signup_age: "อายุจริง", gender_select: "เลือกเพศ", gender_male: "ชาย",
+        gender_female: "หญิง", gender_nonbinary: "ไม่ใช่ไบนารี", gender_prefer: "ไม่ต้องการบอก",
+        signup_hobbies: "งานอดิเรก (เช่น อ่านหนังสือ, ดนตรี)", signup_interests: "ความสนใจ (เช่น ศิลปะ, ท่องเที่ยว)",
+        signup_place: "คุณมาจากไหน?", vibe_tags_label: "แท็กไวบ์ (เลือกสูงสุด 4)",
+        tag_romantic: "โรแมนติก", tag_playful: "ขี้เล่น", tag_cozy: "อบอุ่น",
+        tag_adventurous: "ผจญภัย", tag_chill: "ผ่อนคลาย", tag_nerdy: "เนิร์ด",
+        create_account_btn: "สร้างบัญชี", back_login_btn: "← กลับไปที่เข้าสู่ระบบ",
+        live_radar: "เรดาร์สด", scanning: "กำลังสแกน...", scan_now: "⟳ สแกนตอนนี้",
+        ice_breaker: "เปิดบทสนทนา", ring_history: "ประวัติริง", alarm_history: "ประวัติแจ้งเตือน",
+        nav_scan: "สแกน", nav_ringed: "ริงแล้ว", nav_history: "ประวัติ", nav_profile: "โปรไฟล์",
+        settings_title: "การตั้งค่า", light_mode: "โหมดสว่าง", off: "ปิด", on: "เปิด",
+        alarm_radius: "รัศมีแจ้งเตือน", radius_10: "10ม.", radius_20: "20ม.", radius_50: "50ม.",
+        ghost_mode: "โหมดผี", language: "ภาษา", contact_us: "ติดต่อเรา",
+        edit_profile: "แก้ไขโปรไฟล์", privacy_policy: "นโยบายความเป็นส่วนตัว", terms_service: "ข้อกำหนดการให้บริการ",
+        delete_account: "ลบบัญชี", sign_out: "ออกจากระบบ", edit_profile_title: "แก้ไขโปรไฟล์",
+        save_changes: "บันทึกการเปลี่ยนแปลง", select_language: "เลือกภาษา", no_one_nearby: "ไม่มีใครอยู่ใกล้",
+        no_rings: "ยังไม่มีริง"
+      },
+      vi: {
+        app_name: "✦ RING", app_subtitle: "cho tôi", loading_title: "RING FOR ME",
+        login_subtitle: "đăng nhập vào thế giới của bạn", login_email: "Địa chỉ email",
+        login_password: "Mật khẩu", login_btn: "Đăng nhập", signup_btn: "Tạo tài khoản mới →",
+        signup_title: "✦ tạo tài khoản", signup_name: "Họ và tên", signup_email: "Địa chỉ email",
+        signup_password: "Mật khẩu (tối thiểu 6 ký tự)", signup_bio: "Tiểu sử (giới thiệu về bạn)",
+        signup_age: "Tuổi thật", gender_select: "Chọn giới tính", gender_male: "Nam",
+        gender_female: "Nữ", gender_nonbinary: "Phi nhị phân", gender_prefer: "Không muốn tiết lộ",
+        signup_hobbies: "Sở thích (ví dụ: đọc sách, âm nhạc)", signup_interests: "Sở thích (ví dụ: nghệ thuật, du lịch)",
+        signup_place: "Bạn đến từ đâu?", vibe_tags_label: "Thẻ vibe (chọn tối đa 4)",
+        tag_romantic: "Lãng mạn", tag_playful: "Tinh nghịch", tag_cozy: "Ấm cúng",
+        tag_adventurous: "Phiêu lưu", tag_chill: "Thư giãn", tag_nerdy: "Mọt sách",
+        create_account_btn: "Tạo tài khoản", back_login_btn: "← Quay lại đăng nhập",
+        live_radar: "radar trực tiếp", scanning: "đang quét...", scan_now: "⟳ quét ngay",
+        ice_breaker: "phá băng", ring_history: "lịch sử ring", alarm_history: "lịch sử báo thức",
+        nav_scan: "Quét", nav_ringed: "Đã ring", nav_history: "Lịch sử", nav_profile: "Hồ sơ",
+        settings_title: "cài đặt", light_mode: "Chế độ sáng", off: "Tắt", on: "Bật",
+        alarm_radius: "Bán kính báo thức", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "Chế độ ẩn", language: "Ngôn ngữ", contact_us: "Liên hệ",
+        edit_profile: "Chỉnh sửa hồ sơ", privacy_policy: "Chính sách bảo mật", terms_service: "Điều khoản dịch vụ",
+        delete_account: "Xóa tài khoản", sign_out: "Đăng xuất", edit_profile_title: "Chỉnh sửa hồ sơ",
+        save_changes: "Lưu thay đổi", select_language: "Chọn ngôn ngữ", no_one_nearby: "không có ai gần",
+        no_rings: "chưa có ring nào"
+      },
+      ro: {
+        app_name: "✦ RING", app_subtitle: "pentru mine", loading_title: "RING FOR ME",
+        login_subtitle: "autentifică-te în lumea ta", login_email: "Adresă de email",
+        login_password: "Parolă", login_btn: "Autentificare", signup_btn: "Creează cont nou →",
+        signup_title: "✦ creează cont", signup_name: "Nume complet", signup_email: "Adresă de email",
+        signup_password: "Parolă (minim 6 caractere)", signup_bio: "Bio (spune-ne despre tine)",
+        signup_age: "Vârstă reală", gender_select: "Selectează genul", gender_male: "Masculin",
+        gender_female: "Feminin", gender_nonbinary: "Non-binar", gender_prefer: "Prefer să nu spun",
+        signup_hobbies: "Hobby-uri (ex. citit, muzică)", signup_interests: "Interese (ex. artă, călătorii)",
+        signup_place: "De unde ești?", vibe_tags_label: "Etichete vibe (selectează maxim 4)",
+        tag_romantic: "Romantic", tag_playful: "Jucăuș", tag_cozy: "Confortabil",
+        tag_adventurous: "Aventuros", tag_chill: "Relaxat", tag_nerdy: "Tocilar",
+        create_account_btn: "Creează cont", back_login_btn: "← Înapoi la autentificare",
+        live_radar: "radar live", scanning: "scanare...", scan_now: "⟳ scanează acum",
+        ice_breaker: "spargă gheața", ring_history: "istoric ring", alarm_history: "istoric alarmă",
+        nav_scan: "Scanare", nav_ringed: "Ringed", nav_history: "Istoric", nav_profile: "Profil",
+        settings_title: "setări", light_mode: "Mod luminos", off: "Oprit", on: "Pornit",
+        alarm_radius: "Raza alarmei", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "Mod fantomă", language: "Limbă", contact_us: "Contactați-ne",
+        edit_profile: "Editează profilul", privacy_policy: "Politica de confidențialitate", terms_service: "Termeni și condiții",
+        delete_account: "Șterge contul", sign_out: "Deconectare", edit_profile_title: "Editează profilul",
+        save_changes: "Salvează modificările", select_language: "Selectează limba", no_one_nearby: "nimeni în apropiere",
+        no_rings: "niciun ring încă"
+      },
+      ru: {
+        app_name: "✦ РИНГ", app_subtitle: "для меня", loading_title: "РИНГ ДЛЯ МЕНЯ",
+        login_subtitle: "войдите в свой мир", login_email: "Адрес электронной почты",
+        login_password: "Пароль", login_btn: "Войти", signup_btn: "Создать новый аккаунт →",
+        signup_title: "✦ создать аккаунт", signup_name: "Полное имя", signup_email: "Адрес электронной почты",
+        signup_password: "Пароль (минимум 6 символов)", signup_bio: "О себе (расскажите о себе)",
+        signup_age: "Настоящий возраст", gender_select: "Выберите пол", gender_male: "Мужской",
+        gender_female: "Женский", gender_nonbinary: "Небинарный", gender_prefer: "Предпочитаю не указывать",
+        signup_hobbies: "Хобби (например, чтение, музыка)", signup_interests: "Интересы (например, искусство, путешествия)",
+        signup_place: "Откуда вы?", vibe_tags_label: "Вайб теги (выберите до 4)",
+        tag_romantic: "Романтичный", tag_playful: "Игривый", tag_cozy: "Уютный",
+        tag_adventurous: "Авантюрный", tag_chill: "Спокойный", tag_nerdy: "Заучка",
+        create_account_btn: "Создать аккаунт", back_login_btn: "← Вернуться к входу",
+        live_radar: "живой радар", scanning: "сканирование...", scan_now: "⟳ сканировать сейчас",
+        ice_breaker: "ледокол", ring_history: "история рингов", alarm_history: "история будильников",
+        nav_scan: "Сканировать", nav_ringed: "Ринги", nav_history: "История", nav_profile: "Профиль",
+        settings_title: "настройки", light_mode: "Светлый режим", off: "Выкл", on: "Вкл",
+        alarm_radius: "Радиус будильника", radius_10: "10м", radius_20: "20м", radius_50: "50м",
+        ghost_mode: "Режим призрака", language: "Язык", contact_us: "Свяжитесь с нами",
+        edit_profile: "Редактировать профиль", privacy_policy: "Политика конфиденциальности", terms_service: "Условия обслуживания",
+        delete_account: "Удалить аккаунт", sign_out: "Выйти", edit_profile_title: "Редактировать профиль",
+        save_changes: "Сохранить изменения", select_language: "Выберите язык", no_one_nearby: "никого рядом",
+        no_rings: "пока нет рингов"
+      },
+      ar: {
+        app_name: "✦ رينج", app_subtitle: "من أجلي", loading_title: "رينج فور مي",
+        login_subtitle: "تسجيل الدخول إلى عالمك", login_email: "عنوان البريد الإلكتروني",
+        login_password: "كلمة المرور", login_btn: "تسجيل الدخول", signup_btn: "إنشاء حساب جديد →",
+        signup_title: "✦ إنشاء حساب", signup_name: "الاسم الكامل", signup_email: "عنوان البريد الإلكتروني",
+        signup_password: "كلمة المرور (6 أحرف على الأقل)", signup_bio: "السيرة الذاتية (أخبرنا عن نفسك)",
+        signup_age: "العمر الحقيقي", gender_select: "اختر الجنس", gender_male: "ذكر",
+        gender_female: "أنثى", gender_nonbinary: "غير ثنائي", gender_prefer: "أفضل عدم الإفصاح",
+        signup_hobbies: "الهوايات (مثل القراءة، الموسيقى)", signup_interests: "الاهتمامات (مثل الفن، السفر)",
+        signup_place: "من أين أنت؟", vibe_tags_label: "علامات الاهتزاز (اختر حتى 4)",
+        tag_romantic: "رومانسي", tag_playful: "مرح", tag_cozy: "مريح",
+        tag_adventurous: "مغامر", tag_chill: "هادئ", tag_nerdy: "أكاديمي",
+        create_account_btn: "إنشاء حساب", back_login_btn: "← العودة إلى تسجيل الدخول",
+        live_radar: "رادار مباشر", scanning: "جاري المسح...", scan_now: "⟳ مسح الآن",
+        ice_breaker: "كسر الجليد", ring_history: "تاريخ الرينج", alarm_history: "تاريخ التنبيه",
+        nav_scan: "مسح", nav_ringed: "رينجد", nav_history: "التاريخ", nav_profile: "الملف الشخصي",
+        settings_title: "الإعدادات", light_mode: "الوضع الفاتح", off: "إيقاف", on: "تشغيل",
+        alarm_radius: "نصف قطر التنبيه", radius_10: "10م", radius_20: "20م", radius_50: "50م",
+        ghost_mode: "وضع الشبح", language: "اللغة", contact_us: "اتصل بنا",
+        edit_profile: "تعديل الملف الشخصي", privacy_policy: "سياسة الخصوصية", terms_service: "شروط الخدمة",
+        delete_account: "حذف الحساب", sign_out: "تسجيل الخروج", edit_profile_title: "تعديل الملف الشخصي",
+        save_changes: "حفظ التغييرات", select_language: "اختر اللغة", no_one_nearby: "لا أحد بالقرب",
+        no_rings: "لا توجد رينجات بعد"
       }
     };
 
@@ -711,11 +864,14 @@
         const key = el.getAttribute('data-i18n-placeholder');
         el.placeholder = translate(key);
       });
-      document.querySelectorAll('[data-i18n-value]').forEach(el => {
-        const key = el.getAttribute('data-i18n-value');
-        el.value = translate(key);
-      });
-      // Update language buttons
+      // Update language display
+      const langNames = {
+        en: 'English', hi: 'हिन्दी', zh: '中文', ko: '한국어', ja: '日本語',
+        gu: 'ગુજરાતી', bn: 'বাংলা', ur: 'اردو', th: 'ไทย', vi: 'Tiếng Việt',
+        ro: 'Română', ru: 'Русский', ar: 'العربية'
+      };
+      const display = document.getElementById('currentLangDisplay');
+      if (display) display.textContent = `(${langNames[currentLang] || 'English'})`;
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.lang === currentLang);
       });
@@ -752,6 +908,16 @@
     const privacyPolicyBtn = $('privacyPolicyBtn'), termsServiceBtn = $('termsServiceBtn');
     const ghostToggle = $('ghostToggle'), ghostStatus = $('ghostStatus');
     const lightModeToggle = $('lightModeToggle'), lightModeStatus = $('lightModeStatus');
+    const languagePanel = $('languagePanel'), openLanguagePanel = $('openLanguagePanel');
+    const closeLanguagePanel = $('closeLanguagePanel');
+
+    // ============ LANGUAGE PANEL ============
+    openLanguagePanel.addEventListener('click', () => {
+      languagePanel.classList.add('active');
+    });
+    closeLanguagePanel.addEventListener('click', () => {
+      languagePanel.classList.remove('active');
+    });
 
     // ============ LIGHT MODE ============
     function toggleLightMode() {
@@ -762,7 +928,6 @@
       lightModeToggle.classList.toggle('active', lightMode);
     }
 
-    // Load light mode preference
     const savedLightMode = localStorage.getItem('ring_light_mode');
     if (savedLightMode === 'on') {
       lightMode = true;
@@ -770,7 +935,6 @@
       lightModeStatus.textContent = translate('on');
       lightModeToggle.classList.add('active');
     }
-
     lightModeToggle.addEventListener('click', toggleLightMode);
 
     // ============ LANGUAGE ============
@@ -779,13 +943,12 @@
         currentLang = lang;
         localStorage.setItem('ring_language', lang);
         applyTranslations();
-        // Update UI texts that need refresh
         if (lightModeStatus) lightModeStatus.textContent = translate(lightMode ? 'on' : 'off');
         if (ghostStatus) ghostStatus.textContent = translate(isGhostMode ? 'on' : 'off');
+        languagePanel.classList.remove('active');
       }
     }
 
-    // Load language preference
     const savedLang = localStorage.getItem('ring_language');
     if (savedLang && translations[savedLang]) {
       currentLang = savedLang;
@@ -901,6 +1064,8 @@
         if (snap.val() === true) {
           mutualRings[otherUid] = true;
           loadRinged();
+          // Refresh nearby to remove mutual users
+          scanNearby();
         }
       });
     }
@@ -929,6 +1094,7 @@
               await db.ref('mutualRings/' + fromUid + '/' + myUID).set(true);
               mutualRings[fromUid] = true;
               loadRinged();
+              scanNearby();
             }
             
             // Only show alarm if this is an incoming ring (someone rang me)
@@ -1135,7 +1301,10 @@
       if (!allUsers) return;
       const results = [];
       const myLat = currentUser.lat, myLng = currentUser.lng;
-      if (!myLat || !myLng) return;
+      if (!myLat || !myLng) {
+        scanStatus.textContent = '📍 waiting for location...';
+        return;
+      }
       for (let uid in allUsers) {
         if (uid === myUID) continue;
         const u = allUsers[uid];
@@ -1216,7 +1385,7 @@
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
               }
               loadRinged();
-              scanNearby(); // Refresh nearby list
+              scanNearby();
             } else {
               if (Notification.permission === 'granted') {
                 new Notification('❤️ Ring sent!', { body: `You rang ${user.name}` });
