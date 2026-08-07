@@ -223,7 +223,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"/></svg>
                 <span data-i18n="live_radar">live radar</span>
               </span>
-              <span id="scanStatus" class="text-xs text-[#6b5e4e]" data-i18n="scanning">scanning...</span>
+              <span id="scanStatus" class="text-xs text-[#6b5e4e]">scanning...</span>
             </div>
             <div class="relative flex justify-center my-2">
               <svg width="160" height="160" viewBox="0 0 160 160">
@@ -379,17 +379,30 @@
           </div>
         </div>
 
+        <!-- Edit Profile -->
+        <button id="editProfileBtn" class="btn-secondary text-sm" data-i18n="edit_profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span data-i18n="edit_profile">Edit Profile</span>
+        </button>
+
         <!-- Language Button -->
-        <div class="setting-section">
-          <span class="text-sm text-white-important block mb-2" data-i18n="language">Language</span>
-          <button id="openLanguagePanel" class="btn-secondary text-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="2"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
-            <span data-i18n="select_language">Select Language</span>
-            <span id="currentLangDisplay" class="ml-2 text-xs">(English)</span>
-          </button>
-        </div>
+        <button id="openLanguagePanel" class="btn-secondary text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="2"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+          <span data-i18n="select_language">Select Language</span>
+          <span id="currentLangDisplay" class="ml-2 text-xs">(English)</span>
+        </button>
 
         <!-- Contact Us -->
+        <button id="privacyPolicyBtn" class="btn-secondary text-sm" data-i18n="privacy_policy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          <span data-i18n="privacy_policy">Privacy Policy</span>
+        </button>
+        <button id="termsServiceBtn" class="btn-secondary text-sm" data-i18n="terms_service">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span data-i18n="terms_service">Terms of Service</span>
+        </button>
+
+        <!-- Contact Us Section -->
         <div class="setting-section">
           <span class="text-sm text-white-important block mb-2" data-i18n="contact_us">Contact us</span>
           <div class="space-y-2 text-sm">
@@ -408,19 +421,6 @@
           </div>
         </div>
 
-        <!-- Edit Profile -->
-        <button id="editProfileBtn" class="btn-secondary text-sm" data-i18n="edit_profile">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          <span data-i18n="edit_profile">Edit Profile</span>
-        </button>
-        <button id="privacyPolicyBtn" class="btn-secondary text-sm" data-i18n="privacy_policy">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-          <span data-i18n="privacy_policy">Privacy Policy</span>
-        </button>
-        <button id="termsServiceBtn" class="btn-secondary text-sm" data-i18n="terms_service">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span data-i18n="terms_service">Terms of Service</span>
-        </button>
         <div class="mt-auto pt-4 border-t border-[#f3c96b20] space-y-3">
           <button id="deleteAccountBtn" class="btn-danger text-sm" data-i18n="delete_account">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" class="inline"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
@@ -864,7 +864,6 @@
         const key = el.getAttribute('data-i18n-placeholder');
         el.placeholder = translate(key);
       });
-      // Update language display
       const langNames = {
         en: 'English', hi: 'हिन्दी', zh: '中文', ko: '한국어', ja: '日本語',
         gu: 'ગુજરાતી', bn: 'বাংলা', ur: 'اردو', th: 'ไทย', vi: 'Tiếng Việt',
@@ -1064,7 +1063,6 @@
         if (snap.val() === true) {
           mutualRings[otherUid] = true;
           loadRinged();
-          // Refresh nearby to remove mutual users
           scanNearby();
         }
       });
@@ -1310,7 +1308,7 @@
         const u = allUsers[uid];
         if (!u.lat || !u.lng || u.ghost) continue;
         const dist = haversine(myLat, myLng, u.lat, u.lng);
-        // Only show users within 50m
+        // Show all users within 50m
         if (dist > 50) continue;
         // Skip mutual users - they go to ringed section
         if (mutualRings[uid]) continue;
