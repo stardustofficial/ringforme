@@ -66,6 +66,53 @@
     .ring-btn:hover { background: #f3c96b40; }
     .ring-btn.ringed { opacity: 0.6; cursor: default; }
     .ring-btn.ringed:hover { background: #f3c96b20; }
+    .popup-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 36px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .popup-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .popup-box {
+      background: #1f1b1e;
+      border: 2px solid #f3c96b;
+      border-radius: 24px;
+      padding: 32px 28px;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 0 60px #f3c96b30;
+      transform: scale(0.9);
+      transition: transform 0.4s ease;
+    }
+    .popup-overlay.active .popup-box {
+      transform: scale(1);
+    }
+    .ghost-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #2a2529;
+      padding: 8px 16px;
+      border-radius: 30px;
+      border: 1px solid #f3c96b40;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: #f3c96b;
+      font-size: 0.9rem;
+    }
+    .ghost-toggle:hover { background: #3a3539; }
+    .ghost-toggle.active { border-color: #f3c96b; background: #f3c96b20; }
   </style>
 </head>
 <body>
@@ -283,6 +330,13 @@
             <option value="10">10m</option><option value="20" selected>20m</option><option value="50">50m</option>
           </select>
         </div>
+        <div>
+          <span class="text-sm text-white-important block mb-2">Ghost mode</span>
+          <div id="ghostToggle" class="ghost-toggle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0-6 6c0 4 3 7 6 9 3-2 6-5 6-9a6 6 0 0 0-6-6z"/><circle cx="12" cy="9" r="2"/></svg>
+            <span id="ghostStatus">Off</span>
+          </div>
+        </div>
         <button id="editProfileBtn" class="btn-secondary text-sm">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           Edit Profile
@@ -332,6 +386,16 @@
         <input id="editInterest" type="text" placeholder="Interests" class="text-white-important text-base" />
         <input id="editPlace" type="text" placeholder="Where do you belong?" class="text-white-important text-base" />
         <button id="saveEditProfile" class="btn-primary text-base">Save Changes</button>
+      </div>
+    </div>
+
+    <!-- POPUPS -->
+    <div id="popupOverlay" class="popup-overlay">
+      <div class="popup-box">
+        <div id="popupIcon" class="text-5xl mb-3">❤️</div>
+        <div id="popupTitle" class="text-xl font-bold gold-text">Ring Sent!</div>
+        <div id="popupMessage" class="text-sm text-[#b8a68b] mt-2">Your ring has been sent successfully</div>
+        <button id="popupCloseBtn" class="btn-primary text-sm mt-4 w-auto px-8 py-2">Got it</button>
       </div>
     </div>
 
@@ -386,6 +450,9 @@
     let currentUser = null, myUID = null, watchId = null;
     let selectedVibes = [], nearbyUsers = [], alarmHistory = [];
     let alarmTimer = null;
+    let isGhostMode = false;
+    let isAlarmActive = false;
+    let currentAlarmUid = null;
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
@@ -418,6 +485,9 @@
     const editHobbies = $('editHobbies'), editInterest = $('editInterest'), editPlace = $('editPlace');
     const saveEditProfile = $('saveEditProfile'), editProfileBtn = $('editProfileBtn');
     const privacyPolicyBtn = $('privacyPolicyBtn'), termsServiceBtn = $('termsServiceBtn');
+    const popupOverlay = $('popupOverlay'), popupIcon = $('popupIcon'), popupTitle = $('popupTitle');
+    const popupMessage = $('popupMessage'), popupCloseBtn = $('popupCloseBtn');
+    const ghostToggle = $('ghostToggle'), ghostStatus = $('ghostStatus');
 
     function showView(view) {
       [loadingView, loginView, signupView, pagesContainer].forEach(v => v.classList.add('hidden'));
@@ -447,6 +517,40 @@
       el.addEventListener('click', () => navigateTo(el.dataset.page));
     });
 
+    // Popup
+    function showPopup(icon, title, message) {
+      popupIcon.textContent = icon;
+      popupTitle.textContent = title;
+      popupMessage.textContent = message;
+      popupOverlay.classList.add('active');
+    }
+
+    popupCloseBtn.addEventListener('click', () => {
+      popupOverlay.classList.remove('active');
+    });
+    popupOverlay.addEventListener('click', (e) => {
+      if (e.target === popupOverlay) popupOverlay.classList.remove('active');
+    });
+
+    // Ghost mode toggle
+    ghostToggle.addEventListener('click', function() {
+      isGhostMode = !isGhostMode;
+      this.classList.toggle('active');
+      ghostStatus.textContent = isGhostMode ? 'On' : 'Off';
+      if (isGhostMode && myUID) {
+        db.ref('users/' + myUID + '/lat').remove();
+        db.ref('users/' + myUID + '/lng').remove();
+        db.ref('users/' + myUID + '/ghost').set(true);
+      } else if (myUID) {
+        db.ref('users/' + myUID + '/ghost').set(false);
+        // Restart location update
+        if (currentUser && currentUser.lat && currentUser.lng) {
+          db.ref('users/' + myUID + '/lat').set(currentUser.lat);
+          db.ref('users/' + myUID + '/lng').set(currentUser.lng);
+        }
+      }
+    });
+
     // Auth
     auth.onAuthStateChanged(async user => {
       if (user) {
@@ -455,6 +559,11 @@
         const data = snap.val();
         if (data) {
           currentUser = data; currentUser.uid = myUID;
+          isGhostMode = data.ghost || false;
+          if (isGhostMode) {
+            ghostStatus.textContent = 'On';
+            ghostToggle.classList.add('active');
+          }
           showView(pagesContainer);
           fillProfile(data);
           startLocationWatch();
@@ -483,7 +592,7 @@
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
-          // SOMEONE RANG ME! - This is where alarm should play
+          // SOMEONE RANG ME!
           const userSnap = await db.ref('users/' + fromUid).once('value');
           const user = userSnap.val();
           if (user) {
@@ -492,7 +601,10 @@
             const myRingSnap = await myRingRef.once('value');
             const iRangThem = myRingSnap.val() === true;
             
-            // ONLY HERE we call showAlarmWithFullDetails
+            // Dismiss any existing alarm first
+            dismissAlarm();
+            
+            // Show alarm with details
             showAlarmWithFullDetails(user, iRangThem);
             
             alarmHistory.push({ 
@@ -506,6 +618,8 @@
             if (iRangThem) {
               alarmMutualBadge.classList.remove('hidden');
               if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+              // Show mutual popup on both phones
+              showPopup('💞', 'Mutual Ring! 💞', `You and ${user.name} have ringed each other! Congratulations! 🎉`);
             }
           }
         }
@@ -513,6 +627,7 @@
     }
 
     function showAlarmWithFullDetails(user, isMutual) {
+      currentAlarmUid = user.uid;
       alarmUserName.textContent = user.name || 'Someone';
       alarmUserBio.textContent = user.bio || '';
       alarmUserAge.textContent = user.age || '—';
@@ -532,6 +647,7 @@
       
       alarmOverlay.classList.remove('opacity-0');
       alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
+      isAlarmActive = true;
       
       alarmSound.loop = true;
       alarmSound.play().catch(() => {});
@@ -550,6 +666,8 @@
       alarmSound.pause();
       alarmSound.currentTime = 0;
       alarmSound.loop = false;
+      isAlarmActive = false;
+      currentAlarmUid = null;
       clearTimeout(alarmTimer);
     }
 
@@ -587,7 +705,7 @@
         const cred = await auth.createUserWithEmailAndPassword(email, pass);
         const uid = cred.user.uid;
         const userObj = { name, email, bio, age, gender, hobbies, interests, place,
-          vibeTags: [...selectedVibes], badges: ['✨ Explorer'], streak: 1, lat: 0, lng: 0, timestamp: Date.now() };
+          vibeTags: [...selectedVibes], badges: ['✨ Explorer'], streak: 1, lat: 0, lng: 0, ghost: false, timestamp: Date.now() };
         await db.ref('users/' + uid).set(userObj);
         currentUser = userObj; currentUser.uid = uid;
         showView(pagesContainer);
@@ -659,7 +777,7 @@
       if (watchId) navigator.geolocation.clearWatch(watchId);
       watchId = navigator.geolocation.watchPosition(
         async (pos) => {
-          if (!currentUser || !myUID) return;
+          if (!currentUser || !myUID || isGhostMode) return;
           currentUser.lat = pos.coords.latitude; currentUser.lng = pos.coords.longitude;
           await db.ref('users/' + myUID + '/lat').set(pos.coords.latitude);
           await db.ref('users/' + myUID + '/lng').set(pos.coords.longitude);
@@ -697,7 +815,7 @@
       for (let uid in allUsers) {
         if (uid === myUID) continue;
         const u = allUsers[uid];
-        if (!u.lat || !u.lng) continue;
+        if (!u.lat || !u.lng || u.ghost) continue;
         const dist = haversine(myLat, myLng, u.lat, u.lng);
         const match = calculateMatch(currentUser, u);
         results.push({ uid, ...u, distance: dist, matchPercent: Math.round(match * 100) });
@@ -736,7 +854,6 @@
           const uid = card.dataset.uid;
           if (!uid || !myUID) return;
           
-          // ============ ONLY SAVE TO FIREBASE - NO ALARM PLAYED HERE ============
           // Send ring to other user - this will trigger their listener
           await db.ref('rings/' + uid + '/' + myUID).set(true);
           
@@ -761,22 +878,25 @@
             const theyRangMe = theirRingSnap.val() === true;
             
             if (theyRangMe) {
-              // Mutual ring - save mutual status
+              // Mutual ring!
               await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
               await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
               alarmHistory.push({ name: user.name, time: new Date().toLocaleTimeString(), dist: 'mutual ring!', isMutual: true });
               loadHistory();
+              // Show mutual popup
+              showPopup('💞', 'Mutual Ring! 💞', `You and ${user.name} have ringed each other! Congratulations! 🎉`);
               if (Notification.permission === 'granted') {
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
               }
             } else {
+              // Single ring - show success popup
+              showPopup('❤️', 'Ring Sent!', `Your ring has been sent to ${user.name} successfully!`);
               if (Notification.permission === 'granted') {
                 new Notification('❤️ You rang ' + user.name + '!', { body: 'Waiting for them to ring back...' });
               }
             }
             loadRinged();
           }
-          // Reset button after 3 seconds
           this.textContent = '✅ Ringed!';
           this.classList.add('ringed');
           setTimeout(() => {
