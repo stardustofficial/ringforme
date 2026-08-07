@@ -66,6 +66,7 @@
     .ring-btn:hover { background: #f3c96b40; }
     .ring-btn.ringed { opacity: 0.6; cursor: default; }
     .ring-btn.ringed:hover { background: #f3c96b20; }
+    .ring-btn.mutual { border-color: #f3c96b; background: #f3c96b30; }
     .ghost-toggle {
       display: inline-flex;
       align-items: center;
@@ -411,6 +412,7 @@
     let isGhostMode = false;
     let isAlarmActive = false;
     let mutualRings = {};
+    let processedRingKeys = new Set();
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
@@ -551,6 +553,14 @@
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
+          // Check if already processed
+          const key = fromUid + '_' + Date.now();
+          if (processedRingKeys.has(fromUid)) {
+            return;
+          }
+          processedRingKeys.add(fromUid);
+          
+          // Check if mutual
           if (mutualRings[fromUid]) {
             return;
           }
@@ -583,6 +593,11 @@
               alarmMutualBadge.classList.remove('hidden');
               if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
             }
+            
+            // Clear from processed after 5 seconds
+            setTimeout(() => {
+              processedRingKeys.delete(fromUid);
+            }, 5000);
           }
         }
       });
@@ -809,7 +824,7 @@
               ${isMatch ? '<span class="match-heart">❤️</span>' : ''}
             </div>
             <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
-            <button class="ring-btn mt-1" data-uid="${r.uid}">${isMutual ? '💞 Mutual' : 'Ring ❤️'}</button>
+            <button class="ring-btn mt-1 ${isMutual ? 'mutual' : ''}" data-uid="${r.uid}">${isMutual ? '💞 Mutual' : 'Ring ❤️'}</button>
           </div>
         </div>`;
       }).join('');
@@ -819,12 +834,10 @@
           const uid = this.dataset.uid;
           if (!uid || !myUID) return;
           
-          // If already mutual, just return
           if (mutualRings[uid]) {
             return;
           }
           
-          // Send ring to other user
           await db.ref('rings/' + uid + '/' + myUID).set(true);
           
           const user = nearbyUsers.find(u => u.uid === uid);
@@ -855,9 +868,8 @@
               if (Notification.permission === 'granted') {
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
               }
-              // Update button text
               this.textContent = '💞 Mutual';
-              this.classList.add('ringed');
+              this.classList.add('mutual');
             } else {
               if (Notification.permission === 'granted') {
                 new Notification('❤️ Ring sent!', { body: `You rang ${user.name}` });
@@ -944,6 +956,7 @@
         db.ref('mutualRings/' + myUID).off();
       }
       dismissAlarm();
+      processedRingKeys.clear();
     });
     deleteAccountBtn.addEventListener('click', async () => {
       if (confirm('Delete your account permanently? This cannot be undone.')) {
