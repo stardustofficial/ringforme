@@ -60,6 +60,9 @@
     .settings-gear svg { stroke: #f3c96b; }
     .mt-auto { margin-top: auto; }
     .ring-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; text-align: left; font-size: 0.7rem; }
+    .ring-btn { cursor: pointer; transition: all 0.2s; }
+    .ring-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .ring-btn:hover:not(:disabled) { background: #f3c96b40; }
   </style>
 </head>
 <body>
@@ -487,23 +490,19 @@
       const ringRef = db.ref('rings/' + myUID);
       ringRef.on('child_added', async (snap) => {
         const fromUid = snap.key;
-        // Ignore if it's me ringing myself
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
-          // Someone rang me!
           const userSnap = await db.ref('users/' + fromUid).once('value');
           const user = userSnap.val();
           if (user) {
-            // Check if this is a mutual ring (I already rang them)
+            // Check if mutual
             const myRingRef = db.ref('rings/' + fromUid + '/' + myUID);
             const myRingSnap = await myRingRef.once('value');
             const iRangThem = myRingSnap.val() === true;
             
-            // Show alarm with full user details
             showAlarmWithFullDetails(user, iRangThem);
             
-            // Save to history
             alarmHistory.push({ 
               name: user.name, 
               time: new Date().toLocaleTimeString(), 
@@ -512,11 +511,8 @@
             });
             loadHistory();
             
-            // If mutual, trigger mutual ring effect
             if (iRangThem) {
-              // Show mutual badge
               alarmMutualBadge.classList.remove('hidden');
-              // Also ring my phone with mutual pattern
               if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
             }
           }
@@ -525,7 +521,6 @@
     }
 
     function showAlarmWithFullDetails(user, isMutual) {
-      // Set all user details
       alarmUserName.textContent = user.name || 'Someone';
       alarmUserBio.textContent = user.bio || '';
       alarmUserAge.textContent = user.age || '—';
@@ -537,18 +532,15 @@
       const common = (currentUser.vibeTags || []).filter(t => (user.vibeTags || []).includes(t));
       commonTagsDisplay.textContent = common.join(', ') || '❤️';
       
-      // Show/hide mutual badge
       if (isMutual) {
         alarmMutualBadge.classList.remove('hidden');
       } else {
         alarmMutualBadge.classList.add('hidden');
       }
       
-      // Show alarm
       alarmOverlay.classList.remove('opacity-0');
       alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
       
-      // Play sound with loop
       alarmSound.loop = true;
       alarmSound.play().catch(() => {});
       alarmSoundPlaying = true;
@@ -556,7 +548,6 @@
       if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
       isAlarmActive = true;
       
-      // Auto dismiss after 30 seconds if not dismissed manually
       clearTimeout(alarmTimer);
       alarmTimer = setTimeout(() => {
         dismissAlarm();
@@ -749,7 +740,7 @@
               ${isMatch ? '<span class="match-heart">❤️</span>' : ''}
             </div>
             <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
-            ${isMatch ? `<button class="ring-btn text-xs gold-text bg-[#f3c96b20] px-3 py-1 rounded-full mt-1 border border-[#f3c96b40]">Ring ❤️</button>` : ''}
+            ${isMatch ? `<button class="ring-btn text-xs gold-text bg-[#f3c96b20] px-3 py-1 rounded-full mt-1 border border-[#f3c96b40] hover:bg-[#f3c96b40] transition-all">Ring ❤️</button>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -765,7 +756,7 @@
           
           const user = nearbyUsers.find(u => u.uid === uid);
           if (user) {
-            // Save ring details for the other user to see
+            // Save ring details for the other user
             await db.ref('ringDetails/' + uid + '/' + myUID).set({
               name: currentUser.name,
               bio: currentUser.bio || '',
@@ -786,7 +777,6 @@
             if (theyRangMe) {
               // Mutual ring - trigger alarm for me too
               showAlarmWithFullDetails(user, true);
-              // Also trigger mutual ring for them via database
               await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
               await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
               alarmHistory.push({ name: user.name, time: new Date().toLocaleTimeString(), dist: 'mutual ring!', isMutual: true });
@@ -795,15 +785,17 @@
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
               }
             } else {
-              // Single ring - just notify them (they'll get the ring on their phone)
               if (Notification.permission === 'granted') {
                 new Notification('❤️ You rang ' + user.name + '!', { body: 'Waiting for them to ring back...' });
               }
             }
             loadRinged();
           }
+          // Don't disable the button - allow multiple rings
           this.textContent = '✅ Ringed!';
-          this.disabled = true;
+          setTimeout(() => {
+            this.textContent = 'Ring ❤️';
+          }, 3000);
         });
       });
     }
