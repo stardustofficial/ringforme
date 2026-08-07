@@ -62,7 +62,7 @@
     .settings-gear svg { stroke: #f3c96b; }
     .mt-auto { margin-top: auto; }
     .ring-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; text-align: left; font-size: 0.7rem; }
-    .ring-btn { cursor: pointer; transition: all 0.2s; }
+    .ring-btn { cursor: pointer; transition: all 0.2s; padding: 4px 12px; border-radius: 20px; border: 1px solid #f3c96b40; background: #f3c96b20; color: #f3c96b; font-size: 0.7rem; }
     .ring-btn:hover { background: #f3c96b40; }
     .ring-btn.ringed { opacity: 0.6; cursor: default; }
     .ring-btn.ringed:hover { background: #f3c96b20; }
@@ -532,9 +532,7 @@
         const otherUid = snap.key;
         if (otherUid === myUID) return;
         if (snap.val() === true) {
-          // This user has a mutual ring with me
           mutualRings[otherUid] = true;
-          // Also show alarm on my phone if not already showing
           const userSnap = await db.ref('users/' + otherUid).once('value');
           const user = userSnap.val();
           if (user && !isAlarmActive) {
@@ -553,31 +551,24 @@
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
-          // Check if this is already a mutual ring
           if (mutualRings[fromUid]) {
-            // Already mutual, don't ring again
             return;
           }
           
           const userSnap = await db.ref('users/' + fromUid).once('value');
           const user = userSnap.val();
           if (user) {
-            // Check if I already rang them (mutual)
             const myRingRef = db.ref('rings/' + fromUid + '/' + myUID);
             const myRingSnap = await myRingRef.once('value');
             const iRangThem = myRingSnap.val() === true;
             
             if (iRangThem) {
-              // Mutual ring! Save to mutualRings
               await db.ref('mutualRings/' + myUID + '/' + fromUid).set(true);
               await db.ref('mutualRings/' + fromUid + '/' + myUID).set(true);
               mutualRings[fromUid] = true;
             }
             
-            // Dismiss any existing alarm first
             dismissAlarm();
-            
-            // Show alarm with sender's full details
             showAlarmWithFullDetails(user, iRangThem);
             
             alarmHistory.push({ 
@@ -787,7 +778,6 @@
         const u = allUsers[uid];
         if (!u.lat || !u.lng || u.ghost) continue;
         const dist = haversine(myLat, myLng, u.lat, u.lng);
-        // Only show users within 50m radius
         if (dist > 50) continue;
         const match = calculateMatch(currentUser, u);
         results.push({ uid, ...u, distance: dist, matchPercent: Math.round(match * 100) });
@@ -806,31 +796,30 @@
       }
       nearbyList.innerHTML = results.slice(0, 6).map(r => {
         const isMatch = r.distance < parseInt(radiusSelect.value) && r.matchPercent >= 70;
-        // Check if mutual ring already exists
         const isMutual = mutualRings[r.uid] || false;
         return `<div class="ring-card flex justify-between items-center" data-uid="${r.uid}">
-          <div><span class="font-medium gold-text">${r.name}</span>
-          <div class="flex flex-wrap gap-1 mt-1">${(r.vibeTags||[]).slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}</div></div>
+          <div>
+            <span class="font-medium gold-text">${r.name}</span>
+            ${isMutual ? '<span class="text-[10px] gold-text ml-1">💞</span>' : ''}
+            <div class="flex flex-wrap gap-1 mt-1">${(r.vibeTags||[]).slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}</div>
+          </div>
           <div class="text-right">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 justify-end">
               <span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span>
               ${isMatch ? '<span class="match-heart">❤️</span>' : ''}
-              ${isMutual ? '<span class="match-heart">💞</span>' : ''}
             </div>
             <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
-            ${isMatch && !isMutual ? `<button class="ring-btn text-xs gold-text bg-[#f3c96b20] px-3 py-1 rounded-full mt-1 border border-[#f3c96b40]">Ring ❤️</button>` : ''}
-            ${isMutual ? `<span class="text-xs gold-text mt-1 block">💞 Mutual!</span>` : ''}
+            <button class="ring-btn mt-1" data-uid="${r.uid}">${isMutual ? '💞 Mutual' : 'Ring ❤️'}</button>
           </div>
         </div>`;
       }).join('');
 
       document.querySelectorAll('.ring-btn').forEach((btn) => {
         btn.addEventListener('click', async function() {
-          const card = this.closest('.ring-card');
-          const uid = card.dataset.uid;
+          const uid = this.dataset.uid;
           if (!uid || !myUID) return;
           
-          // Check if already mutual
+          // If already mutual, just return
           if (mutualRings[uid]) {
             return;
           }
@@ -840,7 +829,6 @@
           
           const user = nearbyUsers.find(u => u.uid === uid);
           if (user) {
-            // Save sender details for the receiver
             await db.ref('ringDetails/' + uid + '/' + myUID).set({
               name: currentUser.name,
               bio: currentUser.bio || '',
@@ -853,37 +841,36 @@
               timestamp: Date.now()
             });
             
-            // Check if they already rang me (mutual)
             const theirRingRef = db.ref('rings/' + myUID + '/' + uid);
             const theirRingSnap = await theirRingRef.once('value');
             const theyRangMe = theirRingSnap.val() === true;
             
             if (theyRangMe) {
-              // Mutual ring!
               await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
               await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
               mutualRings[uid] = true;
               alarmHistory.push({ name: user.name, time: new Date().toLocaleTimeString(), dist: 'mutual ring!', isMutual: true });
               loadHistory();
-              // Show alarm on sender's phone for mutual ring
               showAlarmWithFullDetails(user, true);
               if (Notification.permission === 'granted') {
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
               }
+              // Update button text
+              this.textContent = '💞 Mutual';
+              this.classList.add('ringed');
             } else {
-              // Single ring - just sent
               if (Notification.permission === 'granted') {
                 new Notification('❤️ Ring sent!', { body: `You rang ${user.name}` });
               }
+              this.textContent = '✅ Ringed!';
+              this.classList.add('ringed');
+              setTimeout(() => {
+                this.textContent = 'Ring ❤️';
+                this.classList.remove('ringed');
+              }, 3000);
             }
             loadRinged();
           }
-          this.textContent = '✅ Ringed!';
-          this.classList.add('ringed');
-          setTimeout(() => {
-            this.textContent = 'Ring ❤️';
-            this.classList.remove('ringed');
-          }, 3000);
         });
       });
     }
