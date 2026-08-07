@@ -66,38 +66,6 @@
     .ring-btn:hover { background: #f3c96b40; }
     .ring-btn.ringed { opacity: 0.6; cursor: default; }
     .ring-btn.ringed:hover { background: #f3c96b20; }
-    .popup-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 60;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
-      border-radius: 36px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
-    }
-    .popup-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .popup-box {
-      background: #1f1b1e;
-      border: 2px solid #f3c96b;
-      border-radius: 24px;
-      padding: 32px 28px;
-      max-width: 90%;
-      text-align: center;
-      box-shadow: 0 0 60px #f3c96b30;
-      transform: scale(0.9);
-      transition: transform 0.4s ease;
-    }
-    .popup-overlay.active .popup-box {
-      transform: scale(1);
-    }
     .ghost-toggle {
       display: inline-flex;
       align-items: center;
@@ -389,16 +357,6 @@
       </div>
     </div>
 
-    <!-- POPUPS -->
-    <div id="popupOverlay" class="popup-overlay">
-      <div class="popup-box">
-        <div id="popupIcon" class="text-5xl mb-3">❤️</div>
-        <div id="popupTitle" class="text-xl font-bold gold-text">Ring Sent!</div>
-        <div id="popupMessage" class="text-sm text-[#b8a68b] mt-2">Your ring has been sent successfully</div>
-        <button id="popupCloseBtn" class="btn-primary text-sm mt-4 w-auto px-8 py-2">Got it</button>
-      </div>
-    </div>
-
     <!-- alarm overlay -->
     <div id="alarmOverlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-all duration-700 ease-in-out rounded-[36px] overflow-hidden" style="background: radial-gradient(circle at center, #f3c96b30, #141215 80%);">
       <div class="heart-beat text-8xl gold-text">
@@ -452,7 +410,6 @@
     let alarmTimer = null;
     let isGhostMode = false;
     let isAlarmActive = false;
-    let currentAlarmUid = null;
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
@@ -485,8 +442,6 @@
     const editHobbies = $('editHobbies'), editInterest = $('editInterest'), editPlace = $('editPlace');
     const saveEditProfile = $('saveEditProfile'), editProfileBtn = $('editProfileBtn');
     const privacyPolicyBtn = $('privacyPolicyBtn'), termsServiceBtn = $('termsServiceBtn');
-    const popupOverlay = $('popupOverlay'), popupIcon = $('popupIcon'), popupTitle = $('popupTitle');
-    const popupMessage = $('popupMessage'), popupCloseBtn = $('popupCloseBtn');
     const ghostToggle = $('ghostToggle'), ghostStatus = $('ghostStatus');
 
     function showView(view) {
@@ -517,21 +472,6 @@
       el.addEventListener('click', () => navigateTo(el.dataset.page));
     });
 
-    // Popup
-    function showPopup(icon, title, message) {
-      popupIcon.textContent = icon;
-      popupTitle.textContent = title;
-      popupMessage.textContent = message;
-      popupOverlay.classList.add('active');
-    }
-
-    popupCloseBtn.addEventListener('click', () => {
-      popupOverlay.classList.remove('active');
-    });
-    popupOverlay.addEventListener('click', (e) => {
-      if (e.target === popupOverlay) popupOverlay.classList.remove('active');
-    });
-
     // Ghost mode toggle
     ghostToggle.addEventListener('click', function() {
       isGhostMode = !isGhostMode;
@@ -543,7 +483,6 @@
         db.ref('users/' + myUID + '/ghost').set(true);
       } else if (myUID) {
         db.ref('users/' + myUID + '/ghost').set(false);
-        // Restart location update
         if (currentUser && currentUser.lat && currentUser.lng) {
           db.ref('users/' + myUID + '/lat').set(currentUser.lat);
           db.ref('users/' + myUID + '/lng').set(currentUser.lng);
@@ -592,7 +531,7 @@
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
-          // SOMEONE RANG ME!
+          // SOMEONE RANG ME! - This is like receiving a call
           const userSnap = await db.ref('users/' + fromUid).once('value');
           const user = userSnap.val();
           if (user) {
@@ -604,7 +543,7 @@
             // Dismiss any existing alarm first
             dismissAlarm();
             
-            // Show alarm with details
+            // Show alarm with sender's full details
             showAlarmWithFullDetails(user, iRangThem);
             
             alarmHistory.push({ 
@@ -618,8 +557,6 @@
             if (iRangThem) {
               alarmMutualBadge.classList.remove('hidden');
               if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
-              // Show mutual popup on both phones
-              showPopup('💞', 'Mutual Ring! 💞', `You and ${user.name} have ringed each other! Congratulations! 🎉`);
             }
           }
         }
@@ -627,7 +564,6 @@
     }
 
     function showAlarmWithFullDetails(user, isMutual) {
-      currentAlarmUid = user.uid;
       alarmUserName.textContent = user.name || 'Someone';
       alarmUserBio.textContent = user.bio || '';
       alarmUserAge.textContent = user.age || '—';
@@ -667,7 +603,6 @@
       alarmSound.currentTime = 0;
       alarmSound.loop = false;
       isAlarmActive = false;
-      currentAlarmUid = null;
       clearTimeout(alarmTimer);
     }
 
@@ -854,12 +789,12 @@
           const uid = card.dataset.uid;
           if (!uid || !myUID) return;
           
-          // Send ring to other user - this will trigger their listener
+          // Send ring to other user - this triggers their listener
           await db.ref('rings/' + uid + '/' + myUID).set(true);
           
           const user = nearbyUsers.find(u => u.uid === uid);
           if (user) {
-            // Save ring details for the other user
+            // Save sender details for the receiver
             await db.ref('ringDetails/' + uid + '/' + myUID).set({
               name: currentUser.name,
               bio: currentUser.bio || '',
@@ -883,16 +818,10 @@
               await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
               alarmHistory.push({ name: user.name, time: new Date().toLocaleTimeString(), dist: 'mutual ring!', isMutual: true });
               loadHistory();
-              // Show mutual popup
-              showPopup('💞', 'Mutual Ring! 💞', `You and ${user.name} have ringed each other! Congratulations! 🎉`);
+              // Also show alarm on sender's phone for mutual ring
+              showAlarmWithFullDetails(user, true);
               if (Notification.permission === 'granted') {
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
-              }
-            } else {
-              // Single ring - show success popup
-              showPopup('❤️', 'Ring Sent!', `Your ring has been sent to ${user.name} successfully!`);
-              if (Notification.permission === 'granted') {
-                new Notification('❤️ You rang ' + user.name + '!', { body: 'Waiting for them to ring back...' });
               }
             }
             loadRinged();
