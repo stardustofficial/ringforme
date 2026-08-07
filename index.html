@@ -59,6 +59,7 @@
     .settings-gear:hover { background: #2a2529; }
     .settings-gear svg { stroke: #f3c96b; }
     .mt-auto { margin-top: auto; }
+    .ring-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; text-align: left; font-size: 0.7rem; }
   </style>
 </head>
 <body>
@@ -347,10 +348,18 @@
         </svg>
       </div>
       <div class="text-3xl font-bold gold-text mt-2 tracking-widest">RING</div>
-      <div id="alarmUserDetails" class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-3 rounded-full mt-2 backdrop-blur text-center max-w-[90%]">
-        <div id="alarmUserName" class="font-bold">—</div>
-        <div id="alarmUserBio" class="text-xs text-[#f3c96b99]">—</div>
-        <div id="alarmCommonTags" class="text-xs mt-1">common: <span id="commonTagsDisplay">—</span></div>
+      <div id="alarmUserDetails" class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-4 rounded-2xl mt-3 backdrop-blur text-center max-w-[92%] w-full">
+        <div id="alarmUserName" class="font-bold text-lg gold-text">—</div>
+        <div id="alarmUserBio" class="text-xs text-[#f3c96b99] mt-1">—</div>
+        <div class="ring-details-grid mt-3 text-[#b8a68b]">
+          <div><span class="text-[#f3c96b]">Age:</span> <span id="alarmUserAge">—</span></div>
+          <div><span class="text-[#f3c96b]">Gender:</span> <span id="alarmUserGender">—</span></div>
+          <div><span class="text-[#f3c96b]">Hobbies:</span> <span id="alarmUserHobbies">—</span></div>
+          <div><span class="text-[#f3c96b]">Interests:</span> <span id="alarmUserInterests">—</span></div>
+          <div class="col-span-2"><span class="text-[#f3c96b]">From:</span> <span id="alarmUserPlace">—</span></div>
+        </div>
+        <div id="alarmCommonTags" class="text-xs mt-2 text-[#f3c96b88]">common: <span id="commonTagsDisplay">—</span></div>
+        <div id="alarmMutualBadge" class="hidden text-sm font-bold gold-text mt-2">💞 Mutual Ring! 💞</div>
       </div>
       <div class="absolute bottom-10 text-[10px] text-[#f3c96b88]">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f3c96b88" stroke-width="2" class="inline"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -359,7 +368,7 @@
     </div>
   </div>
 
-  <audio id="alarmSound" preload="auto">
+  <audio id="alarmSound" preload="auto" loop>
     <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
   </audio>
 </div>
@@ -383,6 +392,7 @@
     let selectedVibes = [], nearbyUsers = [], alarmHistory = [];
     let alarmTimer = null;
     let isAlarmActive = false;
+    let alarmSoundPlaying = false;
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
@@ -401,6 +411,9 @@
     const nearbyList = $('nearbyList'), ringedList = $('ringedList'), alarmHistoryList = $('alarmHistoryList');
     const alarmOverlay = $('alarmOverlay'), commonTagsDisplay = $('commonTagsDisplay'), alarmSound = $('alarmSound');
     const alarmUserName = $('alarmUserName'), alarmUserBio = $('alarmUserBio'), alarmUserDetails = $('alarmUserDetails');
+    const alarmUserAge = $('alarmUserAge'), alarmUserGender = $('alarmUserGender');
+    const alarmUserHobbies = $('alarmUserHobbies'), alarmUserInterests = $('alarmUserInterests');
+    const alarmUserPlace = $('alarmUserPlace'), alarmMutualBadge = $('alarmMutualBadge');
     const radarDots = $('radarDots'), refreshBtn = $('refreshProximity');
     const settingsPanel = $('settingsPanel'), closeSettings = $('closeSettings'), radiusSelect = $('radiusSelect');
     const ghostSettingToggle = $('ghostSettingToggle'), settingsToggle = $('settingsToggle');
@@ -468,12 +481,13 @@
       }
     });
 
-    // Listen for incoming rings
+    // Listen for incoming rings - only for other users ringing ME
     function listenForRings() {
       if (!myUID) return;
       const ringRef = db.ref('rings/' + myUID);
       ringRef.on('child_added', async (snap) => {
         const fromUid = snap.key;
+        // Ignore if it's me ringing myself
         if (fromUid === myUID) return;
         const val = snap.val();
         if (val === true) {
@@ -486,8 +500,8 @@
             const myRingSnap = await myRingRef.once('value');
             const iRangThem = myRingSnap.val() === true;
             
-            // Show alarm with user details
-            showAlarmWithDetails(user, iRangThem);
+            // Show alarm with full user details
+            showAlarmWithFullDetails(user, iRangThem);
             
             // Save to history
             alarmHistory.push({ 
@@ -498,52 +512,55 @@
             });
             loadHistory();
             
-            // If mutual, trigger mutual ring sound/effect
+            // If mutual, trigger mutual ring effect
             if (iRangThem) {
-              // Both rang each other - special mutual ring
-              triggerMutualRing(user);
+              // Show mutual badge
+              alarmMutualBadge.classList.remove('hidden');
+              // Also ring my phone with mutual pattern
+              if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
             }
           }
         }
       });
     }
 
-    function showAlarmWithDetails(user, isMutual) {
+    function showAlarmWithFullDetails(user, isMutual) {
+      // Set all user details
       alarmUserName.textContent = user.name || 'Someone';
       alarmUserBio.textContent = user.bio || '';
+      alarmUserAge.textContent = user.age || '—';
+      alarmUserGender.textContent = user.gender || '—';
+      alarmUserHobbies.textContent = (user.hobbies || []).join(', ') || '—';
+      alarmUserInterests.textContent = (user.interests || []).join(', ') || '—';
+      alarmUserPlace.textContent = user.place || '—';
+      
       const common = (currentUser.vibeTags || []).filter(t => (user.vibeTags || []).includes(t));
       commonTagsDisplay.textContent = common.join(', ') || '❤️';
       
+      // Show/hide mutual badge
       if (isMutual) {
-        alarmUserDetails.innerHTML = `
-          <div class="font-bold">💞 ${user.name} ringed you back!</div>
-          <div class="text-xs text-[#f3c96b99]">${user.bio || ''}</div>
-          <div class="text-xs mt-1">common: ${common.join(', ') || '❤️'}</div>
-        `;
+        alarmMutualBadge.classList.remove('hidden');
       } else {
-        alarmUserDetails.innerHTML = `
-          <div class="font-bold">❤️ ${user.name} ringed you!</div>
-          <div class="text-xs text-[#f3c96b99]">${user.bio || ''}</div>
-          <div class="text-xs mt-1">common: ${common.join(', ') || '❤️'}</div>
-        `;
+        alarmMutualBadge.classList.add('hidden');
       }
       
+      // Show alarm
       alarmOverlay.classList.remove('opacity-0');
       alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
+      
+      // Play sound with loop
+      alarmSound.loop = true;
       alarmSound.play().catch(() => {});
+      alarmSoundPlaying = true;
+      
       if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
       isAlarmActive = true;
       
+      // Auto dismiss after 30 seconds if not dismissed manually
       clearTimeout(alarmTimer);
       alarmTimer = setTimeout(() => {
         dismissAlarm();
-      }, 10000);
-    }
-
-    function triggerMutualRing(user) {
-      // Already handled by showAlarmWithDetails with isMutual=true
-      // Extra vibration pattern for mutual
-      if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+      }, 30000);
     }
 
     function dismissAlarm() {
@@ -551,6 +568,8 @@
       alarmOverlay.classList.add('opacity-0');
       alarmSound.pause();
       alarmSound.currentTime = 0;
+      alarmSound.loop = false;
+      alarmSoundPlaying = false;
       isAlarmActive = false;
       clearTimeout(alarmTimer);
     }
@@ -741,12 +760,12 @@
           const uid = card.dataset.uid;
           if (!uid || !myUID) return;
           
-          // Send ring to other user
+          // Send ring to other user (NOT to myself!)
           await db.ref('rings/' + uid + '/' + myUID).set(true);
           
           const user = nearbyUsers.find(u => u.uid === uid);
           if (user) {
-            // Save ring details
+            // Save ring details for the other user to see
             await db.ref('ringDetails/' + uid + '/' + myUID).set({
               name: currentUser.name,
               bio: currentUser.bio || '',
@@ -766,7 +785,7 @@
             
             if (theyRangMe) {
               // Mutual ring - trigger alarm for me too
-              showAlarmWithDetails(user, true);
+              showAlarmWithFullDetails(user, true);
               // Also trigger mutual ring for them via database
               await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
               await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
@@ -776,7 +795,7 @@
                 new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
               }
             } else {
-              // Single ring - just notify them
+              // Single ring - just notify them (they'll get the ring on their phone)
               if (Notification.permission === 'granted') {
                 new Notification('❤️ You rang ' + user.name + '!', { body: 'Waiting for them to ring back...' });
               }
@@ -861,10 +880,10 @@
       auth.signOut(); 
       showView(loginView); 
       if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-      // Remove ring listener
       if (myUID) {
         db.ref('rings/' + myUID).off();
       }
+      dismissAlarm();
     });
     deleteAccountBtn.addEventListener('click', async () => {
       if (confirm('Delete your account permanently? This cannot be undone.')) {
