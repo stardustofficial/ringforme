@@ -347,7 +347,11 @@
         </svg>
       </div>
       <div class="text-3xl font-bold gold-text mt-2 tracking-widest">RING</div>
-      <div class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-2 rounded-full mt-2 backdrop-blur">common: <span id="commonTagsDisplay">—</span></div>
+      <div id="alarmUserDetails" class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-3 rounded-full mt-2 backdrop-blur text-center max-w-[90%]">
+        <div id="alarmUserName" class="font-bold">—</div>
+        <div id="alarmUserBio" class="text-xs text-[#f3c96b99]">—</div>
+        <div id="alarmCommonTags" class="text-xs mt-1">common: <span id="commonTagsDisplay">—</span></div>
+      </div>
       <div class="absolute bottom-10 text-[10px] text-[#f3c96b88]">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f3c96b88" stroke-width="2" class="inline"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         tap to dismiss
@@ -376,8 +380,9 @@
     const auth = firebase.auth();
 
     let currentUser = null, myUID = null, watchId = null, ghostMode = false;
-    let selectedVibes = [], nearbyUsers = [], alarmHistory = [], ringedUsers = [];
+    let selectedVibes = [], nearbyUsers = [], alarmHistory = [];
     let alarmTimer = null;
+    let isAlarmActive = false;
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
@@ -395,6 +400,7 @@
     const profileHobbies = $('profileHobbies'), profileInterest = $('profileInterest'), profilePlace = $('profilePlace');
     const nearbyList = $('nearbyList'), ringedList = $('ringedList'), alarmHistoryList = $('alarmHistoryList');
     const alarmOverlay = $('alarmOverlay'), commonTagsDisplay = $('commonTagsDisplay'), alarmSound = $('alarmSound');
+    const alarmUserName = $('alarmUserName'), alarmUserBio = $('alarmUserBio'), alarmUserDetails = $('alarmUserDetails');
     const radarDots = $('radarDots'), refreshBtn = $('refreshProximity');
     const settingsPanel = $('settingsPanel'), closeSettings = $('closeSettings'), radiusSelect = $('radiusSelect');
     const ghostSettingToggle = $('ghostSettingToggle'), settingsToggle = $('settingsToggle');
@@ -449,6 +455,7 @@
           scanNearby();
           loadRinged();
           loadHistory();
+          listenForRings();
           streakBadge.textContent = '🔥 ' + ((data.streak || 0) + 1) + 'd';
           db.ref('users/' + myUID + '/streak').set((data.streak || 0) + 1);
         } else {
@@ -460,6 +467,93 @@
         if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
       }
     });
+
+    // Listen for incoming rings
+    function listenForRings() {
+      if (!myUID) return;
+      const ringRef = db.ref('rings/' + myUID);
+      ringRef.on('child_added', async (snap) => {
+        const fromUid = snap.key;
+        if (fromUid === myUID) return;
+        const val = snap.val();
+        if (val === true) {
+          // Someone rang me!
+          const userSnap = await db.ref('users/' + fromUid).once('value');
+          const user = userSnap.val();
+          if (user) {
+            // Check if this is a mutual ring (I already rang them)
+            const myRingRef = db.ref('rings/' + fromUid + '/' + myUID);
+            const myRingSnap = await myRingRef.once('value');
+            const iRangThem = myRingSnap.val() === true;
+            
+            // Show alarm with user details
+            showAlarmWithDetails(user, iRangThem);
+            
+            // Save to history
+            alarmHistory.push({ 
+              name: user.name, 
+              time: new Date().toLocaleTimeString(), 
+              dist: 'incoming ring',
+              isMutual: iRangThem 
+            });
+            loadHistory();
+            
+            // If mutual, trigger mutual ring sound/effect
+            if (iRangThem) {
+              // Both rang each other - special mutual ring
+              triggerMutualRing(user);
+            }
+          }
+        }
+      });
+    }
+
+    function showAlarmWithDetails(user, isMutual) {
+      alarmUserName.textContent = user.name || 'Someone';
+      alarmUserBio.textContent = user.bio || '';
+      const common = (currentUser.vibeTags || []).filter(t => (user.vibeTags || []).includes(t));
+      commonTagsDisplay.textContent = common.join(', ') || '❤️';
+      
+      if (isMutual) {
+        alarmUserDetails.innerHTML = `
+          <div class="font-bold">💞 ${user.name} ringed you back!</div>
+          <div class="text-xs text-[#f3c96b99]">${user.bio || ''}</div>
+          <div class="text-xs mt-1">common: ${common.join(', ') || '❤️'}</div>
+        `;
+      } else {
+        alarmUserDetails.innerHTML = `
+          <div class="font-bold">❤️ ${user.name} ringed you!</div>
+          <div class="text-xs text-[#f3c96b99]">${user.bio || ''}</div>
+          <div class="text-xs mt-1">common: ${common.join(', ') || '❤️'}</div>
+        `;
+      }
+      
+      alarmOverlay.classList.remove('opacity-0');
+      alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
+      alarmSound.play().catch(() => {});
+      if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
+      isAlarmActive = true;
+      
+      clearTimeout(alarmTimer);
+      alarmTimer = setTimeout(() => {
+        dismissAlarm();
+      }, 10000);
+    }
+
+    function triggerMutualRing(user) {
+      // Already handled by showAlarmWithDetails with isMutual=true
+      // Extra vibration pattern for mutual
+      if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+    }
+
+    function dismissAlarm() {
+      alarmOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+      alarmOverlay.classList.add('opacity-0');
+      alarmSound.pause();
+      alarmSound.currentTime = 0;
+      isAlarmActive = false;
+      clearTimeout(alarmTimer);
+    }
 
     loginBtn.addEventListener('click', async () => {
       try { await auth.signInWithEmailAndPassword(loginEmail.value.trim(), loginPassword.value.trim()); }
@@ -504,6 +598,7 @@
         scanNearby();
         loadRinged();
         loadHistory();
+        listenForRings();
         streakBadge.textContent = '🔥 1d';
       } catch(e) { alert('Signup failed: ' + e.message); }
     });
@@ -520,7 +615,6 @@
       profileTags.innerHTML = (user.vibeTags || []).map(t => `<span class="chip">${t}</span>`).join(' ');
       profileBadges.textContent = (user.badges || []).join(' ');
       dailyPoll.textContent = '☕ coffee or tea?  (vote)';
-      // fill edit fields
       editName.value = user.name || '';
       editBio.value = user.bio || '';
       editAge.value = user.age || '';
@@ -555,7 +649,7 @@
       loadRinged();
     });
 
-    // Privacy Policy & Terms - Updated links
+    // Privacy Policy & Terms
     privacyPolicyBtn.addEventListener('click', () => {
       window.open('https://github.com/stardustofficial/ringforme/blob/main/PRIVACY_POLICY.md', '_blank');
     });
@@ -617,7 +711,6 @@
       nearbyUsers = results;
       renderNearby(results);
       updateRadar(results);
-      checkAlarm(results);
       scanStatus.textContent = `📍 ${results.length} nearby`;
     }
 
@@ -647,34 +740,51 @@
           const card = this.closest('.ring-card');
           const uid = card.dataset.uid;
           if (!uid || !myUID) return;
-          await db.ref('rings/' + myUID + '/' + uid).set(true);
+          
+          // Send ring to other user
+          await db.ref('rings/' + uid + '/' + myUID).set(true);
+          
           const user = nearbyUsers.find(u => u.uid === uid);
           if (user) {
-            await db.ref('ringDetails/' + myUID + '/' + uid).set({
-              name: user.name,
-              bio: user.bio || '',
-              age: user.age || '',
-              gender: user.gender || '',
-              hobbies: user.hobbies || [],
-              interests: user.interests || [],
-              place: user.place || '',
-              vibeTags: user.vibeTags || [],
+            // Save ring details
+            await db.ref('ringDetails/' + uid + '/' + myUID).set({
+              name: currentUser.name,
+              bio: currentUser.bio || '',
+              age: currentUser.age || '',
+              gender: currentUser.gender || '',
+              hobbies: currentUser.hobbies || [],
+              interests: currentUser.interests || [],
+              place: currentUser.place || '',
+              vibeTags: currentUser.vibeTags || [],
               timestamp: Date.now()
             });
-          }
-          if (user && Notification.permission === 'granted') {
-            new Notification('❤️ You rang ' + user.name + '!', { body: 'They will know you care.' });
-          }
-          const otherRing = await db.ref('rings/' + uid + '/' + myUID).once('value');
-          if (otherRing.val() === true) {
-            triggerAlarm(user);
-            await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
-            await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
+            
+            // Check if they already rang me (mutual)
+            const theirRingRef = db.ref('rings/' + myUID + '/' + uid);
+            const theirRingSnap = await theirRingRef.once('value');
+            const theyRangMe = theirRingSnap.val() === true;
+            
+            if (theyRangMe) {
+              // Mutual ring - trigger alarm for me too
+              showAlarmWithDetails(user, true);
+              // Also trigger mutual ring for them via database
+              await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
+              await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
+              alarmHistory.push({ name: user.name, time: new Date().toLocaleTimeString(), dist: 'mutual ring!', isMutual: true });
+              loadHistory();
+              if (Notification.permission === 'granted') {
+                new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
+              }
+            } else {
+              // Single ring - just notify them
+              if (Notification.permission === 'granted') {
+                new Notification('❤️ You rang ' + user.name + '!', { body: 'Waiting for them to ring back...' });
+              }
+            }
             loadRinged();
           }
           this.textContent = '✅ Ringed!';
           this.disabled = true;
-          loadRinged();
         });
       });
     }
@@ -697,50 +807,6 @@
       });
     }
 
-    async function checkAlarm(results) {
-      if (!currentUser || !myUID) return;
-      const radius = parseInt(radiusSelect.value);
-      for (let r of results) {
-        if (r.distance < radius && r.matchPercent >= 70) {
-          const ringRef = db.ref('rings/' + myUID + '/' + r.uid);
-          const snap = await ringRef.once('value');
-          const iRang = snap.val() === true;
-          const otherRingRef = db.ref('rings/' + r.uid + '/' + myUID);
-          const otherSnap = await otherRingRef.once('value');
-          const theyRang = otherSnap.val() === true;
-          if (iRang && theyRang) {
-            const mutualRef = db.ref('mutualRings/' + myUID + '/' + r.uid);
-            const mutualSnap = await mutualRef.once('value');
-            if (!mutualSnap.val()) {
-              triggerAlarm(r);
-              await db.ref('mutualRings/' + myUID + '/' + r.uid).set(true);
-              await db.ref('mutualRings/' + r.uid + '/' + myUID).set(true);
-              alarmHistory.push({ name: r.name, time: new Date().toLocaleTimeString(), dist: Math.round(r.distance) + 'm' });
-              loadHistory();
-              if (Notification.permission === 'granted') {
-                new Notification('💖 Ring!', { body: `${r.name} is near!` });
-              }
-            }
-            break;
-          }
-        }
-      }
-    }
-
-    function triggerAlarm(user) {
-      alarmOverlay.classList.remove('opacity-0');
-      alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
-      const common = (currentUser.vibeTags || []).filter(t => (user.vibeTags || []).includes(t));
-      commonTagsDisplay.textContent = common.join(', ') || '❤️';
-      alarmSound.play().catch(() => {});
-      if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
-      clearTimeout(alarmTimer);
-      alarmTimer = setTimeout(() => {
-        alarmOverlay.classList.remove('opacity-100', 'pointer-events-auto');
-        alarmOverlay.classList.add('opacity-0');
-      }, 6000);
-    }
-
     async function loadRinged() {
       if (!myUID) return;
       const snap = await db.ref('rings/' + myUID).once('value');
@@ -749,6 +815,7 @@
       const uids = Object.keys(data);
       let html = '';
       for (let uid of uids) {
+        if (uid === myUID) continue;
         const userSnap = await db.ref('users/' + uid).once('value');
         const user = userSnap.val();
         if (user) {
@@ -771,7 +838,10 @@
 
     function loadHistory() {
       alarmHistoryList.innerHTML = alarmHistory.slice(-10).map(h =>
-        `<div class="ring-card flex justify-between"><span>${h.name}</span><span class="text-[#6b5e4e] text-xs">${h.time} · ${h.dist}</span></div>`
+        `<div class="ring-card flex justify-between">
+          <span>${h.name} ${h.isMutual ? '💞' : ''}</span>
+          <span class="text-[#6b5e4e] text-xs">${h.time} · ${h.dist}</span>
+        </div>`
       ).join('') || '<div class="text-center text-[#6b5e4e] text-sm py-4">no history</div>';
     }
 
@@ -787,7 +857,15 @@
         db.ref('users/' + myUID + '/lng').remove();
       }
     });
-    logoutBtn.addEventListener('click', () => { auth.signOut(); showView(loginView); if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; } });
+    logoutBtn.addEventListener('click', () => { 
+      auth.signOut(); 
+      showView(loginView); 
+      if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+      // Remove ring listener
+      if (myUID) {
+        db.ref('rings/' + myUID).off();
+      }
+    });
     deleteAccountBtn.addEventListener('click', async () => {
       if (confirm('Delete your account permanently? This cannot be undone.')) {
         const user = auth.currentUser;
@@ -797,12 +875,9 @@
     });
     refreshBtn.addEventListener('click', scanNearby);
 
+    // Alarm overlay tap to dismiss
     alarmOverlay.addEventListener('click', function() {
-      this.classList.remove('opacity-100', 'pointer-events-auto');
-      this.classList.add('opacity-0');
-      clearTimeout(alarmTimer);
-      alarmSound.pause();
-      alarmSound.currentTime = 0;
+      dismissAlarm();
     });
 
     if (Notification.permission === 'default') Notification.requestPermission();
