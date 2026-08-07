@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Ring For Me · Love Alarm</title>
-  <!-- Tailwind + custom golden theme -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -22,7 +20,6 @@
     }
     .gold-gradient { background: linear-gradient(145deg, #f7d875, #d9a441); }
     .gold-text { color: #f3c96b; }
-    .gold-border { border-color: #f3c96b; }
     .glass-card { background: rgba(20, 18, 21, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     ::-webkit-scrollbar { display: none; }
@@ -31,74 +28,78 @@
       50% { box-shadow: 0 0 40px #f7d875, 0 0 80px #f3c96bcc; transform: scale(1.02); }
       100% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88; transform: scale(1); }
     }
-    .alarm-active { animation: glowPulse 1.2s infinite ease-in-out; background: rgba(243, 201, 107, 0.15); border: 2px solid #f3c96b; }
     .heart-beat { animation: heartBeat 1s infinite; }
     @keyframes heartBeat { 0%,100% { transform: scale(1); } 15% { transform: scale(1.2); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
     .chip { background: #2a2529; color: #f3c96b; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; border: 1px solid #f3c96b40; }
-    .radar-ring { stroke: #f3c96b30; fill: none; }
-    .radar-dot { fill: #f3c96b; opacity: 0.7; }
-    .transition-smooth { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
-    .badge { background: #2a2529; border: 1px solid #f3c96b60; border-radius: 20px; padding: 2px 10px; font-size: 0.6rem; color: #f3c96b; }
-    .btn-primary { background: linear-gradient(145deg, #f7d875, #d9a441); color: #141215; font-weight: 700; padding: 12px; border-radius: 16px; transition: all 0.2s; border: none; width: 100%; }
+    .btn-primary { background: linear-gradient(145deg, #f7d875, #d9a441); color: #141215; font-weight: 700; padding: 14px; border-radius: 16px; transition: all 0.2s; border: none; width: 100%; font-size: 1rem; }
     .btn-primary:hover { transform: scale(1.02); opacity: 0.9; }
-    .btn-secondary { background: #2a2529; color: #f3c96b; border: 1px solid #f3c96b40; padding: 12px; border-radius: 16px; transition: all 0.2s; width: 100%; }
+    .btn-secondary { background: #2a2529; color: #f3c96b; border: 1px solid #f3c96b40; padding: 14px; border-radius: 16px; transition: all 0.2s; width: 100%; font-size: 1rem; }
     .btn-secondary:hover { background: #3a3539; }
-    input, select { background: #1f1b1e; border: 1px solid #f3c96b50; border-radius: 16px; padding: 14px 18px; color: #ffffff; width: 100%; outline: none; transition: border 0.2s; }
+    input, select { background: #1f1b1e; border: 1px solid #f3c96b50; border-radius: 16px; padding: 14px 18px; color: #ffffff; width: 100%; outline: none; transition: border 0.2s; font-size: 1rem; }
     input:focus, select:focus { border-color: #f3c96b; }
     input::placeholder { color: #6b5e4e; }
     .like-hint { color: #f3c96b88; font-size: 0.6rem; text-align: center; padding: 4px; border-top: 1px solid #f3c96b20; margin-top: 6px; }
-    /* white text on dark bg */
     .text-white-important { color: #ffffff !important; }
-    .text-white-80 { color: rgba(255,255,255,0.8); }
+    .nav-icon { width: 28px; height: 28px; fill: none; stroke: #6b5e4e; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.3s; }
+    .nav-icon.active { stroke: #f3c96b; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 4px 12px; border-radius: 12px; transition: background 0.2s; }
+    .nav-item:hover { background: #2a2529; }
+    .nav-label { font-size: 0.55rem; color: #6b5e4e; transition: color 0.3s; }
+    .nav-label.active { color: #f3c96b; }
+    .bottom-nav { background: #141215; border-top: 1px solid #f3c96b20; padding: 6px 8px 10px; display: flex; justify-content: space-around; align-items: center; flex-shrink: 0; }
+    .page { display: none; height: 100%; overflow-y: auto; padding-bottom: 4px; }
+    .page.active { display: block; }
+    .profile-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(145deg, #f7d875, #d9a441); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #141215; font-weight: bold; }
+    .ring-card { background: #1f1b1e; border: 1px solid #f3c96b30; border-radius: 16px; padding: 12px; transition: all 0.3s; }
+    .ring-card:hover { border-color: #f3c96b60; }
+    .badge-gold { background: #f3c96b20; color: #f3c96b; padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; border: 1px solid #f3c96b40; }
+    .match-heart { color: #f3c96b; font-size: 1.2rem; }
   </style>
 </head>
 <body>
 <div id="app" class="flex flex-col text-white relative no-scrollbar">
 
-  <!-- header (only shown when logged in) -->
+  <!-- header -->
   <div id="mainHeader" class="flex items-center justify-between px-6 pt-5 pb-2 flex-shrink-0 hidden">
     <span class="text-2xl font-light tracking-widest gold-text">✦ RING</span>
     <span class="text-[10px] uppercase tracking-[0.2em] text-[#f3c96b99]">for me</span>
-    <button id="settingsToggle" class="text-[#f3c96b] text-xs border border-[#f3c96b30] rounded-full px-3 py-1 hover:bg-[#f3c96b20]">⚙</button>
   </div>
   <div id="headerLine" class="h-[2px] w-4/5 mx-auto gold-gradient opacity-50 rounded-full mb-2 hidden"></div>
 
-  <!-- main container -->
-  <div id="mainContainer" class="flex-1 px-5 pb-4 overflow-y-auto no-scrollbar transition-smooth relative">
+  <div id="mainContainer" class="flex-1 px-4 pb-0 overflow-hidden transition-smooth relative flex flex-col">
 
-    <!-- loading screen -->
+    <!-- loading -->
     <div id="loadingView" class="flex flex-col items-center justify-center h-full space-y-4">
       <div class="text-6xl gold-text heart-beat">❤️</div>
       <div class="text-xl gold-text tracking-widest">RING FOR ME</div>
       <div class="w-12 h-12 border-4 border-[#f3c96b] border-t-transparent rounded-full animate-spin"></div>
-      <div class="text-[#f3c96b80] text-sm">loading your world...</div>
     </div>
 
-    <!-- login view -->
-    <div id="loginView" class="hidden flex flex-col justify-center h-full space-y-5 pt-4">
-      <div class="text-3xl gold-text font-light tracking-wider text-center">✦ RING</div>
+    <!-- login -->
+    <div id="loginView" class="hidden flex flex-col justify-center h-full space-y-6 pt-4">
+      <div class="text-4xl gold-text font-light tracking-wider text-center">✦ RING</div>
       <div class="text-center text-[#f3c96b99] text-sm tracking-widest">sign in to your world</div>
-      <div class="space-y-3 mt-4">
-        <input id="loginEmail" type="email" placeholder="Email" class="text-white-important" />
-        <input id="loginPassword" type="password" placeholder="Password" class="text-white-important" />
-        <button id="loginBtn" class="btn-primary">Sign In</button>
-        <button id="showSignupBtn" class="btn-secondary">Create New Account →</button>
+      <div class="space-y-4 mt-2">
+        <input id="loginEmail" type="email" placeholder="Email address" class="text-white-important text-base" />
+        <input id="loginPassword" type="password" placeholder="Password" class="text-white-important text-base" />
+        <button id="loginBtn" class="btn-primary text-base">Sign In</button>
+        <button id="showSignupBtn" class="btn-secondary text-base">Create New Account →</button>
       </div>
     </div>
 
-    <!-- signup view -->
+    <!-- signup -->
     <div id="signupView" class="hidden flex-col justify-center h-full space-y-3 pt-2 overflow-y-auto no-scrollbar">
-      <div class="text-xl gold-text font-light tracking-wider text-center">✦ create account</div>
-      <div class="space-y-2">
-        <input id="signupName" type="text" placeholder="Full Name" class="text-white-important" />
-        <input id="signupEmail" type="email" placeholder="Email" class="text-white-important" />
-        <input id="signupPassword" type="password" placeholder="Password (min 6)" class="text-white-important" />
-        <input id="signupHobbies" type="text" placeholder="Hobbies (comma separated)" class="text-white-important" />
-        <input id="signupInterest" type="text" placeholder="Interests (comma)" class="text-white-important" />
-        <input id="signupFavPlace" type="text" placeholder="Favorite Place" class="text-white-important" />
-        <input id="signupGame" type="text" placeholder="Favorite Game" class="text-white-important" />
+      <div class="text-2xl gold-text font-light tracking-wider text-center">✦ create account</div>
+      <div class="space-y-3">
+        <input id="signupName" type="text" placeholder="Full Name" class="text-white-important text-base" />
+        <input id="signupEmail" type="email" placeholder="Email address" class="text-white-important text-base" />
+        <input id="signupPassword" type="password" placeholder="Password (min 6 characters)" class="text-white-important text-base" />
+        <input id="signupHobbies" type="text" placeholder="Hobbies (e.g. reading, music)" class="text-white-important text-base" />
+        <input id="signupInterest" type="text" placeholder="Interests (e.g. art, travel)" class="text-white-important text-base" />
+        <input id="signupFavPlace" type="text" placeholder="Favorite place" class="text-white-important text-base" />
+        <input id="signupGame" type="text" placeholder="Favorite game" class="text-white-important text-base" />
         <div>
-          <div class="text-xs gold-text mb-1">Vibe Tags (select up to 4)</div>
+          <div class="text-xs gold-text mb-2">Vibe Tags (select up to 4)</div>
           <div id="signupVibeTags" class="flex flex-wrap gap-2">
             <span data-tag="romantic" class="chip cursor-pointer">romantic</span>
             <span data-tag="playful" class="chip cursor-pointer">playful</span>
@@ -108,55 +109,101 @@
             <span data-tag="nerdy" class="chip cursor-pointer">nerdy</span>
           </div>
         </div>
-        <button id="signupBtn" class="btn-primary">Create Account</button>
-        <button id="backToLoginBtn" class="btn-secondary">← Back to Sign In</button>
+        <button id="signupBtn" class="btn-primary text-base">Create Account</button>
+        <button id="backToLoginBtn" class="btn-secondary text-base">← Back to Sign In</button>
       </div>
     </div>
 
-    <!-- main dashboard -->
-    <div id="dashboardView" class="hidden space-y-4 pt-2">
-      <!-- profile card -->
-      <div class="glass-card rounded-3xl p-4 border border-[#f3c96b30]">
-        <div class="flex items-center justify-between">
-          <span id="profileName" class="text-xl font-bold gold-text">—</span>
-          <span id="streakBadge" class="badge">🔥 0d</span>
+    <!-- main pages container -->
+    <div id="pagesContainer" class="hidden flex-1 overflow-hidden flex flex-col">
+      <div class="flex-1 overflow-hidden relative">
+        <!-- Page 1: Scan -->
+        <div id="pageScan" class="page active space-y-4 pt-2">
+          <div class="glass-card rounded-3xl p-4 border border-[#f3c96b30]">
+            <div class="flex items-center justify-between">
+              <span class="text-sm gold-text">📍 live radar</span>
+              <span id="scanStatus" class="text-xs text-[#6b5e4e]">scanning...</span>
+            </div>
+            <!-- Radar -->
+            <div class="relative flex justify-center my-2">
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="75" stroke="#f3c96b20" stroke-width="1" fill="none" />
+                <circle cx="80" cy="80" r="50" stroke="#f3c96b40" stroke-width="1" fill="none" />
+                <circle cx="80" cy="80" r="25" stroke="#f3c96b60" stroke-width="1.5" fill="none" />
+                <circle cx="80" cy="80" r="8" fill="#f3c96b" opacity="0.8" />
+                <g id="radarDots"></g>
+              </svg>
+            </div>
+            <button id="refreshProximity" class="btn-primary text-sm py-3">⟳ scan now</button>
+          </div>
+          <div id="nearbyList" class="space-y-2 max-h-[200px] overflow-y-auto no-scrollbar"></div>
+          <div id="iceBreakerContainer" class="hidden glass-card p-3 rounded-2xl border border-[#f3c96b30]">
+            <div class="text-xs gold-text mb-1">💬 ice breaker</div>
+            <div id="iceBreakerText" class="text-sm text-white-important"></div>
+          </div>
         </div>
-        <div class="flex flex-wrap gap-1 mt-2" id="profileTags"></div>
-        <div class="flex flex-wrap gap-2 mt-1" id="profileBadges"></div>
-        <div class="text-xs text-[#b8a68b] mt-2 flex flex-wrap gap-x-4">
-          <span id="profileHobbies"></span> <span id="profileFoods"></span> <span id="profileGames"></span>
+
+        <!-- Page 2: Ringed -->
+        <div id="pageRinged" class="page space-y-3 pt-2">
+          <div class="text-sm gold-text mb-1">❤️ people who ringed you</div>
+          <div id="ringedList" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
         </div>
-        <div class="like-hint">❤️ Double tap any card below to send Secret Like</div>
+
+        <!-- Page 3: History -->
+        <div id="pageHistory" class="page space-y-3 pt-2">
+          <div class="text-sm gold-text mb-1">📜 alarm history</div>
+          <div id="alarmHistoryList" class="space-y-2 max-h-[280px] overflow-y-auto no-scrollbar"></div>
+        </div>
+
+        <!-- Page 4: Profile -->
+        <div id="pageProfile" class="page space-y-4 pt-2">
+          <div class="glass-card rounded-3xl p-5 border border-[#f3c96b30]">
+            <div class="flex items-center gap-4">
+              <div class="profile-avatar" id="profileAvatar">👤</div>
+              <div>
+                <div id="profileName" class="text-xl font-bold gold-text">—</div>
+                <div class="flex gap-2 mt-1 flex-wrap">
+                  <span id="streakBadge" class="badge-gold">🔥 0d</span>
+                  <span id="profileBadges" class="badge-gold">✨</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-1" id="profileTags"></div>
+            <div class="text-xs text-[#b8a68b] mt-3 space-y-1">
+              <div id="profileHobbies">🎯 —</div>
+              <div id="profileFoods">📍 —</div>
+              <div id="profileGames">🎮 —</div>
+            </div>
+          </div>
+          <button id="settingsToggle" class="btn-secondary text-sm">⚙ Settings</button>
+        </div>
       </div>
 
-      <!-- Radar ring -->
-      <div class="relative flex justify-center">
-        <svg width="180" height="180" viewBox="0 0 180 180" class="radar-ring">
-          <circle cx="90" cy="90" r="85" stroke="#f3c96b20" stroke-width="1" fill="none" />
-          <circle cx="90" cy="90" r="55" stroke="#f3c96b40" stroke-width="1" fill="none" />
-          <circle cx="90" cy="90" r="25" stroke="#f3c96b60" stroke-width="1.5" fill="none" />
-          <circle cx="90" cy="90" r="8" fill="#f3c96b" opacity="0.8" />
-          <g id="radarDots"></g>
-        </svg>
-        <div class="absolute bottom-1 text-[10px] text-[#f3c96b80]">radar</div>
-      </div>
-
-      <button id="refreshProximity" class="btn-primary">⟳ scan nearby</button>
-      
-      <!-- nearby list -->
-      <div id="nearbyList" class="space-y-2 max-h-[120px] overflow-y-auto no-scrollbar"></div>
-
-      <!-- ice breakers -->
-      <div id="iceBreakerContainer" class="hidden glass-card p-3 rounded-2xl border border-[#f3c96b30]">
-        <div class="text-xs gold-text mb-1">💬 ice breakers</div>
-        <div id="iceBreakerText" class="text-sm text-white-important"></div>
+      <!-- Bottom Nav -->
+      <div class="bottom-nav">
+        <div class="nav-item" data-page="pageScan">
+          <svg class="nav-icon active" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 22v-4M2 12h4M22 12h-4"/></svg>
+          <span class="nav-label active">Scan</span>
+        </div>
+        <div class="nav-item" data-page="pageRinged">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span class="nav-label">Ringed</span>
+        </div>
+        <div class="nav-item" data-page="pageHistory">
+          <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="nav-label">History</span>
+        </div>
+        <div class="nav-item" data-page="pageProfile">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="nav-label">Profile</span>
+        </div>
       </div>
     </div>
 
     <!-- settings panel -->
-    <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px]">
+    <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col">
       <div class="flex justify-between"><span class="gold-text text-lg">⚙ settings</span><button id="closeSettings" class="text-[#f3c96b] text-xl">✕</button></div>
-      <div class="mt-4 space-y-4">
+      <div class="mt-4 space-y-4 flex-1 overflow-y-auto">
         <div><span class="text-sm text-white-important">Alarm radius</span>
           <select id="radiusSelect" class="text-white-important mt-1">
             <option value="10">10m</option><option value="20" selected>20m</option><option value="50">50m</option>
@@ -168,10 +215,8 @@
         <div><span class="text-sm text-white-important">Daily poll</span>
           <div id="dailyPoll" class="text-xs text-[#f3c96b] mt-1">coffee or tea? ☕</div>
         </div>
-        <div><span class="text-sm text-white-important">Alarm history</span>
-          <div id="alarmHistory" class="text-xs text-[#b8a68b] max-h-20 overflow-y-auto"></div>
-        </div>
-        <button id="logoutBtn" class="btn-secondary text-center">Sign Out</button>
+        <button id="deleteAccountBtn" class="btn-secondary text-sm text-red-400 border-red-400/30">Delete Account</button>
+        <button id="logoutBtn" class="btn-secondary text-sm">Sign Out</button>
       </div>
     </div>
 
@@ -191,7 +236,6 @@
 
 <script>
   (function() {
-    // ---------- Firebase init ----------
     const firebaseConfig = {
       apiKey: "AIzaSyBFGRsd1jTYLJKFzlJBuRo2t92A7XiSeDQ",
       authDomain: "ring-for-me.firebaseapp.com",
@@ -205,67 +249,34 @@
     const db = firebase.database();
     const auth = firebase.auth();
 
-    // ---------- state ----------
-    let currentUser = null;
-    let myUID = null;
-    let watchId = null;
-    let ghostMode = false;
-    let alarmRadius = 20;
-    let selectedVibes = [];
-    let nearbyUsers = [];
-    let alarmHistory = [];
-    let streakDays = 0;
+    let currentUser = null, myUID = null, watchId = null, ghostMode = false;
+    let selectedVibes = [], nearbyUsers = [], alarmHistory = [], ringedUsers = [];
+    const $ = id => document.getElementById(id);
+    const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
     // DOM refs
-    const $ = id => document.getElementById(id);
-    const loadingView = $('loadingView');
-    const loginView = $('loginView');
-    const signupView = $('signupView');
-    const dashboardView = $('dashboardView');
-    const mainHeader = $('mainHeader');
-    const headerLine = $('headerLine');
-    const loginEmail = $('loginEmail');
-    const loginPassword = $('loginPassword');
-    const loginBtn = $('loginBtn');
-    const showSignupBtn = $('showSignupBtn');
-    const signupName = $('signupName');
-    const signupEmail = $('signupEmail');
-    const signupPassword = $('signupPassword');
-    const signupHobbies = $('signupHobbies');
-    const signupInterest = $('signupInterest');
-    const signupFavPlace = $('signupFavPlace');
-    const signupGame = $('signupGame');
-    const signupBtn = $('signupBtn');
-    const backToLoginBtn = $('backToLoginBtn');
-    const profileName = $('profileName');
-    const profileTags = $('profileTags');
-    const profileBadges = $('profileBadges');
-    const profileHobbies = $('profileHobbies');
-    const profileFoods = $('profileFoods');
-    const profileGames = $('profileGames');
-    const nearbyList = $('nearbyList');
-    const alarmOverlay = $('alarmOverlay');
-    const commonTagsDisplay = $('commonTagsDisplay');
-    const alarmSound = $('alarmSound');
-    const radarDots = $('radarDots');
-    const refreshBtn = $('refreshProximity');
-    const settingsPanel = $('settingsPanel');
-    const closeSettings = $('closeSettings');
-    const radiusSelect = $('radiusSelect');
-    const ghostSettingToggle = $('ghostSettingToggle');
-    const settingsToggle = $('settingsToggle');
-    const dailyPoll = $('dailyPoll');
-    const alarmHistoryEl = $('alarmHistory');
-    const iceBreakerContainer = $('iceBreakerContainer');
-    const iceBreakerText = $('iceBreakerText');
-    const streakBadge = $('streakBadge');
-    const logoutBtn = $('logoutBtn');
+    const loadingView = $('loadingView'), loginView = $('loginView'), signupView = $('signupView');
+    const pagesContainer = $('pagesContainer'), mainHeader = $('mainHeader'), headerLine = $('headerLine');
+    const loginEmail = $('loginEmail'), loginPassword = $('loginPassword'), loginBtn = $('loginBtn');
+    const showSignupBtn = $('showSignupBtn'), backToLoginBtn = $('backToLoginBtn');
+    const signupName = $('signupName'), signupEmail = $('signupEmail'), signupPassword = $('signupPassword');
+    const signupHobbies = $('signupHobbies'), signupInterest = $('signupInterest');
+    const signupFavPlace = $('signupFavPlace'), signupGame = $('signupGame'), signupBtn = $('signupBtn');
+    const profileName = $('profileName'), profileTags = $('profileTags'), profileBadges = $('profileBadges');
+    const profileHobbies = $('profileHobbies'), profileFoods = $('profileFoods'), profileGames = $('profileGames');
+    const nearbyList = $('nearbyList'), ringedList = $('ringedList'), alarmHistoryList = $('alarmHistoryList');
+    const alarmOverlay = $('alarmOverlay'), commonTagsDisplay = $('commonTagsDisplay'), alarmSound = $('alarmSound');
+    const radarDots = $('radarDots'), refreshBtn = $('refreshProximity');
+    const settingsPanel = $('settingsPanel'), closeSettings = $('closeSettings'), radiusSelect = $('radiusSelect');
+    const ghostSettingToggle = $('ghostSettingToggle'), settingsToggle = $('settingsToggle');
+    const dailyPoll = $('dailyPoll'), streakBadge = $('streakBadge'), logoutBtn = $('logoutBtn');
+    const deleteAccountBtn = $('deleteAccountBtn'), iceBreakerContainer = $('iceBreakerContainer');
+    const iceBreakerText = $('iceBreakerText'), scanStatus = $('scanStatus'), profileAvatar = $('profileAvatar');
 
-    // ---------- UI Helpers ----------
     function showView(view) {
-      [loadingView, loginView, signupView, dashboardView].forEach(v => v.classList.add('hidden'));
+      [loadingView, loginView, signupView, pagesContainer].forEach(v => v.classList.add('hidden'));
       if (view) view.classList.remove('hidden');
-      if (view === dashboardView) {
+      if (view === pagesContainer) {
         mainHeader.classList.remove('hidden');
         headerLine.classList.remove('hidden');
       } else {
@@ -274,26 +285,39 @@
       }
     }
 
-    // ---------- Auth state ----------
+    function navigateTo(pageId) {
+      pages.forEach(p => {
+        const el = $(p);
+        el.classList.remove('active');
+        document.querySelector(`.nav-item[data-page="${p}"] .nav-icon`).classList.remove('active');
+        document.querySelector(`.nav-item[data-page="${p}"] .nav-label`).classList.remove('active');
+      });
+      $(pageId).classList.add('active');
+      document.querySelector(`.nav-item[data-page="${pageId}"] .nav-icon`).classList.add('active');
+      document.querySelector(`.nav-item[data-page="${pageId}"] .nav-label`).classList.add('active');
+    }
+
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.addEventListener('click', () => navigateTo(el.dataset.page));
+    });
+
+    // Auth
     auth.onAuthStateChanged(async user => {
       if (user) {
         myUID = user.uid;
-        // check if profile exists
         const snap = await db.ref('users/' + myUID).once('value');
         const data = snap.val();
         if (data) {
-          currentUser = data;
-          currentUser.uid = myUID;
-          showView(dashboardView);
-          fillDashboard(data);
+          currentUser = data; currentUser.uid = myUID;
+          showView(pagesContainer);
+          fillProfile(data);
           startLocationWatch();
           scanNearby();
-          // update streak
-          streakDays = (data.streak || 0) + 1;
-          db.ref('users/' + myUID + '/streak').set(streakDays);
-          streakBadge.textContent = '🔥 ' + streakDays + 'd';
+          loadRinged();
+          loadHistory();
+          streakBadge.textContent = '🔥 ' + ((data.streak || 0) + 1) + 'd';
+          db.ref('users/' + myUID + '/streak').set((data.streak || 0) + 1);
         } else {
-          // user exists in auth but no profile -> show signup with email
           signupEmail.value = user.email || '';
           showView(signupView);
         }
@@ -303,151 +327,87 @@
       }
     });
 
-    // ---------- Login ----------
     loginBtn.addEventListener('click', async () => {
-      const email = loginEmail.value.trim();
-      const pass = loginPassword.value.trim();
-      if (!email || !pass) { alert('Enter email and password'); return; }
-      try {
-        await auth.signInWithEmailAndPassword(email, pass);
-      } catch(e) { alert('Login failed: ' + e.message); }
+      try { await auth.signInWithEmailAndPassword(loginEmail.value.trim(), loginPassword.value.trim()); }
+      catch(e) { alert('Login failed: ' + e.message); }
     });
-
-    showSignupBtn.addEventListener('click', () => {
-      showView(signupView);
-      signupEmail.value = '';
-      signupPassword.value = '';
-    });
-
+    showSignupBtn.addEventListener('click', () => { showView(signupView); signupEmail.value = ''; signupPassword.value = ''; });
     backToLoginBtn.addEventListener('click', () => showView(loginView));
 
-    // ---------- Signup ----------
-    signupBtn.addEventListener('click', async () => {
-      const name = signupName.value.trim();
-      const email = signupEmail.value.trim();
-      const pass = signupPassword.value.trim();
-      const hobbies = signupHobbies.value.split(',').map(s => s.trim()).filter(Boolean);
-      const interest = signupInterest.value.split(',').map(s => s.trim()).filter(Boolean);
-      const favPlace = signupFavPlace.value.trim();
-      const game = signupGame.value.trim();
-      if (!name || !email || !pass || pass.length < 6) { alert('Please fill all fields (password min 6)'); return; }
-      if (selectedVibes.length < 2) { alert('Select at least 2 vibe tags'); return; }
-      try {
-        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-        const uid = cred.user.uid;
-        const userObj = {
-          name, email,
-          vibeTags: [...selectedVibes],
-          hobbies: hobbies,
-          interests: interest,
-          favPlace: favPlace,
-          game: game,
-          badges: ['Coffee Lover', 'MBTI: ENFP'],
-          streak: 1,
-          lat: 0, lng: 0,
-          ghost: false,
-          timestamp: Date.now()
-        };
-        await db.ref('users/' + uid).set(userObj);
-        // auto login
-        currentUser = userObj;
-        currentUser.uid = uid;
-        showView(dashboardView);
-        fillDashboard(userObj);
-        startLocationWatch();
-        scanNearby();
-        streakBadge.textContent = '🔥 1d';
-      } catch(e) { alert('Signup failed: ' + e.message); }
-    });
-
-    // ---------- signup vibe tags ----------
+    // Signup vibe tags
     document.querySelectorAll('#signupVibeTags .chip').forEach(el => {
       el.addEventListener('click', function() {
         const tag = this.dataset.tag;
         if (selectedVibes.includes(tag)) {
           selectedVibes = selectedVibes.filter(t => t !== tag);
-          this.style.background = '#2a2529';
-          this.style.color = '#f3c96b';
+          this.style.background = '#2a2529'; this.style.color = '#f3c96b';
         } else {
           if (selectedVibes.length >= 4) return;
           selectedVibes.push(tag);
-          this.style.background = '#f3c96b40';
-          this.style.color = '#f7d875';
+          this.style.background = '#f3c96b40'; this.style.color = '#f7d875';
         }
       });
     });
 
-    // ---------- Dashboard fill ----------
-    function fillDashboard(user) {
+    signupBtn.addEventListener('click', async () => {
+      const name = signupName.value.trim(), email = signupEmail.value.trim(), pass = signupPassword.value.trim();
+      const hobbies = signupHobbies.value.split(',').map(s => s.trim()).filter(Boolean);
+      const interests = signupInterest.value.split(',').map(s => s.trim()).filter(Boolean);
+      const favPlace = signupFavPlace.value.trim(), game = signupGame.value.trim();
+      if (!name || !email || !pass || pass.length < 6) { alert('Please fill all fields (password min 6)'); return; }
+      if (selectedVibes.length < 2) { alert('Select at least 2 vibe tags'); return; }
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        const uid = cred.user.uid;
+        const userObj = { name, email, vibeTags: [...selectedVibes], hobbies, interests, favPlace, game,
+          badges: ['✨ Explorer'], streak: 1, lat: 0, lng: 0, ghost: false, timestamp: Date.now() };
+        await db.ref('users/' + uid).set(userObj);
+        currentUser = userObj; currentUser.uid = uid;
+        showView(pagesContainer);
+        fillProfile(userObj);
+        startLocationWatch();
+        scanNearby();
+        loadRinged();
+        loadHistory();
+        streakBadge.textContent = '🔥 1d';
+      } catch(e) { alert('Signup failed: ' + e.message); }
+    });
+
+    function fillProfile(user) {
       profileName.textContent = user.name || '—';
+      profileAvatar.textContent = user.name ? user.name[0].toUpperCase() : '👤';
       profileTags.innerHTML = (user.vibeTags || []).map(t => `<span class="chip">${t}</span>`).join(' ');
-      profileBadges.innerHTML = (user.badges || []).map(b => `<span class="badge">${b}</span>`).join(' ');
+      profileBadges.textContent = (user.badges || []).join(' ');
       profileHobbies.textContent = '🎯 ' + (user.hobbies || []).join(', ') || '—';
       profileFoods.textContent = '📍 ' + (user.favPlace || '—');
       profileGames.textContent = '🎮 ' + (user.game || '—');
       dailyPoll.textContent = '☕ coffee or tea?  (vote)';
     }
 
-    // ---------- geolocation watch ----------
+    // Geolocation
     function startLocationWatch() {
       if (watchId) navigator.geolocation.clearWatch(watchId);
       watchId = navigator.geolocation.watchPosition(
         async (pos) => {
           if (!currentUser || !myUID) return;
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          currentUser.lat = lat;
-          currentUser.lng = lng;
+          currentUser.lat = pos.coords.latitude; currentUser.lng = pos.coords.longitude;
           if (!ghostMode) {
-            await db.ref('users/' + myUID + '/lat').set(lat);
-            await db.ref('users/' + myUID + '/lng').set(lng);
+            await db.ref('users/' + myUID + '/lat').set(pos.coords.latitude);
+            await db.ref('users/' + myUID + '/lng').set(pos.coords.longitude);
             await db.ref('users/' + myUID + '/timestamp').set(Date.now());
           }
           scanNearby();
         },
-        () => {},
+        () => { scanStatus.textContent = '⚠️ location off'; },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 }
       );
-    }
-
-    // ---------- scan nearby ----------
-    async function scanNearby() {
-      if (!currentUser || !myUID) return;
-      const usersSnap = await db.ref('users').once('value');
-      const allUsers = usersSnap.val();
-      if (!allUsers) return;
-      const results = [];
-      const myLat = currentUser.lat;
-      const myLng = currentUser.lng;
-      if (!myLat || !myLng) return;
-      for (let uid in allUsers) {
-        if (uid === myUID) continue;
-        const u = allUsers[uid];
-        if (!u.lat || !u.lng) continue;
-        const dist = haversine(myLat, myLng, u.lat, u.lng);
-        const match = calculateMatch(currentUser, u);
-        const matchPercent = Math.round(match * 100);
-        results.push({ uid, ...u, distance: dist, matchPercent });
-      }
-      results.sort((a,b) => a.distance - b.distance);
-      nearbyUsers = results;
-      renderNearby(results);
-      updateRadar(results);
-      checkAlarm(results);
-      if (results.length && results[0].distance < 50 && results[0].matchPercent > 50) {
-        iceBreakerContainer.classList.remove('hidden');
-        const msgs = ['Hey! Love your vibe ✨', 'Coffee sometime? ☕', 'You seem interesting!'];
-        iceBreakerText.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-      } else {
-        iceBreakerContainer.classList.add('hidden');
-      }
     }
 
     function haversine(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
       const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
       const Δφ = (lat2-lat1)*Math.PI/180, Δλ = (lon2-lon1)*Math.PI/180;
-      const a = Math.sin(Δφ/2)*Math.sin(Δφ/2) + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
+      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
 
@@ -458,72 +418,112 @@
       return common.length / [...new Set([...t1, ...t2])].length;
     }
 
+    async function scanNearby() {
+      if (!currentUser || !myUID) return;
+      const usersSnap = await db.ref('users').once('value');
+      const allUsers = usersSnap.val();
+      if (!allUsers) return;
+      const results = [];
+      const myLat = currentUser.lat, myLng = currentUser.lng;
+      if (!myLat || !myLng) return;
+      for (let uid in allUsers) {
+        if (uid === myUID) continue;
+        const u = allUsers[uid];
+        if (!u.lat || !u.lng) continue;
+        const dist = haversine(myLat, myLng, u.lat, u.lng);
+        const match = calculateMatch(currentUser, u);
+        results.push({ uid, ...u, distance: dist, matchPercent: Math.round(match * 100) });
+      }
+      results.sort((a,b) => a.distance - b.distance);
+      nearbyUsers = results;
+      renderNearby(results);
+      updateRadar(results);
+      checkAlarm(results);
+      scanStatus.textContent = `📍 ${results.length} nearby`;
+    }
+
     function renderNearby(results) {
       if (!results.length) {
         nearbyList.innerHTML = `<div class="text-center text-[#6b5e4e] text-sm py-4">✨ no one nearby</div>`;
         return;
       }
-      nearbyList.innerHTML = results.slice(0, 5).map(r => {
-        const distLabel = r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : '📡 ' + Math.round(r.distance) + 'm';
-        return `<div class="glass-card rounded-2xl p-3 border border-[#f3c96b20] flex justify-between items-center cursor-pointer hover:border-[#f3c96b60] transition-smooth" data-uid="${r.uid}">
+      nearbyList.innerHTML = results.slice(0, 6).map(r => {
+        const isMatch = r.distance < parseInt(radiusSelect.value) && r.matchPercent >= 70;
+        return `<div class="ring-card flex justify-between items-center" data-uid="${r.uid}">
           <div><span class="font-medium gold-text">${r.name}</span>
           <div class="flex flex-wrap gap-1 mt-1">${(r.vibeTags||[]).slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}</div></div>
-          <div class="text-right"><span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span><div class="text-[10px] text-[#6b5e4e]">${distLabel}</div></div>
+          <div class="text-right">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span>
+              ${isMatch ? '<span class="match-heart">❤️</span>' : ''}
+            </div>
+            <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
+            ${isMatch ? `<button class="ring-btn text-xs gold-text bg-[#f3c96b20] px-3 py-1 rounded-full mt-1 border border-[#f3c96b40]">Ring ❤️</button>` : ''}
+          </div>
         </div>`;
       }).join('');
-      // double tap like
-      document.querySelectorAll('#nearbyList .glass-card').forEach(el => {
-        el.addEventListener('dblclick', async function() {
-          const uid = this.dataset.uid;
+
+      document.querySelectorAll('.ring-btn').forEach((btn, idx) => {
+        btn.addEventListener('click', async function() {
+          const card = this.closest('.ring-card');
+          const uid = card.dataset.uid;
           if (!uid || !myUID) return;
-          await db.ref('likes/' + myUID + '/' + uid).set(true);
-          if (Notification.permission === 'granted') {
-            const user = nearbyUsers.find(u => u.uid === uid);
-            new Notification('❤️ Like sent!', { body: `You liked ${user?.name || 'someone'}` });
+          await db.ref('rings/' + myUID + '/' + uid).set(true);
+          // send notification
+          const user = nearbyUsers.find(u => u.uid === uid);
+          if (user && Notification.permission === 'granted') {
+            new Notification('❤️ You rang ' + user.name + '!', { body: 'They will know you care.' });
           }
-          this.style.borderColor = '#f3c96b';
-          setTimeout(() => this.style.borderColor = '', 1000);
+          // check if mutual
+          const otherRing = await db.ref('rings/' + uid + '/' + myUID).once('value');
+          if (otherRing.val() === true) {
+            // mutual ring!
+            triggerAlarm(user);
+            // add to ringed list
+            ringedUsers.push({ uid, name: user.name, time: new Date().toLocaleTimeString() });
+            loadRinged();
+            // also ring other's phone
+            await db.ref('rings/' + uid + '/mutual/' + myUID).set(true);
+          }
+          this.textContent = '✅ Ringed!';
+          this.disabled = true;
         });
       });
     }
 
     function updateRadar(results) {
       radarDots.innerHTML = '';
-      const close = results.filter(r => r.distance < 10);
-      const nearby = results.filter(r => r.distance >= 10 && r.distance < 50);
-      const far = results.filter(r => r.distance >= 50 && r.distance < 200);
-      const dots = [...close.map(r => ({...r, zone: 'close'})), ...nearby.map(r => ({...r, zone: 'nearby'})), ...far.map(r => ({...r, zone: 'far'}))];
-      dots.slice(0, 8).forEach((r, i) => {
+      const dots = results.slice(0, 8);
+      dots.forEach((r, i) => {
         const angle = (i / Math.max(dots.length, 1)) * 2 * Math.PI + Math.random() * 0.3;
-        const radius = r.zone === 'close' ? 20 : r.zone === 'nearby' ? 45 : 75;
-        const cx = 90 + radius * Math.cos(angle);
-        const cy = 90 + radius * Math.sin(angle);
+        const radius = r.distance < 10 ? 20 : r.distance < 50 ? 45 : 75;
+        const cx = 80 + radius * Math.cos(angle);
+        const cy = 80 + radius * Math.sin(angle);
         const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         dot.setAttribute('cx', cx);
         dot.setAttribute('cy', cy);
-        dot.setAttribute('r', r.zone === 'close' ? 5 : 3);
-        dot.setAttribute('fill', r.zone === 'close' ? '#f3c96b' : '#f3c96b80');
+        dot.setAttribute('r', r.distance < 10 ? 5 : 3);
+        dot.setAttribute('fill', r.distance < 10 ? '#f3c96b' : '#f3c96b80');
         dot.setAttribute('opacity', '0.8');
         radarDots.appendChild(dot);
       });
     }
 
-    // ---------- alarm check ----------
     async function checkAlarm(results) {
       if (!currentUser || !myUID) return;
       const radius = parseInt(radiusSelect.value);
       for (let r of results) {
         if (r.distance < radius && r.matchPercent >= 70) {
-          const likeRef = db.ref('likes/' + myUID + '/' + r.uid);
-          const snap = await likeRef.once('value');
-          const iLiked = snap.val() === true;
-          const otherLikeRef = db.ref('likes/' + r.uid + '/' + myUID);
-          const otherSnap = await otherLikeRef.once('value');
-          const theyLiked = otherSnap.val() === true;
-          if (iLiked && theyLiked) {
+          const ringRef = db.ref('rings/' + myUID + '/' + r.uid);
+          const snap = await ringRef.once('value');
+          const iRang = snap.val() === true;
+          const otherRingRef = db.ref('rings/' + r.uid + '/' + myUID);
+          const otherSnap = await otherRingRef.once('value');
+          const theyRang = otherSnap.val() === true;
+          if (iRang && theyRang) {
             triggerAlarm(r);
             alarmHistory.push({ name: r.name, time: new Date().toLocaleTimeString(), dist: Math.round(r.distance) + 'm' });
-            alarmHistoryEl.innerHTML = alarmHistory.slice(-5).map(h => `<div>${h.time} · ${h.name} ${h.dist}</div>`).join('');
+            loadHistory();
             if (Notification.permission === 'granted') {
               new Notification('💖 Ring!', { body: `${r.name} is near!` });
             }
@@ -547,11 +547,38 @@
       }, 6000);
     }
 
-    // ---------- settings ----------
+    async function loadRinged() {
+      if (!myUID) return;
+      const snap = await db.ref('rings/' + myUID).once('value');
+      const data = snap.val();
+      if (!data) { ringedList.innerHTML = '<div class="text-center text-[#6b5e4e] text-sm py-4">no rings yet</div>'; return; }
+      const uids = Object.keys(data);
+      let html = '';
+      for (let uid of uids) {
+        const userSnap = await db.ref('users/' + uid).once('value');
+        const user = userSnap.val();
+        if (user) {
+          const mutual = await db.ref('rings/' + uid + '/mutual/' + myUID).once('value');
+          html += `<div class="ring-card flex justify-between items-center">
+            <div><span class="font-medium gold-text">${user.name}</span>
+            <div class="text-[10px] text-[#6b5e4e]">${mutual.val() === true ? '❤️ mutual ring!' : '🔔 you rang them'}</div></div>
+            <span class="badge-gold">${mutual.val() === true ? '💞' : '✨'}</span>
+          </div>`;
+        }
+      }
+      ringedList.innerHTML = html || '<div class="text-center text-[#6b5e4e] text-sm py-4">no rings yet</div>';
+    }
+
+    function loadHistory() {
+      alarmHistoryList.innerHTML = alarmHistory.slice(-10).map(h =>
+        `<div class="ring-card flex justify-between"><span>${h.name}</span><span class="text-[#6b5e4e] text-xs">${h.time} · ${h.dist}</span></div>`
+      ).join('') || '<div class="text-center text-[#6b5e4e] text-sm py-4">no history</div>';
+    }
+
+    // Settings
     settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
     closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
-    radiusSelect.addEventListener('change', (e) => { alarmRadius = parseInt(e.target.value); });
-    
+    radiusSelect.addEventListener('change', () => scanNearby());
     ghostSettingToggle.addEventListener('click', () => {
       ghostMode = !ghostMode;
       ghostSettingToggle.textContent = ghostMode ? 'on' : 'off';
@@ -560,29 +587,24 @@
         db.ref('users/' + myUID + '/lng').remove();
       }
     });
-
-    logoutBtn.addEventListener('click', () => {
-      auth.signOut();
-      showView(loginView);
-      if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    logoutBtn.addEventListener('click', () => { auth.signOut(); showView(loginView); if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; } });
+    deleteAccountBtn.addEventListener('click', async () => {
+      if (confirm('Delete your account permanently?')) {
+        const user = auth.currentUser;
+        if (user) { await db.ref('users/' + myUID).remove(); await user.delete(); }
+        showView(loginView);
+      }
     });
-
     refreshBtn.addEventListener('click', scanNearby);
-
     alarmOverlay.addEventListener('click', function() {
       this.classList.remove('opacity-100', 'pointer-events-auto');
       this.classList.add('opacity-0');
       clearTimeout(window.alarmTimer);
     });
-
     if (Notification.permission === 'default') Notification.requestPermission();
 
-    // initial loading -> check auth state
     showView(loadingView);
-    setTimeout(() => {
-      if (!auth.currentUser) showView(loginView);
-    }, 1500);
-
+    setTimeout(() => { if (!auth.currentUser) showView(loginView); }, 1200);
   })();
 </script>
 </body>
