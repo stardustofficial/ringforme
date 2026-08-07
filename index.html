@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Ring For Me · Love Alarm</title>
+  <!-- Tailwind via CDN + custom golden theme -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font & extra style -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; margin:0; padding:0; box-sizing:border-box; }
+    body { background: #0b0a0c; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    /* main card – mobile first, no scroll, native feel */
+    #app {
+      width: 100%; max-width: 420px; height: 100vh; max-height: 780px;
+      background: #141215; border-radius: 36px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      overflow: hidden; position: relative; display: flex; flex-direction: column;
+      border: 1px solid #f5b56b30;
+    }
+    .gold-gradient { background: linear-gradient(145deg, #f7d875, #d9a441); }
+    .gold-text { color: #f3c96b; }
+    .gold-border { border-color: #f3c96b; }
+    .glass-card { background: rgba(20, 18, 21, 0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    /* custom scroll none */
+    ::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* pulse animation for alarm */
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88, 0 0 40px #d9a44155; transform: scale(1); }
+      50% { box-shadow: 0 0 40px #f7d875, 0 0 80px #f3c96bcc, 0 0 120px #d9a441aa; transform: scale(1.02); }
+      100% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88, 0 0 40px #d9a44155; transform: scale(1); }
+    }
+    .alarm-active {
+      animation: glowPulse 1.2s infinite ease-in-out;
+      background: rgba(243, 201, 107, 0.15);
+      border: 2px solid #f3c96b;
+    }
+    .heart-beat {
+      animation: heartBeat 1s infinite;
+    }
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.2); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.15); }
+      60% { transform: scale(1); }
+    }
+    .transition-smooth { transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1); }
+    /* tag chips */
+    .chip { background: #2a2529; color: #f3c96b; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; border: 1px solid #f3c96b40; }
+  </style>
+</head>
+<body>
+<div id="app" class="flex flex-col text-white relative no-scrollbar">
+
+  <!-- header with golden line -->
+  <div class="flex items-center justify-between px-6 pt-5 pb-2 flex-shrink-0">
+    <span class="text-2xl font-light tracking-widest gold-text">✦ RING</span>
+    <span class="text-[10px] uppercase tracking-[0.2em] text-[#f3c96b99]">for me</span>
+  </div>
+  <div class="h-[2px] w-4/5 mx-auto gold-gradient opacity-50 rounded-full mb-2"></div>
+
+  <!-- main dynamic container (no overflow) -->
+  <div id="mainContainer" class="flex-1 px-5 pb-4 overflow-y-auto no-scrollbar transition-smooth relative">
+    <!-- onboarding view (multi-step) -->
+    <div id="onboardingView" class="space-y-5 pt-2">
+      <!-- step 1: name & vibe tags (simplified multi-step) -->
+      <div id="step1" class="space-y-4">
+        <div class="text-xs gold-text tracking-widest">STEP 1 · WHO ARE YOU</div>
+        <input id="userName" type="text" placeholder="Your name" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-4 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth text-base" value="Jisoo">
+        <div>
+          <div class="text-xs gold-text mb-2 tracking-wide">VIBE TAGS (select up to 4)</div>
+          <div id="vibeTags" class="flex flex-wrap gap-2">
+            <span data-tag="romantic" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">❤️ romantic</span>
+            <span data-tag="playful" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">🌀 playful</span>
+            <span data-tag="cozy" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">☕ cozy</span>
+            <span data-tag="adventurous" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">🏔️ adventurous</span>
+            <span data-tag="chill" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">🌊 chill</span>
+            <span data-tag="nerdy" class="chip cursor-pointer transition-smooth hover:bg-[#f3c96b30] active:scale-95">📚 nerdy</span>
+          </div>
+          <div class="text-[10px] text-[#a0907a] mt-1">tap to toggle</div>
+        </div>
+        <button id="nextStep1" class="w-full gold-gradient text-[#141215] font-bold py-4 rounded-2xl text-base tracking-wide shadow-lg shadow-[#f3c96b30] transition-smooth hover:scale-[1.01] active:scale-95">next →</button>
+      </div>
+
+      <!-- step 2: hobbies, fav foods, games -->
+      <div id="step2" class="space-y-4 hidden">
+        <div class="text-xs gold-text tracking-widest">STEP 2 · YOUR FAVES</div>
+        <input id="hobbies" type="text" placeholder="Hobbies (comma separated)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" value="photography, dancing, guitar">
+        <input id="favFoods" type="text" placeholder="Fav foods (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" value="ramen, sushi, chocolate">
+        <input id="favGames" type="text" placeholder="Fav games (comma)" class="w-full bg-[#1f1b1e] border border-[#f3c96b50] rounded-2xl px-5 py-3 text-white placeholder:text-[#6b5e4e] focus:outline-none focus:border-[#f3c96b] transition-smooth" value="stardew, zelda, persona">
+        <div class="flex gap-3 pt-1">
+          <button id="backStep2" class="flex-1 bg-[#2a2529] text-[#f3c96b] border border-[#f3c96b40] py-3 rounded-2xl transition-smooth active:scale-95">back</button>
+          <button id="saveProfile" class="flex-1 gold-gradient text-[#141215] font-bold py-3 rounded-2xl transition-smooth active:scale-95">save & find</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- profile card (after onboarding) -->
+    <div id="profileView" class="hidden space-y-4 pt-2">
+      <div class="glass-card rounded-3xl p-4 border border-[#f3c96b30]">
+        <div class="flex items-center justify-between">
+          <span id="profileName" class="text-xl font-bold gold-text">Jisoo</span>
+          <span class="text-xs px-3 py-1 rounded-full bg-[#f3c96b20] border border-[#f3c96b40]">📍 live</span>
+        </div>
+        <div class="flex flex-wrap gap-1 mt-2" id="profileTags"></div>
+        <div class="text-xs text-[#b8a68b] mt-2 flex flex-wrap gap-x-4"><span id="profileHobbies"></span> <span id="profileFoods"></span> <span id="profileGames"></span></div>
+      </div>
+      <button id="refreshProximity" class="w-full gold-gradient text-[#141215] font-bold py-3 rounded-2xl text-sm tracking-wide transition-smooth active:scale-95">⟳ scan nearby</button>
+      <div id="nearbyList" class="space-y-2 max-h-[180px] overflow-y-auto no-scrollbar"></div>
+    </div>
+
+    <!-- ALARM overlay (full screen glow) -->
+    <div id="alarmOverlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-all duration-700 ease-in-out rounded-[36px] overflow-hidden" style="background: radial-gradient(circle at center, #f3c96b30, #141215 80%);">
+      <div class="heart-beat text-8xl gold-text drop-shadow-[0_0_30px_#f3c96b]">❤️</div>
+      <div class="text-3xl font-bold gold-text mt-2 tracking-widest">RING</div>
+      <div class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-2 rounded-full mt-2 backdrop-blur">✨ common: <span id="commonTagsDisplay">romantic, cozy</span></div>
+      <div class="absolute bottom-10 text-[10px] text-[#f3c96b88]">❤️ alarm active</div>
+    </div>
+  </div>
+
+  <!-- audio alarm (hidden) -->
+  <audio id="alarmSound" preload="auto">
+    <source src="data:audio/wav;base64,U3RlcmVvIGlzIG5vdCBzdXBwb3J0ZWQgcGxlYXNlIHVzZSBhbiBhdWRpbyBmaWxlLg==" type="audio/wav">
+  </audio>
+</div>
+<script>
+  (function() {
+    // ---------- state ----------
+    let currentUser = null;
+    let nearbyUsers = [];
+    let selectedVibes = [];
+    const STORAGE_KEY = 'ring_for_me_users';
+    const MAX_DIST_M = 10;
+    const MATCH_THRESHOLD = 0.7;
+
+    // DOM refs
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const nextBtn = document.getElementById('nextStep1');
+    const backBtn = document.getElementById('backStep2');
+    const saveBtn = document.getElementById('saveProfile');
+    const userName = document.getElementById('userName');
+    const hobbies = document.getElementById('hobbies');
+    const favFoods = document.getElementById('favFoods');
+    const favGames = document.getElementById('favGames');
+    const profileView = document.getElementById('profileView');
+    const onboardingView = document.getElementById('onboardingView');
+    const profileName = document.getElementById('profileName');
+    const profileTags = document.getElementById('profileTags');
+    const profileHobbies = document.getElementById('profileHobbies');
+    const profileFoods = document.getElementById('profileFoods');
+    const profileGames = document.getElementById('profileGames');
+    const nearbyList = document.getElementById('nearbyList');
+    const alarmOverlay = document.getElementById('alarmOverlay');
+    const commonTagsDisplay = document.getElementById('commonTagsDisplay');
+    const alarmSound = document.getElementById('alarmSound');
+
+    // tag toggles
+    document.querySelectorAll('#vibeTags .chip').forEach(el => {
+      el.addEventListener('click', function(e) {
+        const tag = this.dataset.tag;
+        if (selectedVibes.includes(tag)) {
+          selectedVibes = selectedVibes.filter(t => t !== tag);
+          this.style.background = '#2a2529';
+          this.style.color = '#f3c96b';
+        } else {
+          if (selectedVibes.length >= 4) return;
+          selectedVibes.push(tag);
+          this.style.background = '#f3c96b40';
+          this.style.color = '#f7d875';
+        }
+      });
+    });
+
+    // step nav
+    nextBtn.addEventListener('click', () => {
+      if (!userName.value.trim()) { alert('name required'); return; }
+      if (selectedVibes.length < 2) { alert('select at least 2 vibe tags'); return; }
+      step1.classList.add('hidden');
+      step2.classList.remove('hidden');
+    });
+    backBtn.addEventListener('click', () => {
+      step1.classList.remove('hidden');
+      step2.classList.add('hidden');
+    });
+
+    // ---------- geolocation + storage ----------
+    function getPosition() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve({ coords: { latitude: 37.5665, longitude: 126.9780 } }); // seoul fallback
+        } else {
+          navigator.geolocation.getCurrentPosition(
+            pos => resolve(pos),
+            () => resolve({ coords: { latitude: 37.5665, longitude: 126.9780 } }),
+            { enableHighAccuracy: true, timeout: 6000 }
+          );
+        }
+      });
+    }
+
+    function loadUsersFromStorage() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (data) {
+        try { return JSON.parse(data); } catch(e) { return []; }
+      }
+      return [];
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+    }
+
+    // create user object from form
+    function buildUserFromForm() {
+      const name = userName.value.trim();
+      const hobbiesArr = hobbies.value.split(',').map(s => s.trim()).filter(Boolean);
+      const foodsArr = favFoods.value.split(',').map(s => s.trim()).filter(Boolean);
+      const gamesArr = favGames.value.split(',').map(s => s.trim()).filter(Boolean);
+      return {
+        id: Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        name,
+        vibeTags: [...selectedVibes],
+        hobbies: hobbiesArr,
+        favFoods: foodsArr,
+        favGames: gamesArr,
+        lat: 0, lng: 0,
+        timestamp: Date.now()
+      };
+    }
+
+    // show profile UI
+    function showProfile(user) {
+      currentUser = user;
+      profileName.textContent = user.name;
+      profileTags.innerHTML = user.vibeTags.map(t => `<span class="chip">${t}</span>`).join(' ');
+      profileHobbies.textContent = '🎯 ' + (user.hobbies.join(', ') || '—');
+      profileFoods.textContent = '🍜 ' + (user.favFoods.join(', ') || '—');
+      profileGames.textContent = '🎮 ' + (user.favGames.join(', ') || '—');
+      onboardingView.classList.add('hidden');
+      profileView.classList.remove('hidden');
+      // fetch nearby
+      scanNearby(user);
+    }
+
+    // ---------- match & proximity ----------
+    function calculateMatch(user1, user2) {
+      const tags1 = user1.vibeTags || [];
+      const tags2 = user2.vibeTags || [];
+      if (!tags1.length || !tags2.length) return 0;
+      const common = tags1.filter(t => tags2.includes(t));
+      const union = [...new Set([...tags1, ...tags2])];
+      return common.length / union.length;
+    }
+
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
+      const Δφ = (lat2-lat1)*Math.PI/180;
+      const Δλ = (lon2-lon1)*Math.PI/180;
+      const a = Math.sin(Δφ/2)*Math.sin(Δφ/2) + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
+      const c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    async function scanNearby(user) {
+      const pos = await getPosition();
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      user.lat = lat;
+      user.lng = lng;
+
+      let allUsers = loadUsersFromStorage();
+      // remove old entries (> 5 min)
+      allUsers = allUsers.filter(u => (Date.now() - u.timestamp) < 300000);
+      // add current user
+      const existingIdx = allUsers.findIndex(u => u.id === user.id);
+      if (existingIdx !== -1) allUsers[existingIdx] = user;
+      else allUsers.push(user);
+      saveUsers(allUsers);
+
+      // compute distances & matches
+      const others = allUsers.filter(u => u.id !== user.id && u.lat && u.lng);
+      const results = [];
+      for (let other of others) {
+        const dist = haversine(lat, lng, other.lat, other.lng);
+        const match = calculateMatch(user, other);
+        results.push({ ...other, distance: dist, matchPercent: Math.round(match*100) });
+      }
+      results.sort((a,b) => a.distance - b.distance);
+      nearbyUsers = results;
+      renderNearby(results, user);
+      // check alarm condition
+      checkAlarm(results, user);
+    }
+
+    function renderNearby(results, user) {
+      if (!results.length) {
+        nearbyList.innerHTML = `<div class="text-center text-[#6b5e4e] text-sm py-4">✨ no nearby alarms yet</div>`;
+        return;
+      }
+      nearbyList.innerHTML = results.slice(0, 6).map(r => `
+        <div class="glass-card rounded-2xl p-3 border border-[#f3c96b20] flex justify-between items-center transition-smooth">
+          <div>
+            <span class="font-medium gold-text">${r.name}</span>
+            <div class="flex flex-wrap gap-1 mt-1">
+              ${r.vibeTags.slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span>
+            <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : (r.distance < 50 ? '📍 nearby' : '📡 ' + Math.round(r.distance)+'m')}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function checkAlarm(results, user) {
+      const trigger = results.find(r => r.distance < MAX_DIST_M && r.matchPercent >= 70);
+      if (trigger) {
+        // show alarm overlay
+        alarmOverlay.classList.remove('opacity-0');
+        alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
+        // common tags
+        const common = user.vibeTags.filter(t => trigger.vibeTags.includes(t));
+        commonTagsDisplay.textContent = common.join(', ') || '❤️';
+        // play sound
+        try {
+          alarmSound.play().catch(() => {});
+        } catch(e) {}
+        // vibrate
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+        // auto-dismiss after 6 sec
+        clearTimeout(window.alarmTimer);
+        window.alarmTimer = setTimeout(() => {
+          alarmOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+          alarmOverlay.classList.add('opacity-0');
+        }, 6000);
+      } else {
+        alarmOverlay.classList.remove('opacity-100', 'pointer-events-auto');
+        alarmOverlay.classList.add('opacity-0');
+      }
+    }
+
+    // ---------- save & init ----------
+    saveBtn.addEventListener('click', async function() {
+      if (!userName.value.trim()) { alert('name required'); return; }
+      const user = buildUserFromForm();
+      const pos = await getPosition();
+      user.lat = pos.coords.latitude;
+      user.lng = pos.coords.longitude;
+      showProfile(user);
+      // refresh after 2 sec
+      setTimeout(() => scanNearby(user), 500);
+    });
+
+    document.getElementById('refreshProximity').addEventListener('click', function() {
+      if (currentUser) scanNearby(currentUser);
+    });
+
+    // ---- auto load if user exists ----
+    (async function init() {
+      const stored = loadUsersFromStorage();
+      if (stored.length) {
+        // find last user by timestamp
+        const last = stored.reduce((a,b) => a.timestamp > b.timestamp ? a : b);
+        // fill form
+        userName.value = last.name || '';
+        selectedVibes = last.vibeTags || [];
+        hobbies.value = (last.hobbies || []).join(', ');
+        favFoods.value = (last.favFoods || []).join(', ');
+        favGames.value = (last.favGames || []).join(', ');
+        // highlight tags
+        document.querySelectorAll('#vibeTags .chip').forEach(el => {
+          const tag = el.dataset.tag;
+          if (selectedVibes.includes(tag)) {
+            el.style.background = '#f3c96b40';
+            el.style.color = '#f7d875';
+          } else {
+            el.style.background = '#2a2529';
+            el.style.color = '#f3c96b';
+          }
+        });
+        // auto show profile
+        const pos = await getPosition();
+        last.lat = pos.coords.latitude;
+        last.lng = pos.coords.longitude;
+        showProfile(last);
+      }
+    })();
+
+    // tap alarm to dismiss
+    alarmOverlay.addEventListener('click', function() {
+      this.classList.remove('opacity-100', 'pointer-events-auto');
+      this.classList.add('opacity-0');
+      clearTimeout(window.alarmTimer);
+    });
+
+  })();
+</script>
+</body>
+</html>
