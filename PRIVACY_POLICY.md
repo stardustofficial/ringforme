@@ -43,3 +43,4 @@ We take reasonable security measures to protect your information. However, no in
 
 ## 6. Contact Us
 If you have any questions or concerns about this Privacy Policy, please open an issue in our official GitHub repository.
+___
