@@ -30,7 +30,7 @@
     ::-webkit-scrollbar { display: none; }
     @keyframes glowPulse {
       0% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88; transform: scale(1); }
-      50% { box-shadow: 0 0 40px #f7d875, 0 0 80px #f3c96bcc; transform: scale(1.02); }
+      50% { box-shadow: 0 0 20px #f7d875, 0 0 40px #f3c96bcc; transform: scale(1.03); }
       100% { box-shadow: 0 0 10px #f3c96b, 0 0 20px #f3c96b88; transform: scale(1); }
     }
     .heart-beat { animation: heartBeat 1s infinite; }
@@ -78,8 +78,6 @@
     body.light-mode .ring-card:hover { border-color: #c4902a60; }
     .badge-gold { background: #f3c96b20; color: #f3c96b; padding: 2px 10px; border-radius: 20px; font-size: 0.6rem; border: 1px solid #f3c96b40; }
     body.light-mode .badge-gold { background: #c4902a20; color: #c4902a; border-color: #c4902a40; }
-    .match-heart { color: #f3c96b; font-size: 1.2rem; }
-    body.light-mode .match-heart { color: #c4902a; }
     .profile-header { display: flex; justify-content: flex-end; align-items: center; padding-right: 4px; }
     .settings-gear { cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
     .settings-gear:hover { background: #2a2529; }
@@ -88,25 +86,33 @@
     body.light-mode .settings-gear svg { stroke: #c4902a; }
     .mt-auto { margin-top: auto; }
     .ring-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; text-align: left; font-size: 0.7rem; }
-    .ring-btn { cursor: pointer; transition: all 0.2s; padding: 4px 12px; border-radius: 20px; border: 1px solid #f3c96b40; background: #f3c96b20; color: #f3c96b; font-size: 0.7rem; }
+    
+    /* Ring Buttons & Ringing Animations */
+    .ring-btn { cursor: pointer; transition: all 0.2s; padding: 6px 14px; border-radius: 20px; border: 1px solid #f3c96b40; background: #f3c96b20; color: #f3c96b; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
     body.light-mode .ring-btn { border-color: #c4902a40; background: #c4902a20; color: #c4902a; }
     .ring-btn:hover { background: #f3c96b40; }
     body.light-mode .ring-btn:hover { background: #c4902a40; }
-    .ring-btn.ringed { opacity: 0.6; cursor: default; }
-    .ring-btn.ringed:hover { background: #f3c96b20; }
-    body.light-mode .ring-btn.ringed:hover { background: #c4902a20; }
+    
+    .ring-btn.ringing {
+      animation: glowPulse 1.2s infinite;
+      background: linear-gradient(145deg, #f7d875, #d9a441);
+      color: #141215;
+      border-color: #f7d875;
+    }
+    .ring-btn.ringed {
+      background: #f3c96b10;
+      border-color: #f3c96b30;
+      color: #f3c96b88;
+      cursor: default;
+    }
+    body.light-mode .ring-btn.ringed {
+      background: #c4902a10;
+      border-color: #c4902a30;
+      color: #c4902a88;
+    }
+
     .ghost-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #2a2529;
-      padding: 8px 16px;
-      border-radius: 30px;
-      border: 1px solid #f3c96b40;
-      cursor: pointer;
-      transition: all 0.3s;
-      color: #f3c96b;
-      font-size: 0.9rem;
+      display: inline-flex; align-items: center; gap: 8px; background: #2a2529; padding: 8px 16px; border-radius: 30px; border: 1px solid #f3c96b40; cursor: pointer; transition: all 0.3s; color: #f3c96b; font-size: 0.9rem;
     }
     body.light-mode .ghost-toggle { background: #e8e0d8; color: #c4902a; border-color: #c4902a40; }
     .ghost-toggle:hover { background: #3a3539; }
@@ -126,28 +132,17 @@
     .contact-link:hover { color: #f7d875; }
     body.light-mode .contact-link:hover { color: #d9a441; }
     .lang-panel {
-      position: absolute;
-      inset: 0;
-      background: #141215dd;
-      backdrop-filter: blur(8px);
-      z-index: 45;
-      padding: 24px;
-      border-radius: 36px;
-      display: none;
-      flex-direction: column;
-      overflow-y: auto;
+      position: absolute; inset: 0; background: #141215dd; backdrop-filter: blur(8px); z-index: 45; padding: 24px; border-radius: 36px; display: none; flex-direction: column; overflow-y: auto;
     }
     body.light-mode .lang-panel { background: #f8f4f0dd; }
     .lang-panel.active { display: flex; }
     .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
-    .match-percent { font-size: 0.65rem; color: #b8a68b; }
-    body.light-mode .match-percent { color: #8a7a6a; }
   </style>
 </head>
 <body>
 <div id="app" class="flex flex-col text-white relative no-scrollbar">
 
-  <!-- header -->
+  <!-- Header -->
   <div id="mainHeader" class="flex items-center justify-between px-6 pt-5 pb-2 flex-shrink-0 hidden">
     <span class="text-2xl font-light tracking-widest gold-text" data-i18n="app_name">✦ RING</span>
     <span class="text-[10px] uppercase tracking-[0.2em] text-[#f3c96b99]" data-i18n="app_subtitle">for me</span>
@@ -156,7 +151,7 @@
 
   <div id="mainContainer" class="flex-1 px-4 pb-0 overflow-hidden transition-smooth relative flex flex-col">
 
-    <!-- loading -->
+    <!-- Loading -->
     <div id="loadingView" class="flex flex-col items-center justify-center h-full space-y-4">
       <div class="text-6xl gold-text heart-beat">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2">
@@ -167,7 +162,7 @@
       <div class="w-12 h-12 border-4 border-[#f3c96b] border-t-transparent rounded-full animate-spin"></div>
     </div>
 
-    <!-- login -->
+    <!-- Login -->
     <div id="loginView" class="hidden flex flex-col justify-center h-full space-y-6 pt-4">
       <div class="text-4xl gold-text font-light tracking-wider text-center">✦ RING</div>
       <div class="text-center text-[#f3c96b99] text-sm tracking-widest" data-i18n="login_subtitle">sign in to your world</div>
@@ -179,7 +174,7 @@
       </div>
     </div>
 
-    <!-- signup -->
+    <!-- Signup -->
     <div id="signupView" class="hidden flex-col justify-center h-full space-y-3 pt-2 overflow-y-auto no-scrollbar">
       <div class="text-2xl gold-text font-light tracking-wider text-center" data-i18n="signup_title">✦ create account</div>
       <div class="space-y-3">
@@ -214,9 +209,10 @@
       </div>
     </div>
 
-    <!-- main pages container -->
+    <!-- Main Pages Container -->
     <div id="pagesContainer" class="hidden flex-1 overflow-hidden flex flex-col">
       <div class="flex-1 overflow-hidden relative">
+        
         <!-- Page 1: Scan -->
         <div id="pageScan" class="page active space-y-4 pt-2">
           <div class="glass-card rounded-3xl p-4 border border-[#f3c96b30]">
@@ -238,7 +234,10 @@
             </div>
             <button id="refreshProximity" class="btn-primary text-sm py-3" data-i18n="scan_now">⟳ scan now</button>
           </div>
-          <div id="nearbyList" class="space-y-2 max-h-[200px] overflow-y-auto no-scrollbar"></div>
+          
+          <!-- Nearby Users Profile Cards List (<50m) -->
+          <div id="nearbyList" class="space-y-3 max-h-[260px] overflow-y-auto no-scrollbar"></div>
+          
           <div id="iceBreakerContainer" class="hidden glass-card p-3 rounded-2xl border border-[#f3c96b30]">
             <div class="text-xs gold-text mb-1">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -343,17 +342,16 @@
       </div>
     </div>
 
-    <!-- settings panel -->
+    <!-- Settings Panel -->
     <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col overflow-y-auto">
       <div class="flex justify-between flex-shrink-0">
         <span class="gold-text text-lg">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span data-i18n="settings_title">settings</span>
         </span>
         <button id="closeSettings" class="text-[#f3c96b] text-xl">✕</button>
       </div>
       <div class="mt-4 space-y-4 flex-1 overflow-y-auto">
-        <!-- Light Mode -->
         <div class="setting-section">
           <span class="text-sm text-white-important block mb-2" data-i18n="light_mode">Light mode</span>
           <div id="lightModeToggle" class="ghost-toggle">
@@ -362,17 +360,15 @@
           </div>
         </div>
 
-        <!-- Alarm Radius -->
         <div class="setting-section">
           <span class="text-sm text-white-important block mb-2" data-i18n="alarm_radius">Alarm radius</span>
           <select id="radiusSelect" class="text-white-important mt-1">
             <option value="10" data-i18n="radius_10">10m</option>
-            <option value="20" selected data-i18n="radius_20">20m</option>
-            <option value="50" data-i18n="radius_50">50m</option>
+            <option value="20" data-i18n="radius_20">20m</option>
+            <option value="50" selected data-i18n="radius_50">50m</option>
           </select>
         </div>
 
-        <!-- Ghost Mode -->
         <div class="setting-section">
           <span class="text-sm text-white-important block mb-2" data-i18n="ghost_mode">Ghost mode</span>
           <div id="ghostToggle" class="ghost-toggle">
@@ -381,32 +377,27 @@
           </div>
         </div>
 
-        <!-- Edit Profile -->
         <button id="editProfileBtn" class="btn-secondary text-sm" data-i18n="edit_profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           <span data-i18n="edit_profile">Edit Profile</span>
         </button>
 
-        <!-- Language Button -->
         <button id="openLanguagePanel" class="btn-secondary text-sm">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="2"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
           <span data-i18n="select_language">Select Language</span>
           <span id="currentLangDisplay" class="ml-2 text-xs">(English)</span>
         </button>
 
-        <!-- Privacy Policy -->
         <button id="privacyPolicyBtn" class="btn-secondary text-sm" data-i18n="privacy_policy">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
           <span data-i18n="privacy_policy">Privacy Policy</span>
         </button>
         
-        <!-- Terms of Service -->
         <button id="termsServiceBtn" class="btn-secondary text-sm" data-i18n="terms_service">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           <span data-i18n="terms_service">Terms of Service</span>
         </button>
 
-        <!-- Contact Us Section -->
         <div class="setting-section">
           <span class="text-sm text-white-important block mb-2" data-i18n="contact_us">Contact us</span>
           <div class="space-y-2 text-sm">
@@ -464,7 +455,7 @@
       </div>
     </div>
 
-    <!-- edit profile panel -->
+    <!-- Edit Profile Panel -->
     <div id="editProfilePanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col overflow-y-auto">
       <div class="flex justify-between flex-shrink-0">
         <span class="gold-text text-lg">
@@ -491,15 +482,15 @@
       </div>
     </div>
 
-    <!-- alarm overlay -->
-    <div id="alarmOverlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-all duration-700 ease-in-out rounded-[36px] overflow-hidden" style="background: radial-gradient(circle at center, #f3c96b30, #141215 80%);">
+    <!-- Alarm Overlay (For Receiver Screen) -->
+    <div id="alarmOverlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-auto opacity-0 transition-all duration-700 ease-in-out rounded-[36px] overflow-hidden hidden" style="background: radial-gradient(circle at center, #f3c96b30, #141215 85%);">
       <div class="heart-beat text-8xl gold-text">
         <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2">
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
       </div>
-      <div class="text-3xl font-bold gold-text mt-2 tracking-widest">RING</div>
-      <div id="alarmUserDetails" class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-4 rounded-2xl mt-3 backdrop-blur text-center max-w-[92%] w-full">
+      <div class="text-3xl font-bold gold-text mt-2 tracking-widest">RINGING!</div>
+      <div id="alarmUserDetails" class="text-sm text-[#f3c96bcc] bg-[#14121580] px-6 py-4 rounded-2xl mt-3 backdrop-blur text-center max-w-[92%] w-full border border-[#f3c96b40]">
         <div id="alarmUserName" class="font-bold text-lg gold-text">—</div>
         <div id="alarmUserBio" class="text-xs text-[#f3c96b99] mt-1">—</div>
         <div class="ring-details-grid mt-3 text-[#b8a68b]">
@@ -512,20 +503,15 @@
         <div id="alarmCommonTags" class="text-xs mt-2 text-[#f3c96b88]">common: <span id="commonTagsDisplay">—</span></div>
         <div id="alarmMutualBadge" class="hidden text-sm font-bold gold-text mt-2">💞 Mutual Ring! 💞</div>
       </div>
-      <div class="absolute bottom-10 text-[10px] text-[#f3c96b88]">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f3c96b88" stroke-width="2" class="inline"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        tap to dismiss
+      <div class="absolute bottom-10 text-xs text-[#f3c96b88] cursor-pointer bg-[#2a2529] px-4 py-2 rounded-full border border-[#f3c96b40]">
+        Tap anywhere to receive ring
       </div>
     </div>
+
   </div>
 
-  <audio id="alarmSound" preload="auto">
+  <audio id="alarmSound" preload="auto" loop>
     <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
-  </audio>
-  
-  <!-- New ring sound for sending rings -->
-  <audio id="ringSendSound" preload="auto">
-    <source src="https://assets.mixkit.co/active_storage/sfx/2070/2070-preview.mp3" type="audio/mpeg">
   </audio>
 </div>
 
@@ -554,7 +540,7 @@
         ghost_mode: "Ghost mode", language: "Language", contact_us: "Contact us",
         edit_profile: "Edit Profile", privacy_policy: "Privacy Policy", terms_service: "Terms of Service",
         delete_account: "Delete Account", sign_out: "Sign Out", edit_profile_title: "Edit Profile",
-        save_changes: "Save Changes", select_language: "Select Language", no_one_nearby: "no one nearby",
+        save_changes: "Save Changes", select_language: "Select Language", no_one_nearby: "no one nearby within 50m",
         no_rings: "no rings yet"
       },
       hi: {
@@ -578,288 +564,22 @@
         ghost_mode: "गोस्ट मोड", language: "भाषा", contact_us: "संपर्क करें",
         edit_profile: "प्रोफ़ाइल संपादित करें", privacy_policy: "गोपनीयता नीति", terms_service: "सेवा की शर्तें",
         delete_account: "खाता हटाएं", sign_out: "साइन आउट", edit_profile_title: "प्रोफ़ाइल संपादित करें",
-        save_changes: "परिवर्तन सहेजें", select_language: "भाषा चुनें", no_one_nearby: "कोई आस-पास नहीं",
+        save_changes: "परिवर्तन सहेजें", select_language: "भाषा चुनें", no_one_nearby: "50 मीटर में कोई आस-पास नहीं",
         no_rings: "अभी तक कोई रिंग नहीं"
-      },
-      zh: {
-        app_name: "✦ 铃声", app_subtitle: "为我", loading_title: "为我响起",
-        login_subtitle: "登录你的世界", login_email: "电子邮箱",
-        login_password: "密码", login_btn: "登录", signup_btn: "创建新账号 →",
-        signup_title: "✦ 创建账号", signup_name: "全名", signup_email: "电子邮箱",
-        signup_password: "密码（至少6个字符）", signup_bio: "个人简介（介绍一下你自己）",
-        signup_age: "真实年龄", gender_select: "选择性别", gender_male: "男",
-        gender_female: "女", gender_nonbinary: "非二元", gender_prefer: "不愿透露",
-        signup_hobbies: "爱好（如阅读、音乐）", signup_interests: "兴趣（如艺术、旅行）",
-        signup_place: "你来自哪里？", vibe_tags_label: "氛围标签（最多选4个）",
-        tag_romantic: "浪漫", tag_playful: "俏皮", tag_cozy: "舒适",
-        tag_adventurous: "冒险", tag_chill: "放松", tag_nerdy: "书呆子",
-        create_account_btn: "创建账号", back_login_btn: "← 返回登录",
-        live_radar: "实时雷达", scanning: "扫描中...", scan_now: "⟳ 立即扫描",
-        ice_breaker: "破冰话题", ring_history: "铃声历史", alarm_history: "闹钟历史",
-        nav_scan: "扫描", nav_ringed: "已响", nav_history: "历史", nav_profile: "个人资料",
-        settings_title: "设置", light_mode: "亮色模式", off: "关", on: "开",
-        alarm_radius: "闹钟半径", radius_10: "10米", radius_20: "20米", radius_50: "50米",
-        ghost_mode: "隐身模式", language: "语言", contact_us: "联系我们",
-        edit_profile: "编辑资料", privacy_policy: "隐私政策", terms_service: "服务条款",
-        delete_account: "删除账号", sign_out: "退出登录", edit_profile_title: "编辑资料",
-        save_changes: "保存更改", select_language: "选择语言", no_one_nearby: "附近没有人",
-        no_rings: "还没有铃声"
-      },
-      ko: {
-        app_name: "✦ 링", app_subtitle: "나를 위해", loading_title: "링 포 미",
-        login_subtitle: "당신의 세계에 로그인", login_email: "이메일 주소",
-        login_password: "비밀번호", login_btn: "로그인", signup_btn: "새 계정 만들기 →",
-        signup_title: "✦ 계정 만들기", signup_name: "이름", signup_email: "이메일 주소",
-        signup_password: "비밀번호 (최소 6자)", signup_bio: "자기소개",
-        signup_age: "나이", gender_select: "성별 선택", gender_male: "남성",
-        gender_female: "여성", gender_nonbinary: "논바이너리", gender_prefer: "말하고 싶지 않음",
-        signup_hobbies: "취미 (예: 독서, 음악)", signup_interests: "관심사 (예: 예술, 여행)",
-        signup_place: "어디 출신인가요?", vibe_tags_label: "바이브 태그 (최대 4개 선택)",
-        tag_romantic: "로맨틱", tag_playful: "장난기", tag_cozy: "아늑한",
-        tag_adventurous: "모험심", tag_chill: "편안한", tag_nerdy: "덕후",
-        create_account_btn: "계정 만들기", back_login_btn: "← 로그인으로 돌아가기",
-        live_radar: "실시간 레이더", scanning: "스캔 중...", scan_now: "⟳ 지금 스캔",
-        ice_breaker: "아이스브레이커", ring_history: "링 기록", alarm_history: "알람 기록",
-        nav_scan: "스캔", nav_ringed: "링됨", nav_history: "기록", nav_profile: "프로필",
-        settings_title: "설정", light_mode: "라이트 모드", off: "끄기", on: "켜기",
-        alarm_radius: "알람 반경", radius_10: "10m", radius_20: "20m", radius_50: "50m",
-        ghost_mode: "고스트 모드", language: "언어", contact_us: "문의하기",
-        edit_profile: "프로필 수정", privacy_policy: "개인정보처리방침", terms_service: "서비스 이용약관",
-        delete_account: "계정 삭제", sign_out: "로그아웃", edit_profile_title: "프로필 수정",
-        save_changes: "변경사항 저장", select_language: "언어 선택", no_one_nearby: "주변에 없음",
-        no_rings: "아직 링 없음"
-      },
-      ja: {
-        app_name: "✦ リング", app_subtitle: "私のために", loading_title: "リング・フォー・ミー",
-        login_subtitle: "あなたの世界にサインイン", login_email: "メールアドレス",
-        login_password: "パスワード", login_btn: "サインイン", signup_btn: "新規アカウント作成 →",
-        signup_title: "✦ アカウント作成", signup_name: "フルネーム", signup_email: "メールアドレス",
-        signup_password: "パスワード（6文字以上）", signup_bio: "自己紹介",
-        signup_age: "年齢", gender_select: "性別を選択", gender_male: "男性",
-        gender_female: "女性", gender_nonbinary: "ノンバイナリー", gender_prefer: "答えたくない",
-        signup_hobbies: "趣味（例：読書、音楽）", signup_interests: "興味（例：アート、旅行）",
-        signup_place: "出身はどこですか？", vibe_tags_label: "バイブタグ（最大4つ選択）",
-        tag_romantic: "ロマンチック", tag_playful: "遊び心", tag_cozy: "居心地が良い",
-        tag_adventurous: "冒険心", tag_chill: "リラックス", tag_nerdy: "オタク",
-        create_account_btn: "アカウント作成", back_login_btn: "← サインインに戻る",
-        live_radar: "ライブレーダー", scanning: "スキャン中...", scan_now: "⟳ 今すぐスキャン",
-        ice_breaker: "アイスブレイカー", ring_history: "リング履歴", alarm_history: "アラーム履歴",
-        nav_scan: "スキャン", nav_ringed: "リング済み", nav_history: "履歴", nav_profile: "プロフィール",
-        settings_title: "設定", light_mode: "ライトモード", off: "オフ", on: "オン",
-        alarm_radius: "アラーム半径", radius_10: "10m", radius_20: "20m", radius_50: "50m",
-        ghost_mode: "ゴーストモード", language: "言語", contact_us: "お問い合わせ",
-        edit_profile: "プロフィール編集", privacy_policy: "プライバシーポリシー", terms_service: "利用規約",
-        delete_account: "アカウント削除", sign_out: "サインアウト", edit_profile_title: "プロフィール編集",
-        save_changes: "変更を保存", select_language: "言語を選択", no_one_nearby: "近くに誰もいません",
-        no_rings: "まだリングがありません"
-      },
-      gu: {
-        app_name: "✦ રિંગ", app_subtitle: "મારા માટે", loading_title: "રિંગ ફોર મી",
-        login_subtitle: "તમારી દુનિયામાં સાઇન ઇન કરો", login_email: "ઇમેઇલ સરનામું",
-        login_password: "પાસવર્ડ", login_btn: "સાઇન ઇન", signup_btn: "નવું ખાતું બનાવો →",
-        signup_title: "✦ ખાતું બનાવો", signup_name: "પૂરું નામ", signup_email: "ઇમેઇલ સરનામું",
-        signup_password: "પાસવર્ડ (ઓછામાં ઓછા 6 અક્ષરો)", signup_bio: "જીવનકથા (તમારા વિશે જણાવો)",
-        signup_age: "વાસ્તવિક ઉંમર", gender_select: "લિંગ પસંદ કરો", gender_male: "પુરુષ",
-        gender_female: "સ્ત્રી", gender_nonbinary: "નોન-બાઇનરી", gender_prefer: "કહેવું નથી ઇચ્છતા",
-        signup_hobbies: "શોખ (દા.ત. વાંચન, સંગીત)", signup_interests: "રુચિઓ (દા.ત. કળા, મુસાફરી)",
-        signup_place: "તમે ક્યાંના છો?", vibe_tags_label: "વાઇબ ટૅગ્સ (અધિકતમ 4 પસંદ કરો)",
-        tag_romantic: "રોમેન્ટિક", tag_playful: "ચંચળ", tag_cozy: "આરામદાયક",
-        tag_adventurous: "સાહસિક", tag_chill: "શાંત", tag_nerdy: "વિદ્વાન",
-        create_account_btn: "ખાતું બનાવો", back_login_btn: "← સાઇન ઇન પર પાછા જાઓ",
-        live_radar: "લાઇવ રડાર", scanning: "સ્કેન થઈ રહ્યું...", scan_now: "⟳ હવે સ્કેન કરો",
-        ice_breaker: "વાતચીત શરૂ કરો", ring_history: "રિંગ ઇતિહાસ", alarm_history: "અલાર્મ ઇતિહાસ",
-        nav_scan: "સ્કેન", nav_ringed: "રિંગ્ડ", nav_history: "ઇતિહાસ", nav_profile: "પ્રોફાઇલ",
-        settings_title: "સેટિંગ્સ", light_mode: "લાઇટ મોડ", off: "બંધ", on: "ચાલુ",
-        alarm_radius: "અલાર્મ ત્રિજ્યા", radius_10: "10મી", radius_20: "20મી", radius_50: "50મી",
-        ghost_mode: "ઘોસ્ટ મોડ", language: "ભાષા", contact_us: "સંપર્ક કરો",
-        edit_profile: "પ્રોફાઇલ સંપાદિત કરો", privacy_policy: "ગોપનીયતા નીતિ", terms_service: "સેવાની શરતો",
-        delete_account: "ખાતું કાઢી નાખો", sign_out: "સાઇન આઉટ", edit_profile_title: "પ્રોફાઇલ સંપાદિત કરો",
-        save_changes: "ફેરફારો સાચવો", select_language: "ભાષા પસંદ કરો", no_one_nearby: "નજીક કોઈ નથી",
-        no_rings: "હજી સુધી કોઈ રિંગ નથી"
-      },
-      bn: {
-        app_name: "✦ রিং", app_subtitle: "আমার জন্য", loading_title: "রিং ফর মি",
-        login_subtitle: "আপনার জগতে সাইন ইন করুন", login_email: "ইমেইল ঠিকানা",
-        login_password: "পাসওয়ার্ড", login_btn: "সাইন ইন", signup_btn: "নতুন অ্যাকাউন্ট তৈরি করুন →",
-        signup_title: "✦ অ্যাকাউন্ট তৈরি করুন", signup_name: "পুরো নাম", signup_email: "ইমেইল ঠিকানা",
-        signup_password: "পাসওয়ার্ড (কমপক্ষে 6 অক্ষর)", signup_bio: "জীবনী (আপনার সম্পর্কে বলুন)",
-        signup_age: "প্রকৃত বয়স", gender_select: "লিঙ্গ নির্বাচন করুন", gender_male: "পুরুষ",
-        gender_female: "মহিলা", gender_nonbinary: "নন-বাইনারী", gender_prefer: "বলতে চাই না",
-        signup_hobbies: "শখ (যেমন পড়া, সঙ্গীত)", signup_interests: "আগ্রহ (যেমন শিল্প, ভ্রমণ)",
-        signup_place: "আপনি কোথা থেকে?", vibe_tags_label: "ভাইব ট্যাগ (সর্বোচ্চ 4টি নির্বাচন করুন)",
-        tag_romantic: "রোমান্টিক", tag_playful: "চঞ্চল", tag_cozy: "আরামদায়ক",
-        tag_adventurous: "দুঃসাহসিক", tag_chill: "শান্ত", tag_nerdy: "বুদ্ধিমান",
-        create_account_btn: "অ্যাকাউন্ট তৈরি করুন", back_login_btn: "← সাইন ইন-এ ফিরে যান",
-        live_radar: "লাইভ রাডার", scanning: "স্ক্যান করা হচ্ছে...", scan_now: "⟳ এখন স্ক্যান করুন",
-        ice_breaker: "আলোচনা শুরু করুন", ring_history: "রিং ইতিহাস", alarm_history: "অ্যালার্ম ইতিহাস",
-        nav_scan: "স্ক্যান", nav_ringed: "রিংড", nav_history: "ইতিহাস", nav_profile: "প্রোফাইল",
-        settings_title: "সেটিংস", light_mode: "লাইট মোড", off: "বন্ধ", on: "চালু",
-        alarm_radius: "অ্যালার্ম ব্যাসার্ধ", radius_10: "১০মি", radius_20: "২০মি", radius_50: "৫০মি",
-        ghost_mode: "ঘোস্ট মোড", language: "ভাষা", contact_us: "যোগাযোগ করুন",
-        edit_profile: "প্রোফাইল সম্পাদনা করুন", privacy_policy: "গোপনীয়তা নীতি", terms_service: "সেবার শর্তাবলী",
-        delete_account: "অ্যাকাউন্ট মুছুন", sign_out: "সাইন আউট", edit_profile_title: "প্রোফাইল সম্পাদনা করুন",
-        save_changes: "পরিবর্তন সংরক্ষণ করুন", select_language: "ভাষা নির্বাচন করুন", no_one_nearby: "কাছাকাছি কেউ নেই",
-        no_rings: "এখনও কোন রিং নেই"
-      },
-      ur: {
-        app_name: "✦ رنگ", app_subtitle: "میرے لیے", loading_title: "رنگ فار می",
-        login_subtitle: "اپنی دنیا میں سائن ان کریں", login_email: "ای میل پتہ",
-        login_password: "پاس ورڈ", login_btn: "سائن ان", signup_btn: "نیا اکاؤنٹ بنائیں →",
-        signup_title: "✦ اکاؤنٹ بنائیں", signup_name: "پورا نام", signup_email: "ای میل پتہ",
-        signup_password: "پاس ورڈ (کم از کم 6 حروف)", signup_bio: "سوانح (اپنے بارے میں بتائیں)",
-        signup_age: "اصل عمر", gender_select: "صنف منتخب کریں", gender_male: "مرد",
-        gender_female: "خاتون", gender_nonbinary: "نان بائنری", gender_prefer: "نہیں بتانا چاہتے",
-        signup_hobbies: "شوق (مثال: پڑھنا، موسیقی)", signup_interests: "دلچسپیاں (مثال: آرٹ، سفر)",
-        signup_place: "آپ کہاں سے ہیں؟", vibe_tags_label: "وائب ٹیگز (زیادہ سے زیادہ 4 منتخب کریں)",
-        tag_romantic: "رومانٹک", tag_playful: "چنچل", tag_cozy: "آرام دہ",
-        tag_adventurous: "مہم جو", tag_chill: "پرسکون", tag_nerdy: "ذہین",
-        create_account_btn: "اکاؤنٹ بنائیں", back_login_btn: "← سائن ان پر واپس جائیں",
-        live_radar: "لائیو ریڈار", scanning: "اسکین ہو رہا...", scan_now: "⟳ ابھی اسکین کریں",
-        ice_breaker: "گفتگو شروع کریں", ring_history: "رنگ تاریخ", alarm_history: "الارم تاریخ",
-        nav_scan: "اسکین", nav_ringed: "رنگڈ", nav_history: "تاریخ", nav_profile: "پروفائل",
-        settings_title: "ترتیبات", light_mode: "لائٹ موڈ", off: "بند", on: "آن",
-        alarm_radius: "الارم کا دائرہ", radius_10: "10م", radius_20: "20م", radius_50: "50م",
-        ghost_mode: "گوسٹ موڈ", language: "زبان", contact_us: "رابطہ کریں",
-        edit_profile: "پروفائل میں ترمیم کریں", privacy_policy: "رازداری کی پالیسی", terms_service: "خدمت کی شرائط",
-        delete_account: "اکاؤنٹ حذف کریں", sign_out: "سائن آؤٹ", edit_profile_title: "پروفائل میں ترمیم کریں",
-        save_changes: "تبدیلیاں محفوظ کریں", select_language: "زبان منتخب کریں", no_one_nearby: "آس پاس کوئی نہیں",
-        no_rings: "ابھی تک کوئی رنگ نہیں"
-      },
-      th: {
-        app_name: "✦ ริง", app_subtitle: "เพื่อฉัน", loading_title: "ริง ฟอร์ มี",
-        login_subtitle: "เข้าสู่โลกของคุณ", login_email: "ที่อยู่อีเมล",
-        login_password: "รหัสผ่าน", login_btn: "เข้าสู่ระบบ", signup_btn: "สร้างบัญชีใหม่ →",
-        signup_title: "✦ สร้างบัญชี", signup_name: "ชื่อเต็ม", signup_email: "ที่อยู่อีเมล",
-        signup_password: "รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)", signup_bio: "ประวัติย่อ (บอกเกี่ยวกับตัวคุณ)",
-        signup_age: "อายุจริง", gender_select: "เลือกเพศ", gender_male: "ชาย",
-        gender_female: "หญิง", gender_nonbinary: "ไม่ใช่ไบนารี", gender_prefer: "ไม่ต้องการบอก",
-        signup_hobbies: "งานอดิเรก (เช่น อ่านหนังสือ, ดนตรี)", signup_interests: "ความสนใจ (เช่น ศิลปะ, ท่องเที่ยว)",
-        signup_place: "คุณมาจากไหน?", vibe_tags_label: "แท็กไวบ์ (เลือกสูงสุด 4)",
-        tag_romantic: "โรแมนติก", tag_playful: "ขี้เล่น", tag_cozy: "อบอุ่น",
-        tag_adventurous: "ผจญภัย", tag_chill: "ผ่อนคลาย", tag_nerdy: "เนิร์ด",
-        create_account_btn: "สร้างบัญชี", back_login_btn: "← กลับไปที่เข้าสู่ระบบ",
-        live_radar: "เรดาร์สด", scanning: "กำลังสแกน...", scan_now: "⟳ สแกนตอนนี้",
-        ice_breaker: "เปิดบทสนทนา", ring_history: "ประวัติริง", alarm_history: "ประวัติแจ้งเตือน",
-        nav_scan: "สแกน", nav_ringed: "ริงแล้ว", nav_history: "ประวัติ", nav_profile: "โปรไฟล์",
-        settings_title: "การตั้งค่า", light_mode: "โหมดสว่าง", off: "ปิด", on: "เปิด",
-        alarm_radius: "รัศมีแจ้งเตือน", radius_10: "10ม.", radius_20: "20ม.", radius_50: "50ม.",
-        ghost_mode: "โหมดผี", language: "ภาษา", contact_us: "ติดต่อเรา",
-        edit_profile: "แก้ไขโปรไฟล์", privacy_policy: "นโยบายความเป็นส่วนตัว", terms_service: "ข้อกำหนดการให้บริการ",
-        delete_account: "ลบบัญชี", sign_out: "ออกจากระบบ", edit_profile_title: "แก้ไขโปรไฟล์",
-        save_changes: "บันทึกการเปลี่ยนแปลง", select_language: "เลือกภาษา", no_one_nearby: "ไม่มีใครอยู่ใกล้",
-        no_rings: "ยังไม่มีริง"
-      },
-      vi: {
-        app_name: "✦ RING", app_subtitle: "cho tôi", loading_title: "RING FOR ME",
-        login_subtitle: "đăng nhập vào thế giới của bạn", login_email: "Địa chỉ email",
-        login_password: "Mật khẩu", login_btn: "Đăng nhập", signup_btn: "Tạo tài khoản mới →",
-        signup_title: "✦ tạo tài khoản", signup_name: "Họ và tên", signup_email: "Địa chỉ email",
-        signup_password: "Mật khẩu (tối thiểu 6 ký tự)", signup_bio: "Tiểu sử (giới thiệu về bạn)",
-        signup_age: "Tuổi thật", gender_select: "Chọn giới tính", gender_male: "Nam",
-        gender_female: "Nữ", gender_nonbinary: "Phi nhị phân", gender_prefer: "Không muốn tiết lộ",
-        signup_hobbies: "Sở thích (ví dụ: đọc sách, âm nhạc)", signup_interests: "Sở thích (ví dụ: nghệ thuật, du lịch)",
-        signup_place: "Bạn đến từ đâu?", vibe_tags_label: "Thẻ vibe (chọn tối đa 4)",
-        tag_romantic: "Lãng mạn", tag_playful: "Tinh nghịch", tag_cozy: "Ấm cúng",
-        tag_adventurous: "Phiêu lưu", tag_chill: "Thư giãn", tag_nerdy: "Mọt sách",
-        create_account_btn: "Tạo tài khoản", back_login_btn: "← Quay lại đăng nhập",
-        live_radar: "radar trực tiếp", scanning: "đang quét...", scan_now: "⟳ quét ngay",
-        ice_breaker: "phá băng", ring_history: "lịch sử ring", alarm_history: "lịch sử báo thức",
-        nav_scan: "Quét", nav_ringed: "Đã ring", nav_history: "Lịch sử", nav_profile: "Hồ sơ",
-        settings_title: "cài đặt", light_mode: "Chế độ sáng", off: "Tắt", on: "Bật",
-        alarm_radius: "Bán kính báo thức", radius_10: "10m", radius_20: "20m", radius_50: "50m",
-        ghost_mode: "Chế độ ẩn", language: "Ngôn ngữ", contact_us: "Liên hệ",
-        edit_profile: "Chỉnh sửa hồ sơ", privacy_policy: "Chính sách bảo mật", terms_service: "Điều khoản dịch vụ",
-        delete_account: "Xóa tài khoản", sign_out: "Đăng xuất", edit_profile_title: "Chỉnh sửa hồ sơ",
-        save_changes: "Lưu thay đổi", select_language: "Chọn ngôn ngữ", no_one_nearby: "không có ai gần",
-        no_rings: "chưa có ring nào"
-      },
-      ro: {
-        app_name: "✦ RING", app_subtitle: "pentru mine", loading_title: "RING FOR ME",
-        login_subtitle: "autentifică-te în lumea ta", login_email: "Adresă de email",
-        login_password: "Parolă", login_btn: "Autentificare", signup_btn: "Creează cont nou →",
-        signup_title: "✦ creează cont", signup_name: "Nume complet", signup_email: "Adresă de email",
-        signup_password: "Parolă (minim 6 caractere)", signup_bio: "Bio (spune-ne despre tine)",
-        signup_age: "Vârstă reală", gender_select: "Selectează genul", gender_male: "Masculin",
-        gender_female: "Feminin", gender_nonbinary: "Non-binar", gender_prefer: "Prefer să nu spun",
-        signup_hobbies: "Hobby-uri (ex. citit, muzică)", signup_interests: "Interese (ex. artă, călătorii)",
-        signup_place: "De unde ești?", vibe_tags_label: "Etichete vibe (selectează maxim 4)",
-        tag_romantic: "Romantic", tag_playful: "Jucăuș", tag_cozy: "Confortabil",
-        tag_adventurous: "Aventuros", tag_chill: "Relaxat", tag_nerdy: "Tocilar",
-        create_account_btn: "Creează cont", back_login_btn: "← Înapoi la autentificare",
-        live_radar: "radar live", scanning: "scanare...", scan_now: "⟳ scanează acum",
-        ice_breaker: "spargă gheața", ring_history: "istoric ring", alarm_history: "istoric alarmă",
-        nav_scan: "Scanare", nav_ringed: "Ringed", nav_history: "Istoric", nav_profile: "Profil",
-        settings_title: "setări", light_mode: "Mod luminos", off: "Oprit", on: "Pornit",
-        alarm_radius: "Raza alarmei", radius_10: "10m", radius_20: "20m", radius_50: "50m",
-        ghost_mode: "Mod fantomă", language: "Limbă", contact_us: "Contactați-ne",
-        edit_profile: "Editează profilul", privacy_policy: "Politica de confidențialitate", terms_service: "Termeni și condiții",
-        delete_account: "Șterge contul", sign_out: "Deconectare", edit_profile_title: "Editează profilul",
-        save_changes: "Salvează modificările", select_language: "Selectează limba", no_one_nearby: "nimeni în apropiere",
-        no_rings: "niciun ring încă"
-      },
-      ru: {
-        app_name: "✦ РИНГ", app_subtitle: "для меня", loading_title: "РИНГ ДЛЯ МЕНЯ",
-        login_subtitle: "войдите в свой мир", login_email: "Адрес электронной почты",
-        login_password: "Пароль", login_btn: "Войти", signup_btn: "Создать новый аккаунт →",
-        signup_title: "✦ создать аккаунт", signup_name: "Полное имя", signup_email: "Адрес электронной почты",
-        signup_password: "Пароль (минимум 6 символов)", signup_bio: "О себе (расскажите о себе)",
-        signup_age: "Настоящий возраст", gender_select: "Выберите пол", gender_male: "Мужской",
-        gender_female: "Женский", gender_nonbinary: "Небинарный", gender_prefer: "Предпочитаю не указывать",
-        signup_hobbies: "Хобби (например, чтение, музыка)", signup_interests: "Интересы (например, искусство, путешествия)",
-        signup_place: "Откуда вы?", vibe_tags_label: "Вайб теги (выберите до 4)",
-        tag_romantic: "Романтичный", tag_playful: "Игривый", tag_cozy: "Уютный",
-        tag_adventurous: "Авантюрный", tag_chill: "Спокойный", tag_nerdy: "Заучка",
-        create_account_btn: "Создать аккаунт", back_login_btn: "← Вернуться к входу",
-        live_radar: "живой радар", scanning: "сканирование...", scan_now: "⟳ сканировать сейчас",
-        ice_breaker: "ледокол", ring_history: "история рингов", alarm_history: "история будильников",
-        nav_scan: "Сканировать", nav_ringed: "Ринги", nav_history: "История", nav_profile: "Профиль",
-        settings_title: "настройки", light_mode: "Светлый режим", off: "Выкл", on: "Вкл",
-        alarm_radius: "Радиус будильника", radius_10: "10м", radius_20: "20м", radius_50: "50м",
-        ghost_mode: "Режим призрака", language: "Язык", contact_us: "Свяжитесь с нами",
-        edit_profile: "Редактировать профиль", privacy_policy: "Политика конфиденциальности", terms_service: "Условия обслуживания",
-        delete_account: "Удалить аккаунт", sign_out: "Выйти", edit_profile_title: "Редактировать профиль",
-        save_changes: "Сохранить изменения", select_language: "Выберите язык", no_one_nearby: "никого рядом",
-        no_rings: "пока нет рингов"
-      },
-      ar: {
-        app_name: "✦ رينج", app_subtitle: "من أجلي", loading_title: "رينج فور مي",
-        login_subtitle: "تسجيل الدخول إلى عالمك", login_email: "عنوان البريد الإلكتروني",
-        login_password: "كلمة المرور", login_btn: "تسجيل الدخول", signup_btn: "إنشاء حساب جديد →",
-        signup_title: "✦ إنشاء حساب", signup_name: "الاسم الكامل", signup_email: "عنوان البريد الإلكتروني",
-        signup_password: "كلمة المرور (6 أحرف على الأقل)", signup_bio: "السيرة الذاتية (أخبرنا عن نفسك)",
-        signup_age: "العمر الحقيقي", gender_select: "اختر الجنس", gender_male: "ذكر",
-        gender_female: "أنثى", gender_nonbinary: "غير ثنائي", gender_prefer: "أفضل عدم الإفصاح",
-        signup_hobbies: "الهوايات (مثل القراءة، الموسيقى)", signup_interests: "الاهتمامات (مثل الفن، السفر)",
-        signup_place: "من أين أنت؟", vibe_tags_label: "علامات الاهتزاز (اختر حتى 4)",
-        tag_romantic: "رومانسي", tag_playful: "مرح", tag_cozy: "مريح",
-        tag_adventurous: "مغامر", tag_chill: "هادئ", tag_nerdy: "أكاديمي",
-        create_account_btn: "إنشاء حساب", back_login_btn: "← العودة إلى تسجيل الدخول",
-        live_radar: "رادار مباشر", scanning: "جاري المسح...", scan_now: "⟳ مسح الآن",
-        ice_breaker: "كسر الجليد", ring_history: "تاريخ الرينج", alarm_history: "تاريخ التنبيه",
-        nav_scan: "مسح", nav_ringed: "رينجد", nav_history: "التاريخ", nav_profile: "الملف الشخصي",
-        settings_title: "الإعدادات", light_mode: "الوضع الفاتح", off: "إيقاف", on: "تشغيل",
-        alarm_radius: "نصف قطر التنبيه", radius_10: "10م", radius_20: "20م", radius_50: "50م",
-        ghost_mode: "وضع الشبح", language: "اللغة", contact_us: "اتصل بنا",
-        edit_profile: "تعديل الملف الشخصي", privacy_policy: "سياسة الخصوصية", terms_service: "شروط الخدمة",
-        delete_account: "حذف الحساب", sign_out: "تسجيل الخروج", edit_profile_title: "تعديل الملف الشخصي",
-        save_changes: "حفظ التغييرات", select_language: "اختر اللغة", no_one_nearby: "لا أحد بالقرب",
-        no_rings: "لا توجد رينجات بعد"
       }
     };
 
     let currentLang = 'en';
     let lightMode = false;
     let currentUser = null, myUID = null, watchId = null;
-    let selectedVibes = [], nearbyUsers = [], alarmHistory = [];
-    let alarmTimer = null;
+    let selectedVibes = [], nearbyUsers = [];
     let isGhostMode = false;
-    let isAlarmActive = false;
-    let mutualRings = {};
-    let processedRingKeys = new Set();
+    let navSwitchCount = 0; // Page switch counter for 3-section reset rule
+    let userRingStates = {}; // Local memory for ring button states per target user UID
+
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
 
-    // ============ I18N FUNCTIONS ============
     function translate(key) {
       return translations[currentLang] && translations[currentLang][key] ? translations[currentLang][key] : key;
     }
@@ -872,16 +592,6 @@
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         el.placeholder = translate(key);
-      });
-      const langNames = {
-        en: 'English', hi: 'हिन्दी', zh: '中文', ko: '한국어', ja: '日本語',
-        gu: 'ગુજરાતી', bn: 'বাংলা', ur: 'اردو', th: 'ไทย', vi: 'Tiếng Việt',
-        ro: 'Română', ru: 'Русский', ar: 'العربية'
-      };
-      const display = document.getElementById('currentLangDisplay');
-      if (display) display.textContent = `(${langNames[currentLang] || 'English'})`;
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === currentLang);
       });
     }
 
@@ -898,37 +608,28 @@
     const profileBio = $('profileBio'), profileAge = $('profileAge'), profileGender = $('profileGender');
     const profileHobbies = $('profileHobbies'), profileInterest = $('profileInterest'), profilePlace = $('profilePlace');
     const nearbyList = $('nearbyList'), ringedList = $('ringedList'), alarmHistoryList = $('alarmHistoryList');
-    const alarmOverlay = $('alarmOverlay'), commonTagsDisplay = $('commonTagsDisplay'), alarmSound = $('alarmSound');
-    const ringSendSound = $('ringSendSound');
+    const alarmOverlay = $('alarmOverlay'), alarmSound = $('alarmSound');
     const alarmUserName = $('alarmUserName'), alarmUserBio = $('alarmUserBio');
     const alarmUserAge = $('alarmUserAge'), alarmUserGender = $('alarmUserGender');
     const alarmUserHobbies = $('alarmUserHobbies'), alarmUserInterests = $('alarmUserInterests');
-    const alarmUserPlace = $('alarmUserPlace'), alarmMutualBadge = $('alarmMutualBadge');
+    const alarmUserPlace = $('alarmUserPlace');
     const radarDots = $('radarDots'), refreshBtn = $('refreshProximity');
-    const settingsPanel = $('settingsPanel'), closeSettings = $('closeSettings'), radiusSelect = $('radiusSelect');
-    const settingsToggle = $('settingsToggle');
-    const streakBadge = $('streakBadge'), logoutBtn = $('logoutBtn');
-    const deleteAccountBtn = $('deleteAccountBtn'), iceBreakerContainer = $('iceBreakerContainer');
-    const iceBreakerText = $('iceBreakerText'), scanStatus = $('scanStatus'), profileAvatar = $('profileAvatar');
+    const settingsPanel = $('settingsPanel'), closeSettings = $('closeSettings'), settingsToggle = $('settingsToggle');
+    const streakBadge = $('streakBadge'), logoutBtn = $('logoutBtn'), deleteAccountBtn = $('deleteAccountBtn');
+    const scanStatus = $('scanStatus'), profileAvatar = $('profileAvatar');
     const editProfilePanel = $('editProfilePanel'), closeEditProfile = $('closeEditProfile');
     const editName = $('editName'), editBio = $('editBio'), editAge = $('editAge'), editGender = $('editGender');
     const editHobbies = $('editHobbies'), editInterest = $('editInterest'), editPlace = $('editPlace');
     const saveEditProfile = $('saveEditProfile'), editProfileBtn = $('editProfileBtn');
-    const privacyPolicyBtn = $('privacyPolicyBtn'), termsServiceBtn = $('termsServiceBtn');
     const ghostToggle = $('ghostToggle'), ghostStatus = $('ghostStatus');
     const lightModeToggle = $('lightModeToggle'), lightModeStatus = $('lightModeStatus');
-    const languagePanel = $('languagePanel'), openLanguagePanel = $('openLanguagePanel');
-    const closeLanguagePanel = $('closeLanguagePanel');
+    const languagePanel = $('languagePanel'), openLanguagePanel = $('openLanguagePanel'), closeLanguagePanel = $('closeLanguagePanel');
 
-    // ============ LANGUAGE PANEL ============
-    openLanguagePanel.addEventListener('click', () => {
-      languagePanel.classList.add('active');
-    });
-    closeLanguagePanel.addEventListener('click', () => {
-      languagePanel.classList.remove('active');
-    });
+    // Language Panel Toggle
+    openLanguagePanel.addEventListener('click', () => languagePanel.classList.add('active'));
+    closeLanguagePanel.addEventListener('click', () => languagePanel.classList.remove('active'));
 
-    // ============ LIGHT MODE ============
+    // Light Mode
     function toggleLightMode() {
       lightMode = !lightMode;
       document.body.classList.toggle('light-mode', lightMode);
@@ -936,59 +637,20 @@
       lightModeStatus.textContent = translate(lightMode ? 'on' : 'off');
       lightModeToggle.classList.toggle('active', lightMode);
     }
-
-    const savedLightMode = localStorage.getItem('ring_light_mode');
-    if (savedLightMode === 'on') {
-      lightMode = true;
-      document.body.classList.add('light-mode');
-      lightModeStatus.textContent = translate('on');
-      lightModeToggle.classList.add('active');
-    }
+    if (localStorage.getItem('ring_light_mode') === 'on') toggleLightMode();
     lightModeToggle.addEventListener('click', toggleLightMode);
 
-    // ============ LANGUAGE ============
-    function setLanguage(lang) {
-      if (translations[lang]) {
-        currentLang = lang;
-        localStorage.setItem('ring_language', lang);
-        applyTranslations();
-        if (lightModeStatus) lightModeStatus.textContent = translate(lightMode ? 'on' : 'off');
-        if (ghostStatus) ghostStatus.textContent = translate(isGhostMode ? 'on' : 'off');
-        languagePanel.classList.remove('active');
-      }
-    }
-
-    const savedLang = localStorage.getItem('ring_language');
-    if (savedLang && translations[savedLang]) {
-      currentLang = savedLang;
-    }
-    applyTranslations();
-
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        setLanguage(this.dataset.lang);
-      });
-    });
-
-    // ============ GHOST MODE ============
+    // Ghost Mode
     ghostToggle.addEventListener('click', function() {
       isGhostMode = !isGhostMode;
       this.classList.toggle('active');
       ghostStatus.textContent = translate(isGhostMode ? 'on' : 'off');
-      if (isGhostMode && myUID) {
-        db.ref('users/' + myUID + '/lat').remove();
-        db.ref('users/' + myUID + '/lng').remove();
-        db.ref('users/' + myUID + '/ghost').set(true);
-      } else if (myUID) {
-        db.ref('users/' + myUID + '/ghost').set(false);
-        if (currentUser && currentUser.lat && currentUser.lng) {
-          db.ref('users/' + myUID + '/lat').set(currentUser.lat);
-          db.ref('users/' + myUID + '/lng').set(currentUser.lng);
-        }
+      if (myUID) {
+        db.ref('users/' + myUID + '/ghost').set(isGhostMode);
       }
     });
 
-    // ============ FIREBASE ============
+    // ============ FIREBASE INIT ============
     const firebaseConfig = {
       apiKey: "AIzaSyBFGRsd1jTYLJKFzlJBuRo2t92A7XiSeDQ",
       authDomain: "ring-for-me.firebaseapp.com",
@@ -1014,23 +676,47 @@
       }
     }
 
+    // Nav Switcher with 3-Section Ring Reset Rule
     function navigateTo(pageId) {
       pages.forEach(p => {
-        const el = $(p);
-        el.classList.remove('active');
+        $(p).classList.remove('active');
         document.querySelector(`.nav-item[data-page="${p}"] .nav-icon`).classList.remove('active');
         document.querySelector(`.nav-item[data-page="${p}"] .nav-label`).classList.remove('active');
       });
       $(pageId).classList.add('active');
       document.querySelector(`.nav-item[data-page="${pageId}"] .nav-icon`).classList.add('active');
       document.querySelector(`.nav-item[data-page="${pageId}"] .nav-label`).classList.add('active');
+
+      // Increment Section counter for resetting ring button after 3 sections
+      navSwitchCount++;
+      if (navSwitchCount >= 3) {
+        navSwitchCount = 0;
+        userRingStates = {}; // Reset button states back to default 'ring'
+        scanNearby(); // Re-render card lists
+      }
     }
 
     document.querySelectorAll('.nav-item').forEach(el => {
       el.addEventListener('click', () => navigateTo(el.dataset.page));
     });
 
-    // Auth
+    // ============ DISTANCE CALCULATOR (HAVERSINE - IN METERS) ============
+    function getDistanceInMeters(lat1, lon1, lat2, lon2) {
+      if (!lat1 || !lon1 || !lat2 || !lon2) return 999999;
+      const R = 6371e3; // Earth radius in meters
+      const φ1 = lat1 * Math.PI / 180;
+      const φ2 = lat2 * Math.PI / 180;
+      const Δφ = (lat2 - lat1) * Math.PI / 180;
+      const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                Math.cos(φ1) * Math.cos(φ2) *
+                Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    // ============ AUTHENTICATION LISTENERS ============
     auth.onAuthStateChanged(async user => {
       if (user) {
         myUID = user.uid;
@@ -1038,471 +724,255 @@
         const data = snap.val();
         if (data) {
           currentUser = data; currentUser.uid = myUID;
-          isGhostMode = data.ghost || false;
-          if (isGhostMode) {
-            ghostStatus.textContent = translate('on');
-            ghostToggle.classList.add('active');
-          }
           showView(pagesContainer);
           fillProfile(data);
           startLocationWatch();
           scanNearby();
-          loadRinged();
-          loadHistory();
-          listenForRings();
-          listenForMutualRings();
-          streakBadge.textContent = '🔥 ' + ((data.streak || 0) + 1) + 'd';
-          db.ref('users/' + myUID + '/streak').set((data.streak || 0) + 1);
+          listenForIncomingRings();
         } else {
           signupEmail.value = user.email || '';
           showView(signupView);
         }
       } else {
         showView(loginView);
-        if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+        if (watchId) navigator.geolocation.clearWatch(watchId);
       }
     });
 
-    // Listen for mutual rings
-    function listenForMutualRings() {
-      if (!myUID) return;
-      const mutualRef = db.ref('mutualRings/' + myUID);
-      mutualRef.on('child_added', async (snap) => {
-        const otherUid = snap.key;
-        if (otherUid === myUID) return;
-        if (snap.val() === true) {
-          mutualRings[otherUid] = true;
-          loadRinged();
-          scanNearby();
-        }
-      });
-    }
-
-    // ============ RING LISTENER ============
-    function listenForRings() {
-      if (!myUID) return;
-      const ringRef = db.ref('rings/' + myUID);
-      ringRef.on('child_added', async (snap) => {
-        const fromUid = snap.key;
-        if (fromUid === myUID) return;
-        const val = snap.val();
-        if (val === true) {
-          if (processedRingKeys.has(fromUid)) return;
-          processedRingKeys.add(fromUid);
-          
-          const userSnap = await db.ref('users/' + fromUid).once('value');
-          const user = userSnap.val();
-          if (user) {
-            const myRingRef = db.ref('rings/' + fromUid + '/' + myUID);
-            const myRingSnap = await myRingRef.once('value');
-            const iRangThem = myRingSnap.val() === true;
-            
-            if (iRangThem && !mutualRings[fromUid]) {
-              await db.ref('mutualRings/' + myUID + '/' + fromUid).set(true);
-              await db.ref('mutualRings/' + fromUid + '/' + myUID).set(true);
-              mutualRings[fromUid] = true;
-              loadRinged();
-              scanNearby();
-            }
-            
-            // Only show alarm if this is an incoming ring (someone rang me)
-            if (!iRangThem || mutualRings[fromUid]) {
-              dismissAlarm();
-              showAlarmWithFullDetails(user, mutualRings[fromUid] || false);
-              
-              alarmHistory.push({ 
-                name: user.name, 
-                time: new Date().toLocaleTimeString(), 
-                dist: 'incoming ring',
-                isMutual: mutualRings[fromUid] || false
-              });
-              loadHistory();
-              
-              if (mutualRings[fromUid]) {
-                alarmMutualBadge.classList.remove('hidden');
-                if (navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
-              }
-            }
-            
-            setTimeout(() => { processedRingKeys.delete(fromUid); }, 5000);
-          }
-        }
-      });
-    }
-
-    function showAlarmWithFullDetails(user, isMutual) {
-      alarmUserName.textContent = user.name || 'Someone';
-      alarmUserBio.textContent = user.bio || '';
-      alarmUserAge.textContent = user.age || '—';
-      alarmUserGender.textContent = user.gender || '—';
-      alarmUserHobbies.textContent = (user.hobbies || []).join(', ') || '—';
-      alarmUserInterests.textContent = (user.interests || []).join(', ') || '—';
-      alarmUserPlace.textContent = user.place || '—';
-      
-      const common = (currentUser.vibeTags || []).filter(t => (user.vibeTags || []).includes(t));
-      commonTagsDisplay.textContent = common.join(', ') || '❤️';
-      
-      if (isMutual) {
-        alarmMutualBadge.classList.remove('hidden');
-      } else {
-        alarmMutualBadge.classList.add('hidden');
+    // Login & Signup events
+    loginBtn.addEventListener('click', () => {
+      const email = loginEmail.value.trim();
+      const pwd = loginPassword.value.trim();
+      if (email && pwd) {
+        auth.signInWithEmailAndPassword(email, pwd).catch(err => alert(err.message));
       }
-      
-      alarmOverlay.classList.remove('opacity-0');
-      alarmOverlay.classList.add('opacity-100', 'pointer-events-auto');
-      isAlarmActive = true;
-      
-      alarmSound.loop = true;
-      alarmSound.play().catch(() => {});
-      
-      if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]);
-      
-      clearTimeout(alarmTimer);
-      alarmTimer = setTimeout(() => { dismissAlarm(); }, 30000);
-    }
-
-    function dismissAlarm() {
-      alarmOverlay.classList.remove('opacity-100', 'pointer-events-auto');
-      alarmOverlay.classList.add('opacity-0');
-      alarmSound.pause();
-      alarmSound.currentTime = 0;
-      alarmSound.loop = false;
-      isAlarmActive = false;
-      clearTimeout(alarmTimer);
-    }
-
-    // ============ LOGIN / SIGNUP ============
-    loginBtn.addEventListener('click', async () => {
-      try { await auth.signInWithEmailAndPassword(loginEmail.value.trim(), loginPassword.value.trim()); }
-      catch(e) { alert('Login failed: ' + e.message); }
     });
-    showSignupBtn.addEventListener('click', () => { showView(signupView); signupEmail.value = ''; signupPassword.value = ''; });
+
+    showSignupBtn.addEventListener('click', () => showView(signupView));
     backToLoginBtn.addEventListener('click', () => showView(loginView));
 
-    // Signup vibe tags
-    document.querySelectorAll('#signupVibeTags .chip').forEach(el => {
-      el.addEventListener('click', function() {
-        const tag = this.dataset.tag;
+    signupBtn.addEventListener('click', async () => {
+      const email = signupEmail.value.trim();
+      const pwd = signupPassword.value.trim();
+      if (!email || !pwd) return alert("Fill required fields");
+
+      try {
+        const res = await auth.createUserWithEmailAndPassword(email, pwd);
+        const userData = {
+          name: signupName.value.trim() || "Anonymous",
+          email: email,
+          bio: signupBio.value.trim() || "",
+          age: signupAge.value.trim() || "N/A",
+          gender: signupGender.value || "Not specified",
+          hobbies: signupHobbies.value.trim() || "None",
+          interest: signupInterest.value.trim() || "None",
+          place: signupPlace.value.trim() || "Unknown",
+          vibeTags: selectedVibes,
+          streak: 1
+        };
+        await db.ref('users/' + res.user.uid).set(userData);
+      } catch(err) {
+        alert(err.message);
+      }
+    });
+
+    // Tag Handler
+    document.querySelectorAll('#signupVibeTags .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const tag = chip.dataset.tag;
         if (selectedVibes.includes(tag)) {
           selectedVibes = selectedVibes.filter(t => t !== tag);
-          this.style.background = '#2a2529'; this.style.color = '#f3c96b';
-        } else {
-          if (selectedVibes.length >= 4) return;
+          chip.classList.remove('gold-gradient');
+        } else if (selectedVibes.length < 4) {
           selectedVibes.push(tag);
-          this.style.background = '#f3c96b40'; this.style.color = '#f7d875';
+          chip.classList.add('gold-gradient');
         }
       });
     });
 
-    signupBtn.addEventListener('click', async () => {
-      const name = signupName.value.trim(), email = signupEmail.value.trim(), pass = signupPassword.value.trim();
-      const bio = signupBio.value.trim(), age = signupAge.value.trim(), gender = signupGender.value;
-      const hobbies = signupHobbies.value.split(',').map(s => s.trim()).filter(Boolean);
-      const interests = signupInterest.value.split(',').map(s => s.trim()).filter(Boolean);
-      const place = signupPlace.value.trim();
-      if (!name || !email || !pass || pass.length < 6) { alert('Please fill all required fields (password min 6)'); return; }
-      if (selectedVibes.length < 2) { alert('Select at least 2 vibe tags'); return; }
-      try {
-        const cred = await auth.createUserWithEmailAndPassword(email, pass);
-        const uid = cred.user.uid;
-        const userObj = { name, email, bio, age, gender, hobbies, interests, place,
-          vibeTags: [...selectedVibes], badges: ['✨ Explorer'], streak: 1, lat: 0, lng: 0, ghost: false, timestamp: Date.now() };
-        await db.ref('users/' + uid).set(userObj);
-        currentUser = userObj; currentUser.uid = uid;
-        showView(pagesContainer);
-        fillProfile(userObj);
-        startLocationWatch();
-        scanNearby();
-        loadRinged();
-        loadHistory();
-        listenForRings();
-        listenForMutualRings();
-        streakBadge.textContent = '🔥 1d';
-      } catch(e) { alert('Signup failed: ' + e.message); }
-    });
-
-    function fillProfile(user) {
-      profileName.textContent = user.name || '—';
-      profileAvatar.textContent = user.name ? user.name[0].toUpperCase() : '👤';
-      profileBio.textContent = user.bio || 'No bio yet';
-      profileAge.textContent = '🎂 ' + (user.age || '—');
-      profileGender.textContent = '⚤ ' + (user.gender || '—');
-      profileHobbies.textContent = '🎯 ' + (user.hobbies || []).join(', ') || '—';
-      profileInterest.textContent = '💡 ' + (user.interests || []).join(', ') || '—';
-      profilePlace.textContent = '📍 ' + (user.place || '—');
-      profileTags.innerHTML = (user.vibeTags || []).map(t => `<span class="chip">${t}</span>`).join(' ');
-      profileBadges.textContent = (user.badges || []).join(' ');
-      editName.value = user.name || '';
-      editBio.value = user.bio || '';
-      editAge.value = user.age || '';
-      editGender.value = user.gender || '';
-      editHobbies.value = (user.hobbies || []).join(', ');
-      editInterest.value = (user.interests || []).join(', ');
-      editPlace.value = user.place || '';
-    }
-
-    // Edit profile
-    editProfileBtn.addEventListener('click', () => { editProfilePanel.classList.remove('hidden'); });
-    closeEditProfile.addEventListener('click', () => { editProfilePanel.classList.add('hidden'); });
-    saveEditProfile.addEventListener('click', async () => {
-      if (!myUID) return;
-      const updates = {
-        name: editName.value.trim(),
-        bio: editBio.value.trim(),
-        age: editAge.value.trim(),
-        gender: editGender.value,
-        hobbies: editHobbies.value.split(',').map(s => s.trim()).filter(Boolean),
-        interests: editInterest.value.split(',').map(s => s.trim()).filter(Boolean),
-        place: editPlace.value.trim()
-      };
-      await db.ref('users/' + myUID).update(updates);
-      currentUser = { ...currentUser, ...updates };
-      fillProfile(currentUser);
-      editProfilePanel.classList.add('hidden');
-      loadRinged();
-    });
-
-    // Privacy Policy & Terms
-    privacyPolicyBtn.addEventListener('click', () => {
-      window.open('https://github.com/stardustofficial/ringforme/blob/main/PRIVACY_POLICY.md', '_blank');
-    });
-    termsServiceBtn.addEventListener('click', () => {
-      window.open('https://github.com/stardustofficial/ringforme/blob/main/TERMS_OF_SERVICE.md', '_blank');
-    });
-
-    // ============ GEOLOCATION ============
+    // ============ LOCATION TRACKING & NEARBY SCAN (< 50 METERS ONLY) ============
     function startLocationWatch() {
-      if (watchId) navigator.geolocation.clearWatch(watchId);
-      watchId = navigator.geolocation.watchPosition(
-        async (pos) => {
-          if (!currentUser || !myUID || isGhostMode) return;
-          currentUser.lat = pos.coords.latitude; currentUser.lng = pos.coords.longitude;
-          await db.ref('users/' + myUID + '/lat').set(pos.coords.latitude);
-          await db.ref('users/' + myUID + '/lng').set(pos.coords.longitude);
-          await db.ref('users/' + myUID + '/timestamp').set(Date.now());
+      if ('geolocation' in navigator) {
+        watchId = navigator.geolocation.watchPosition(pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          if (currentUser) {
+            currentUser.lat = lat; currentUser.lng = lng;
+            if (!isGhostMode && myUID) {
+              db.ref('users/' + myUID + '/lat').set(lat);
+              db.ref('users/' + myUID + '/lng').set(lng);
+            }
+          }
           scanNearby();
-        },
-        () => { scanStatus.textContent = '⚠️ location off'; },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 10000 }
-      );
+        }, err => console.log(err), { enableHighAccuracy: true });
+      }
     }
 
-    function haversine(lat1, lon1, lat2, lon2) {
-      const R = 6371e3;
-      const φ1 = lat1 * Math.PI/180, φ2 = lat2 * Math.PI/180;
-      const Δφ = (lat2-lat1)*Math.PI/180, Δλ = (lon2-lon1)*Math.PI/180;
-      const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
-    function calculateMatch(u1, u2) {
-      const t1 = u1.vibeTags || [], t2 = u2.vibeTags || [];
-      if (!t1.length || !t2.length) return 0;
-      const common = t1.filter(t => t2.includes(t));
-      return Math.round((common.length / [...new Set([...t1, ...t2])].length) * 100);
-    }
+    refreshBtn.addEventListener('click', scanNearby);
 
     async function scanNearby() {
-      if (!currentUser || !myUID) return;
-      const usersSnap = await db.ref('users').once('value');
-      const allUsers = usersSnap.val();
-      if (!allUsers) return;
-      const results = [];
-      const myLat = currentUser.lat, myLng = currentUser.lng;
-      if (!myLat || !myLng) {
-        scanStatus.textContent = '📍 waiting for location...';
-        return;
-      }
-      for (let uid in allUsers) {
-        if (uid === myUID) continue;
-        const u = allUsers[uid];
-        if (!u.lat || !u.lng || u.ghost) continue;
-        const dist = haversine(myLat, myLng, u.lat, u.lng);
-        // Show all users within 50m
-        if (dist > 50) continue;
-        // Skip mutual users - they go to ringed section
-        if (mutualRings[uid]) continue;
-        const match = calculateMatch(currentUser, u);
-        results.push({ uid, ...u, distance: dist, matchPercent: match });
-      }
-      results.sort((a,b) => a.distance - b.distance);
-      nearbyUsers = results;
-      renderNearby(results);
-      updateRadar(results);
-      scanStatus.textContent = `📍 ${results.length} nearby`;
-    }
+      if (!myUID || !currentUser || !currentUser.lat) return;
+      scanStatus.textContent = translate('scanning');
 
-    function renderNearby(results) {
-      if (!results.length) {
-        nearbyList.innerHTML = `<div class="text-center text-[#6b5e4e] text-sm py-4" data-i18n="no_one_nearby">✨ no one nearby</div>`;
-        return;
-      }
-      nearbyList.innerHTML = results.slice(0, 6).map(r => {
-        const isWithinRadius = r.distance < parseInt(radiusSelect.value);
-        return `<div class="ring-card flex justify-between items-center" data-uid="${r.uid}">
-          <div>
-            <span class="font-medium gold-text">${r.name}</span>
-            <div class="flex flex-wrap gap-1 mt-1">${(r.vibeTags||[]).slice(0,3).map(t => `<span class="chip text-[10px]">${t}</span>`).join(' ')}</div>
-          </div>
-          <div class="text-right">
-            <div class="flex items-center gap-2 justify-end">
-              ${isWithinRadius ? '<span class="match-heart">❤️</span>' : ''}
-            </div>
-            <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
-            ${isWithinRadius ? `<button class="ring-btn" data-uid="${r.uid}">Ring ❤️</button>` : ''}
-          </div>
-        </div>`;
-      }).join('');
-
-      document.querySelectorAll('.ring-btn').forEach((btn) => {
-        btn.addEventListener('click', async function() {
-          const uid = this.dataset.uid;
-          if (!uid || !myUID) return;
-          
-          if (mutualRings[uid]) return;
-          
-          // Play ring sound
-          ringSendSound.currentTime = 0;
-          ringSendSound.play().catch(() => {});
-          
-          await db.ref('rings/' + uid + '/' + myUID).set(true);
-          
-          const user = nearbyUsers.find(u => u.uid === uid);
-          if (user) {
-            await db.ref('ringDetails/' + uid + '/' + myUID).set({
-              name: currentUser.name,
-              bio: currentUser.bio || '',
-              age: currentUser.age || '',
-              gender: currentUser.gender || '',
-              hobbies: currentUser.hobbies || [],
-              interests: currentUser.interests || [],
-              place: currentUser.place || '',
-              vibeTags: currentUser.vibeTags || [],
-              timestamp: Date.now()
-            });
-            
-            const theirRingRef = db.ref('rings/' + myUID + '/' + uid);
-            const theirRingSnap = await theirRingRef.once('value');
-            const theyRangMe = theirRingSnap.val() === true;
-            
-            if (theyRangMe) {
-              await db.ref('mutualRings/' + myUID + '/' + uid).set(true);
-              await db.ref('mutualRings/' + uid + '/' + myUID).set(true);
-              mutualRings[uid] = true;
-              alarmHistory.push({ name: user.name, time: new Date().toLocaleTimeString(), dist: 'mutual ring!', isMutual: true });
-              loadHistory();
-              showAlarmWithFullDetails(user, true);
-              if (Notification.permission === 'granted') {
-                new Notification('💞 Mutual Ring!', { body: `${user.name} ringed you back!` });
-              }
-              loadRinged();
-              scanNearby();
-            } else {
-              if (Notification.permission === 'granted') {
-                new Notification('❤️ Ring sent!', { body: `You rang ${user.name}` });
-              }
-              // Show "Ringed!" for 3 seconds then revert
-              this.textContent = '✅ Ringed!';
-              this.classList.add('ringed');
-              setTimeout(() => {
-                this.textContent = 'Ring ❤️';
-                this.classList.remove('ringed');
-              }, 3000);
-            }
-            loadRinged();
-          }
-        });
-      });
-    }
-
-    function updateRadar(results) {
+      const snap = await db.ref('users').once('value');
+      const allUsers = snap.val() || {};
+      nearbyUsers = [];
       radarDots.innerHTML = '';
-      const dots = results.slice(0, 8);
-      dots.forEach((r, i) => {
-        const angle = (i / Math.max(dots.length, 1)) * 2 * Math.PI + Math.random() * 0.3;
-        const radius = r.distance < 10 ? 20 : r.distance < 50 ? 45 : 75;
-        const cx = 80 + radius * Math.cos(angle);
-        const cy = 80 + radius * Math.sin(angle);
-        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        dot.setAttribute('cx', cx);
-        dot.setAttribute('cy', cy);
-        dot.setAttribute('r', r.distance < 10 ? 5 : 3);
-        dot.setAttribute('fill', r.distance < 10 ? '#f3c96b' : '#f3c96b80');
-        dot.setAttribute('opacity', '0.8');
-        radarDots.appendChild(dot);
+
+      Object.keys(allUsers).forEach(uid => {
+        if (uid === myUID) return;
+        const u = allUsers[uid];
+        if (u.ghost || !u.lat || !u.lng) return;
+
+        const distMeters = getDistanceInMeters(currentUser.lat, currentUser.lng, u.lat, u.lng);
+        
+        // Strict 50 Meters Filter Rule
+        if (distMeters <= 50) {
+          u.uid = uid;
+          u.distance = Math.round(distMeters);
+          nearbyUsers.push(u);
+
+          // Add to Radar SVG Visuals
+          const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          const angle = Math.random() * Math.PI * 2;
+          const radius = (distMeters / 50) * 70;
+          dot.setAttribute('cx', 80 + radius * Math.cos(angle));
+          dot.setAttribute('cy', 80 + radius * Math.sin(angle));
+          dot.setAttribute('r', 5);
+          dot.setAttribute('fill', '#f3c96b');
+          radarDots.appendChild(dot);
+        }
+      });
+
+      renderProfileCards();
+      scanStatus.textContent = nearbyUsers.length + " nearby";
+    }
+
+    // Render Cards in Main Screen (Without Percentage, With Ring Button)
+    function renderProfileCards() {
+      nearbyList.innerHTML = '';
+
+      if (nearbyUsers.length === 0) {
+        nearbyList.innerHTML = `<div class="text-center text-xs text-[#b8a68b] py-6">${translate('no_one_nearby')}</div>`;
+        return;
+      }
+
+      nearbyUsers.forEach(u => {
+        const state = userRingStates[u.uid] || 'normal'; // 'normal', 'ringing', or 'ringed'
+        let btnHtml = '';
+
+        if (state === 'ringing') {
+          btnHtml = `<button class="ring-btn ringing" onclick="window.sendRing('${u.uid}')">🔔 RINGING...</button>`;
+        } else if (state === 'ringed') {
+          btnHtml = `<button class="ring-btn ringed" disabled>✔ RINGED</button>`;
+        } else {
+          btnHtml = `<button class="ring-btn" onclick="window.sendRing('${u.uid}')">🔔 RING</button>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'glass-card p-3 rounded-2xl border border-[#f3c96b30] flex items-center justify-between';
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#f7d875] to-[#d9a441] text-[#141215] flex items-center justify-center font-bold text-lg">
+              ${(u.name || 'U').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div class="text-sm font-bold text-white-important">${u.name || 'Anonymous'}</div>
+              <div class="text-[11px] text-[#b8a68b]">${u.age || 'N/A'} yrs · ${u.gender || 'Person'} · ${u.distance}m away</div>
+            </div>
+          </div>
+          <div>${btnHtml}</div>
+        `;
+        nearbyList.appendChild(card);
       });
     }
 
-    async function loadRinged() {
+    // Send Ring Handler with Animation
+    window.sendRing = function(targetUID) {
       if (!myUID) return;
-      const snap = await db.ref('rings/' + myUID).once('value');
-      const data = snap.val();
-      if (!data) { ringedList.innerHTML = '<div class="text-center text-[#6b5e4e] text-sm py-4" data-i18n="no_rings">no rings yet</div>'; return; }
-      const uids = Object.keys(data);
-      let html = '';
-      for (let uid of uids) {
-        if (uid === myUID) continue;
-        const userSnap = await db.ref('users/' + uid).once('value');
-        const user = userSnap.val();
-        if (user) {
-          const mutual = await db.ref('mutualRings/' + myUID + '/' + uid).once('value');
-          const isMutual = mutual.val() === true;
-          const detailsSnap = await db.ref('ringDetails/' + myUID + '/' + uid).once('value');
-          const details = detailsSnap.val() || {};
-          html += `<div class="ring-card flex justify-between items-center">
-            <div>
-              <span class="font-medium gold-text">${user.name}</span>
-              ${details.bio ? `<div class="text-xs text-[#b8a68b]">${details.bio.substring(0, 60)}</div>` : ''}
-              <div class="text-[10px] text-[#6b5e4e]">${isMutual ? '💞 mutual ring!' : '🔔 you rang them'}</div>
-            </div>
-            <span class="badge-gold">${isMutual ? '💞' : '✨'}</span>
-          </div>`;
+      userRingStates[targetUID] = 'ringing';
+      renderProfileCards();
+
+      // Trigger ring event in Firebase Realtime DB
+      db.ref('rings/' + targetUID + '/' + myUID).set({
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        status: 'ringing'
+      });
+    };
+
+    // ============ RECEIVER SIDE: LISTEN FOR INCOMING RINGS ============
+    function listenForIncomingRings() {
+      if (!myUID) return;
+      db.ref('rings/' + myUID).on('child_added', async snap => {
+        const senderUID = snap.key;
+        const senderSnap = await db.ref('users/' + senderUID).once('value');
+        const sender = senderSnap.val();
+
+        if (sender) {
+          showAlarmOverlay(sender, senderUID);
         }
-      }
-      ringedList.innerHTML = html || '<div class="text-center text-[#6b5e4e] text-sm py-4">no rings yet</div>';
+      });
     }
 
-    function loadHistory() {
-      alarmHistoryList.innerHTML = alarmHistory.slice(-10).map(h =>
-        `<div class="ring-card flex justify-between">
-          <span>${h.name} ${h.isMutual ? '💞' : ''}</span>
-          <span class="text-[#6b5e4e] text-xs">${h.time} · ${h.dist}</span>
-        </div>`
-      ).join('') || '<div class="text-center text-[#6b5e4e] text-sm py-4">no history</div>';
+    function showAlarmOverlay(sender, senderUID) {
+      alarmUserName.textContent = sender.name || 'Someone';
+      alarmUserBio.textContent = sender.bio || 'Wants to ring your bell!';
+      alarmUserAge.textContent = sender.age || '—';
+      alarmUserGender.textContent = sender.gender || '—';
+      alarmUserHobbies.textContent = sender.hobbies || '—';
+      alarmUserInterests.textContent = sender.interest || '—';
+      alarmUserPlace.textContent = sender.place || '—';
+
+      alarmOverlay.classList.remove('hidden');
+      setTimeout(() => alarmOverlay.style.opacity = '1', 50);
+
+      try { alarmSound.play(); } catch(e) {}
+
+      // Receiver tap action to accept/dismiss ring
+      alarmOverlay.onclick = () => {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+        alarmOverlay.style.opacity = '0';
+        setTimeout(() => alarmOverlay.classList.add('hidden'), 500);
+
+        // Update sender's status to RINGED in Firebase
+        db.ref('rings/' + myUID + '/' + senderUID).remove();
+        db.ref('ringHistory/' + myUID).push({
+          from: sender.name,
+          time: new Date().toLocaleTimeString()
+        });
+
+        // Notify Sender that Receiver has answered
+        db.ref('ringReplies/' + senderUID + '/' + myUID).set('ringed');
+      };
     }
 
-    // ============ SETTINGS ============
+    // Sender Listens for Receiver Acceptance
+    db.ref('ringReplies/' + myUID).on('child_added', snap => {
+      const targetUID = snap.key;
+      userRingStates[targetUID] = 'ringed';
+      renderProfileCards();
+      db.ref('ringReplies/' + myUID + '/' + targetUID).remove();
+    });
+
+    // Fill User Profile Data
+    function fillProfile(data) {
+      profileName.textContent = data.name || 'User';
+      profileBio.textContent = data.bio || 'No bio yet';
+      profileAge.innerHTML = `<span class="gold-text">Age:</span> ${data.age || 'N/A'}`;
+      profileGender.innerHTML = `<span class="gold-text">Gender:</span> ${data.gender || 'N/A'}`;
+      profileHobbies.innerHTML = `<span class="gold-text">Hobbies:</span> ${data.hobbies || 'N/A'}`;
+      profileInterest.innerHTML = `<span class="gold-text">Interests:</span> ${data.interest || 'N/A'}`;
+      profilePlace.innerHTML = `<span class="gold-text">Place:</span> ${data.place || 'N/A'}`;
+      profileAvatar.textContent = (data.name || 'U').charAt(0).toUpperCase();
+    }
+
+    // Settings Toggle
     settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
     closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
-    radiusSelect.addEventListener('change', () => scanNearby());
-    
-    logoutBtn.addEventListener('click', () => { 
-      auth.signOut(); 
-      showView(loginView); 
-      if (watchId) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-      if (myUID) {
-        db.ref('rings/' + myUID).off();
-        db.ref('mutualRings/' + myUID).off();
-      }
-      dismissAlarm();
-      processedRingKeys.clear();
-    });
-    
-    deleteAccountBtn.addEventListener('click', async () => {
-      if (confirm('Delete your account permanently? This cannot be undone.')) {
-        const user = auth.currentUser;
-        if (user) { await db.ref('users/' + myUID).remove(); await user.delete(); }
-        showView(loginView);
-      }
-    });
-    
-    refreshBtn.addEventListener('click', scanNearby);
-    alarmOverlay.addEventListener('click', function() { dismissAlarm(); });
 
-    if (Notification.permission === 'default') Notification.requestPermission();
+    logoutBtn.addEventListener('click', () => auth.signOut());
 
-    showView(loadingView);
-    setTimeout(() => { if (!auth.currentUser) showView(loginView); }, 1200);
   })();
 </script>
 </body>
