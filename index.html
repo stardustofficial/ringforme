@@ -347,7 +347,7 @@
     <div id="settingsPanel" class="hidden absolute inset-0 bg-[#141215dd] backdrop-blur z-40 p-6 rounded-[36px] flex flex-col overflow-y-auto">
       <div class="flex justify-between flex-shrink-0">
         <span class="gold-text text-lg">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span data-i18n="settings_title">settings</span>
         </span>
         <button id="closeSettings" class="text-[#f3c96b] text-xl">✕</button>
@@ -519,8 +519,13 @@
     </div>
   </div>
 
-  <audio id="alarmSound" preload="auto" loop>
+  <audio id="alarmSound" preload="auto">
     <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+  </audio>
+  
+  <!-- New ring sound for sending rings -->
+  <audio id="ringSendSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2070/2070-preview.mp3" type="audio/mpeg">
   </audio>
 </div>
 
@@ -894,6 +899,7 @@
     const profileHobbies = $('profileHobbies'), profileInterest = $('profileInterest'), profilePlace = $('profilePlace');
     const nearbyList = $('nearbyList'), ringedList = $('ringedList'), alarmHistoryList = $('alarmHistoryList');
     const alarmOverlay = $('alarmOverlay'), commonTagsDisplay = $('commonTagsDisplay'), alarmSound = $('alarmSound');
+    const ringSendSound = $('ringSendSound');
     const alarmUserName = $('alarmUserName'), alarmUserBio = $('alarmUserBio');
     const alarmUserAge = $('alarmUserAge'), alarmUserGender = $('alarmUserGender');
     const alarmUserHobbies = $('alarmUserHobbies'), alarmUserInterests = $('alarmUserInterests');
@@ -1340,11 +1346,10 @@
           </div>
           <div class="text-right">
             <div class="flex items-center gap-2 justify-end">
-              <span class="text-xs text-[#f3c96b]">${r.matchPercent}%</span>
               ${isWithinRadius ? '<span class="match-heart">❤️</span>' : ''}
             </div>
             <div class="text-[10px] text-[#6b5e4e]">${r.distance < 10 ? '🔔 <10m' : r.distance < 50 ? '📍 nearby' : Math.round(r.distance)+'m'}</div>
-            ${isWithinRadius ? `<button class="ring-btn mt-1" data-uid="${r.uid}">Ring ❤️</button>` : ''}
+            ${isWithinRadius ? `<button class="ring-btn" data-uid="${r.uid}">Ring ❤️</button>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -1355,6 +1360,10 @@
           if (!uid || !myUID) return;
           
           if (mutualRings[uid]) return;
+          
+          // Play ring sound
+          ringSendSound.currentTime = 0;
+          ringSendSound.play().catch(() => {});
           
           await db.ref('rings/' + uid + '/' + myUID).set(true);
           
@@ -1392,6 +1401,7 @@
               if (Notification.permission === 'granted') {
                 new Notification('❤️ Ring sent!', { body: `You rang ${user.name}` });
               }
+              // Show "Ringed!" for 3 seconds then revert
               this.textContent = '✅ Ringed!';
               this.classList.add('ringed');
               setTimeout(() => {
