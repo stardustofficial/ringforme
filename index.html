@@ -838,7 +838,6 @@
     let selectedVibes = [], nearbyUsers = [];
     let isGhostMode = false;
     let userRingStates = {};
-    let myRingedUsers = new Set();
     let ringHistoryData = [];
 
     const $ = id => document.getElementById(id);
@@ -901,7 +900,6 @@
           btn.classList.toggle('active', btn.dataset.lang === lang);
         });
         languagePanel.classList.remove('active');
-        // Re-render all content
         if (currentUser) {
           fillProfile(currentUser);
           renderProfileCards();
@@ -917,17 +915,38 @@
       currentLang = savedLang;
     }
 
-    // Language panel buttons
+    // Fix language panel - add click listeners
     document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setLanguage(this.dataset.lang);
+      });
+    });
+
+    // Fix language panel open/close
+    openLanguagePanel.addEventListener('click', function(e) {
+      e.stopPropagation();
+      languagePanel.classList.add('active');
+    });
+
+    closeLanguagePanel.addEventListener('click', function(e) {
+      e.stopPropagation();
+      languagePanel.classList.remove('active');
+    });
+
+    // Close language panel when clicking outside
+    languagePanel.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.remove('active');
+      }
     });
 
     // ============ PRIVACY POLICY & TERMS ============
     privacyPolicyBtn.addEventListener('click', () => {
-      window.open('https://www.freeprivacypolicy.com/live/9e8c1a3b-2d4f-4a8c-9b7e-5f6d8c9a7b3e', '_blank');
+      window.open('https://github.com/stardustofficial/ringforme/blob/main/PRIVACY_POLICY.md', '_blank');
     });
     termsServiceBtn.addEventListener('click', () => {
-      window.open('https://www.termsofservicegenerator.net/live.php?token=Z7x9K2m4N6p8Q3r5S7t9U1v3W5x7Y9z1B', '_blank');
+      window.open('https://github.com/stardustofficial/ringforme/blob/main/TERMS_OF_SERVICE.md', '_blank');
     });
 
     // ============ EDIT PROFILE ============
@@ -1009,7 +1028,6 @@
       document.querySelector(`.nav-item[data-page="${pageId}"] .nav-icon`).classList.add('active');
       document.querySelector(`.nav-item[data-page="${pageId}"] .nav-label`).classList.add('active');
 
-      // Refresh content on navigation
       if (pageId === 'pageRinged') renderRingedList();
       if (pageId === 'pageHistory') renderHistoryList();
     }
@@ -1048,6 +1066,7 @@
           scanNearby();
           listenForIncomingRings();
           loadRingHistory();
+          calculateStreak(data);
         } else {
           signupEmail.value = user.email || '';
           showView(signupView);
@@ -1057,6 +1076,21 @@
         if (watchId) navigator.geolocation.clearWatch(watchId);
       }
     });
+
+    // ============ STREAK CALCULATOR ============
+    function calculateStreak(userData) {
+      if (!userData) return;
+      const createdAt = userData.createdAt || userData._createdAt || Date.now();
+      const days = Math.floor((Date.now() - createdAt) / (1000 * 60 * 60 * 24));
+      const streak = Math.max(1, days + 1);
+      streakBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ${streak}d`;
+      
+      // Update streak in DB if changed
+      if (userData.streak !== streak) {
+        db.ref('users/' + myUID + '/streak').set(streak);
+        userData.streak = streak;
+      }
+    }
 
     // Login & Signup
     loginBtn.addEventListener('click', () => {
@@ -1088,7 +1122,8 @@
           place: signupPlace.value.trim() || "Unknown",
           vibeTags: selectedVibes,
           streak: 1,
-          ghost: false
+          ghost: false,
+          createdAt: Date.now()
         };
         await db.ref('users/' + res.user.uid).set(userData);
       } catch(err) {
@@ -1211,7 +1246,6 @@
       userRingStates[targetUID] = 'ringing';
       renderProfileCards();
 
-      // Save to history - I rang someone
       db.ref('ringHistory/' + myUID).push({
         type: 'sent',
         toUID: targetUID,
@@ -1259,24 +1293,23 @@
         alarmOverlay.style.opacity = '0';
         setTimeout(() => alarmOverlay.classList.add('hidden'), 500);
 
-        // Save to history - someone rang me
+        // Get sender name for history
+        const senderName = sender.name || 'Someone';
+
         db.ref('ringHistory/' + myUID).push({
           type: 'received',
           fromUID: senderUID,
-          fromName: sender.name || 'Someone',
+          fromName: senderName,
           timestamp: firebase.database.ServerValue.TIMESTAMP,
           time: new Date().toLocaleString()
         });
 
-        // Mark as ringed - mutual ring detection
-        myRingedUsers.add(senderUID);
-        
-        // Check if mutual: if I also ringed this person
+        // Check for mutual ring
         db.ref('rings/' + senderUID + '/' + myUID).once('value', snap => {
           if (snap.exists()) {
-            // Mutual ring! Save to ringed list
+            // Mutual ring detected - save to mutualRings
             db.ref('mutualRings/' + myUID + '/' + senderUID).set({
-              name: sender.name || 'Someone',
+              name: senderName,
               timestamp: firebase.database.ServerValue.TIMESTAMP,
               time: new Date().toLocaleString()
             });
@@ -1296,26 +1329,26 @@
       };
     }
 
-    // ============ LISTEN FOR RING REPLIES (Sender gets notified) ============
-    db.ref('ringReplies/' + myUID).on('child_added', snap => {
+    // ============ LISTEN FOR RING REPLIES ============
+    db.ref('ringReplies/' + myUID).on('child_added', async snap => {
       const targetUID = snap.key;
       userRingStates[targetUID] = 'ringed';
       renderProfileCards();
       
-      // Save to mutual rings
+      // Get target user's name
+      const userSnap = await db.ref('users/' + targetUID).once('value');
+      const userData = userSnap.val();
+      const targetName = userData ? userData.name : 'Someone';
+      
+      // Check if mutual ring exists
       db.ref('mutualRings/' + myUID + '/' + targetUID).once('value', snap2 => {
         if (!snap2.exists()) {
-          db.ref('users/' + targetUID).once('value', uSnap => {
-            const uData = uSnap.val();
-            if (uData) {
-              db.ref('mutualRings/' + myUID + '/' + targetUID).set({
-                name: uData.name || 'Someone',
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                time: new Date().toLocaleString()
-              });
-              renderRingedList();
-            }
+          db.ref('mutualRings/' + myUID + '/' + targetUID).set({
+            name: targetName,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            time: new Date().toLocaleString()
           });
+          renderRingedList();
         }
       });
       
@@ -1339,14 +1372,15 @@
         }
 
         entries.forEach(([uid, info]) => {
+          const displayName = info.name || 'Someone';
           const card = document.createElement('div');
           card.className = 'glass-card p-3 rounded-2xl border border-[#f3c96b30] flex items-center gap-3';
           card.innerHTML = `
             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#f7d875] to-[#d9a441] text-[#141215] flex items-center justify-center font-bold text-lg">
-              ${(info.name || 'U').charAt(0).toUpperCase()}
+              ${displayName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <div class="text-sm font-bold text-white-important">${info.name || 'Anonymous'}</div>
+              <div class="text-sm font-bold text-white-important">${displayName}</div>
               <div class="text-[11px] text-[#b8a68b]">💞 Mutual Ring · ${info.time || 'Just now'}</div>
             </div>
           `;
@@ -1358,13 +1392,21 @@
     // ============ LOAD RING HISTORY ============
     function loadRingHistory() {
       if (!myUID) return;
-      db.ref('ringHistory/' + myUID).on('value', snap => {
+      db.ref('ringHistory/' + myUID).on('value', async snap => {
         const data = snap.val();
         ringHistoryData = [];
         if (data) {
-          Object.values(data).forEach(item => {
+          // Process each entry to get names
+          for (const key of Object.keys(data)) {
+            const item = data[key];
+            if (item.type === 'sent' && item.toUID) {
+              // Get name for sent ring
+              const userSnap = await db.ref('users/' + item.toUID).once('value');
+              const userData = userSnap.val();
+              item.toName = userData ? userData.name : 'Someone';
+            }
             ringHistoryData.push(item);
-          });
+          }
           renderHistoryList();
         }
       });
@@ -1377,7 +1419,6 @@
         return;
       }
 
-      // Show latest first
       const sorted = [...ringHistoryData].reverse();
       sorted.forEach(item => {
         const card = document.createElement('div');
@@ -1385,7 +1426,7 @@
         const isSent = item.type === 'sent';
         const icon = isSent ? '📤' : '📥';
         const label = isSent ? 'You rang' : 'Rang you';
-        const name = isSent ? (item.toUID || 'Someone') : (item.fromName || 'Someone');
+        const name = isSent ? (item.toName || 'Someone') : (item.fromName || 'Someone');
         card.innerHTML = `
           <div class="flex items-center gap-3">
             <div class="text-xl">${icon}</div>
@@ -1414,10 +1455,7 @@
         profileTags.innerHTML = data.vibeTags.map(t => `<span class="chip">${t}</span>`).join('');
       }
       
-      // Streak
-      if (data.streak) {
-        streakBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ${data.streak}d`;
-      }
+      calculateStreak(data);
     }
 
     // ============ SETTINGS ============
@@ -1452,17 +1490,40 @@
     if (localStorage.getItem('ring_light_mode') === 'on') toggleLightMode();
     lightModeToggle.addEventListener('click', toggleLightMode);
 
-    // Logout
-    logoutBtn.addEventListener('click', () => auth.signOut());
+    // Logout - Fixed
+    logoutBtn.addEventListener('click', async () => {
+      if (confirm('Are you sure you want to sign out?')) {
+        try {
+          await auth.signOut();
+          // Clear local data
+          currentUser = null;
+          myUID = null;
+          nearbyUsers = [];
+          ringHistoryData = [];
+          userRingStates = {};
+          showView(loginView);
+          if (watchId) navigator.geolocation.clearWatch(watchId);
+        } catch (err) {
+          alert('Error signing out: ' + err.message);
+        }
+      }
+    });
 
-    // Delete Account
+    // Delete Account - Fixed
     deleteAccountBtn.addEventListener('click', async () => {
       if (confirm('Are you sure you want to delete your account? This cannot be undone!')) {
         if (myUID) {
           try {
+            // Delete user data from database
             await db.ref('users/' + myUID).remove();
+            await db.ref('rings/' + myUID).remove();
+            await db.ref('ringHistory/' + myUID).remove();
+            await db.ref('mutualRings/' + myUID).remove();
+            await db.ref('ringReplies/' + myUID).remove();
+            // Delete the user account
             await auth.currentUser.delete();
             alert('Account deleted successfully.');
+            showView(loginView);
           } catch(err) {
             alert('Error deleting account: ' + err.message);
           }
