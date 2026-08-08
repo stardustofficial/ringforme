@@ -839,6 +839,7 @@
     let isGhostMode = false;
     let userRingStates = {};
     let ringHistoryData = [];
+    let ringTimeoutMap = {};
 
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
@@ -909,13 +910,11 @@
       }
     }
 
-    // Load saved language
     const savedLang = localStorage.getItem('ring_lang');
     if (savedLang && translations[savedLang]) {
       currentLang = savedLang;
     }
 
-    // Fix language panel - add click listeners
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -923,7 +922,6 @@
       });
     });
 
-    // Fix language panel open/close
     openLanguagePanel.addEventListener('click', function(e) {
       e.stopPropagation();
       languagePanel.classList.add('active');
@@ -934,7 +932,6 @@
       languagePanel.classList.remove('active');
     });
 
-    // Close language panel when clicking outside
     languagePanel.addEventListener('click', function(e) {
       if (e.target === this) {
         this.classList.remove('active');
@@ -1017,7 +1014,6 @@
       }
     }
 
-    // Nav Switcher
     function navigateTo(pageId) {
       pages.forEach(p => {
         $(p).classList.remove('active');
@@ -1085,7 +1081,6 @@
       const streak = Math.max(1, days + 1);
       streakBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ${streak}d`;
       
-      // Update streak in DB if changed
       if (userData.streak !== streak) {
         db.ref('users/' + myUID + '/streak').set(streak);
         userData.streak = streak;
@@ -1215,7 +1210,7 @@
         let btnHtml = '';
 
         if (state === 'ringing') {
-          btnHtml = `<button class="ring-btn ringing" onclick="window.sendRing('${u.uid}')">🔔 RINGING...</button>`;
+          btnHtml = `<button class="ring-btn ringing" disabled>🔔 RINGING...</button>`;
         } else if (state === 'ringed') {
           btnHtml = `<button class="ring-btn ringed" disabled>✔ RINGED</button>`;
         } else {
@@ -1243,8 +1238,24 @@
     // ============ SEND RING ============
     window.sendRing = function(targetUID) {
       if (!myUID) return;
+      
+      // Clear any existing timeout for this user
+      if (ringTimeoutMap[targetUID]) {
+        clearTimeout(ringTimeoutMap[targetUID]);
+        delete ringTimeoutMap[targetUID];
+      }
+      
       userRingStates[targetUID] = 'ringing';
       renderProfileCards();
+
+      // Auto reset after 3 seconds
+      ringTimeoutMap[targetUID] = setTimeout(() => {
+        if (userRingStates[targetUID] === 'ringing') {
+          userRingStates[targetUID] = 'normal';
+          renderProfileCards();
+        }
+        delete ringTimeoutMap[targetUID];
+      }, 3000);
 
       db.ref('ringHistory/' + myUID).push({
         type: 'sent',
@@ -1264,6 +1275,38 @@
       if (!myUID) return;
       db.ref('rings/' + myUID).on('child_added', async snap => {
         const senderUID = snap.key;
+        
+        // Check if this is a mutual ring (I also sent a ring to this person)
+        // If so, don't show the alarm overlay on both phones
+        const myRingToSender = await db.ref('rings/' + senderUID + '/' + myUID).once('value');
+        if (myRingToSender.exists()) {
+          // Mutual ring detected - just mark as ringed and clean up
+          userRingStates[senderUID] = 'ringed';
+          renderProfileCards();
+          
+          // Save mutual ring
+          const senderSnap = await db.ref('users/' + senderUID).once('value');
+          const sender = senderSnap.val();
+          const senderName = sender ? sender.name : 'Someone';
+          
+          db.ref('mutualRings/' + myUID + '/' + senderUID).set({
+            name: senderName,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            time: new Date().toLocaleString()
+          });
+          db.ref('mutualRings/' + senderUID + '/' + myUID).set({
+            name: currentUser ? currentUser.name : 'Someone',
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            time: new Date().toLocaleString()
+          });
+          
+          db.ref('rings/' + myUID + '/' + senderUID).remove();
+          db.ref('rings/' + senderUID + '/' + myUID).remove();
+          renderRingedList();
+          renderHistoryList();
+          return;
+        }
+
         const senderSnap = await db.ref('users/' + senderUID).once('value');
         const sender = senderSnap.val();
 
@@ -1293,7 +1336,6 @@
         alarmOverlay.style.opacity = '0';
         setTimeout(() => alarmOverlay.classList.add('hidden'), 500);
 
-        // Get sender name for history
         const senderName = sender.name || 'Someone';
 
         db.ref('ringHistory/' + myUID).push({
@@ -1302,24 +1344,6 @@
           fromName: senderName,
           timestamp: firebase.database.ServerValue.TIMESTAMP,
           time: new Date().toLocaleString()
-        });
-
-        // Check for mutual ring
-        db.ref('rings/' + senderUID + '/' + myUID).once('value', snap => {
-          if (snap.exists()) {
-            // Mutual ring detected - save to mutualRings
-            db.ref('mutualRings/' + myUID + '/' + senderUID).set({
-              name: senderName,
-              timestamp: firebase.database.ServerValue.TIMESTAMP,
-              time: new Date().toLocaleString()
-            });
-            db.ref('mutualRings/' + senderUID + '/' + myUID).set({
-              name: currentUser.name || 'Someone',
-              timestamp: firebase.database.ServerValue.TIMESTAMP,
-              time: new Date().toLocaleString()
-            });
-            renderRingedList();
-          }
         });
 
         db.ref('rings/' + myUID + '/' + senderUID).remove();
@@ -1332,15 +1356,20 @@
     // ============ LISTEN FOR RING REPLIES ============
     db.ref('ringReplies/' + myUID).on('child_added', async snap => {
       const targetUID = snap.key;
+      
+      // Clear any ringing timeout for this user
+      if (ringTimeoutMap[targetUID]) {
+        clearTimeout(ringTimeoutMap[targetUID]);
+        delete ringTimeoutMap[targetUID];
+      }
+      
       userRingStates[targetUID] = 'ringed';
       renderProfileCards();
       
-      // Get target user's name
       const userSnap = await db.ref('users/' + targetUID).once('value');
       const userData = userSnap.val();
       const targetName = userData ? userData.name : 'Someone';
       
-      // Check if mutual ring exists
       db.ref('mutualRings/' + myUID + '/' + targetUID).once('value', snap2 => {
         if (!snap2.exists()) {
           db.ref('mutualRings/' + myUID + '/' + targetUID).set({
@@ -1396,11 +1425,9 @@
         const data = snap.val();
         ringHistoryData = [];
         if (data) {
-          // Process each entry to get names
           for (const key of Object.keys(data)) {
             const item = data[key];
             if (item.type === 'sent' && item.toUID) {
-              // Get name for sent ring
               const userSnap = await db.ref('users/' + item.toUID).once('value');
               const userData = userSnap.val();
               item.toName = userData ? userData.name : 'Someone';
@@ -1462,7 +1489,6 @@
     settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
     closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
 
-    // Ghost Mode
     ghostToggle.addEventListener('click', function() {
       isGhostMode = !isGhostMode;
       this.classList.toggle('active');
@@ -1479,7 +1505,6 @@
       }
     });
 
-    // Light Mode
     function toggleLightMode() {
       lightMode = !lightMode;
       document.body.classList.toggle('light-mode', lightMode);
@@ -1490,12 +1515,10 @@
     if (localStorage.getItem('ring_light_mode') === 'on') toggleLightMode();
     lightModeToggle.addEventListener('click', toggleLightMode);
 
-    // Logout - Fixed
     logoutBtn.addEventListener('click', async () => {
       if (confirm('Are you sure you want to sign out?')) {
         try {
           await auth.signOut();
-          // Clear local data
           currentUser = null;
           myUID = null;
           nearbyUsers = [];
@@ -1509,18 +1532,15 @@
       }
     });
 
-    // Delete Account - Fixed
     deleteAccountBtn.addEventListener('click', async () => {
       if (confirm('Are you sure you want to delete your account? This cannot be undone!')) {
         if (myUID) {
           try {
-            // Delete user data from database
             await db.ref('users/' + myUID).remove();
             await db.ref('rings/' + myUID).remove();
             await db.ref('ringHistory/' + myUID).remove();
             await db.ref('mutualRings/' + myUID).remove();
             await db.ref('ringReplies/' + myUID).remove();
-            // Delete the user account
             await auth.currentUser.delete();
             alert('Account deleted successfully.');
             showView(loginView);
@@ -1531,7 +1551,6 @@
       }
     });
 
-    // Apply initial translations
     applyTranslations();
     document.querySelectorAll('.lang-btn').forEach(btn => {
       if (btn.dataset.lang === currentLang) btn.classList.add('active');
