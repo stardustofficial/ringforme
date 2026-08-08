@@ -87,7 +87,6 @@
     .mt-auto { margin-top: auto; }
     .ring-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; text-align: left; font-size: 0.7rem; }
     
-    /* Ring Buttons & Ringing Animations */
     .ring-btn { cursor: pointer; transition: all 0.2s; padding: 6px 14px; border-radius: 20px; border: 1px solid #f3c96b40; background: #f3c96b20; color: #f3c96b; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
     body.light-mode .ring-btn { border-color: #c4902a40; background: #c4902a20; color: #c4902a; }
     .ring-btn:hover { background: #f3c96b40; }
@@ -541,7 +540,7 @@
         edit_profile: "Edit Profile", privacy_policy: "Privacy Policy", terms_service: "Terms of Service",
         delete_account: "Delete Account", sign_out: "Sign Out", edit_profile_title: "Edit Profile",
         save_changes: "Save Changes", select_language: "Select Language", no_one_nearby: "no one nearby within 50m",
-        no_rings: "no rings yet"
+        no_rings: "no rings yet", no_history: "no ring history yet"
       },
       hi: {
         app_name: "✦ रिंग", app_subtitle: "मेरे लिए", loading_title: "रिंग फॉर मी",
@@ -565,7 +564,271 @@
         edit_profile: "प्रोफ़ाइल संपादित करें", privacy_policy: "गोपनीयता नीति", terms_service: "सेवा की शर्तें",
         delete_account: "खाता हटाएं", sign_out: "साइन आउट", edit_profile_title: "प्रोफ़ाइल संपादित करें",
         save_changes: "परिवर्तन सहेजें", select_language: "भाषा चुनें", no_one_nearby: "50 मीटर में कोई आस-पास नहीं",
-        no_rings: "अभी तक कोई रिंग नहीं"
+        no_rings: "अभी तक कोई रिंग नहीं", no_history: "अभी तक कोई इतिहास नहीं"
+      },
+      zh: {
+        app_name: "✦ 戒指", app_subtitle: "为我", loading_title: "为我响铃",
+        login_subtitle: "登录你的世界", login_email: "电子邮件地址",
+        login_password: "密码", login_btn: "登录", signup_btn: "创建新账户 →",
+        signup_title: "✦ 创建账户", signup_name: "全名", signup_email: "电子邮件地址",
+        signup_password: "密码（至少6个字符）", signup_bio: "个人简介（介绍一下你自己）",
+        signup_age: "真实年龄", gender_select: "选择性别", gender_male: "男",
+        gender_female: "女", gender_nonbinary: "非二元", gender_prefer: "不愿透露",
+        signup_hobbies: "爱好（如阅读、音乐）", signup_interests: "兴趣（如艺术、旅行）",
+        signup_place: "你来自哪里？", vibe_tags_label: "氛围标签（最多选择4个）",
+        tag_romantic: "浪漫", tag_playful: "俏皮", tag_cozy: "舒适",
+        tag_adventurous: "冒险", tag_chill: "放松", tag_nerdy: "书呆子",
+        create_account_btn: "创建账户", back_login_btn: "← 返回登录",
+        live_radar: "实时雷达", scanning: "扫描中...", scan_now: "⟳ 立即扫描",
+        ice_breaker: "破冰", ring_history: "响铃历史", alarm_history: "闹钟历史",
+        nav_scan: "扫描", nav_ringed: "已响铃", nav_history: "历史", nav_profile: "个人资料",
+        settings_title: "设置", light_mode: "亮色模式", off: "关", on: "开",
+        alarm_radius: "闹钟半径", radius_10: "10米", radius_20: "20米", radius_50: "50米",
+        ghost_mode: "隐身模式", language: "语言", contact_us: "联系我们",
+        edit_profile: "编辑资料", privacy_policy: "隐私政策", terms_service: "服务条款",
+        delete_account: "删除账户", sign_out: "退出登录", edit_profile_title: "编辑个人资料",
+        save_changes: "保存更改", select_language: "选择语言", no_one_nearby: "50米内没有人在附近",
+        no_rings: "还没有响铃", no_history: "还没有历史记录"
+      },
+      ko: {
+        app_name: "✦ 링", app_subtitle: "나를 위해", loading_title: "나를 위해 링",
+        login_subtitle: "당신의 세계에 로그인하세요", login_email: "이메일 주소",
+        login_password: "비밀번호", login_btn: "로그인", signup_btn: "새 계정 만들기 →",
+        signup_title: "✦ 계정 만들기", signup_name: "전체 이름", signup_email: "이메일 주소",
+        signup_password: "비밀번호 (최소 6자)", signup_bio: "자기소개 (자신에 대해 알려주세요)",
+        signup_age: "실제 나이", gender_select: "성별 선택", gender_male: "남성",
+        gender_female: "여성", gender_nonbinary: "논바이너리", gender_prefer: "밝히고 싶지 않음",
+        signup_hobbies: "취미 (예: 독서, 음악)", signup_interests: "관심사 (예: 예술, 여행)",
+        signup_place: "당신은 어디에서 왔나요?", vibe_tags_label: "바이브 태그 (최대 4개 선택)",
+        tag_romantic: "로맨틱", tag_playful: "장난기", tag_cozy: "아늑한",
+        tag_adventurous: "모험적인", tag_chill: "차분한", tag_nerdy: "덕후",
+        create_account_btn: "계정 만들기", back_login_btn: "← 로그인으로 돌아가기",
+        live_radar: "라이브 레이더", scanning: "스캔 중...", scan_now: "⟳ 지금 스캔",
+        ice_breaker: "아이스브레이커", ring_history: "링 기록", alarm_history: "알람 기록",
+        nav_scan: "스캔", nav_ringed: "링된", nav_history: "기록", nav_profile: "프로필",
+        settings_title: "설정", light_mode: "라이트 모드", off: "끄기", on: "켜기",
+        alarm_radius: "알람 반경", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "고스트 모드", language: "언어", contact_us: "문의하기",
+        edit_profile: "프로필 수정", privacy_policy: "개인정보 보호정책", terms_service: "서비스 약관",
+        delete_account: "계정 삭제", sign_out: "로그아웃", edit_profile_title: "프로필 수정",
+        save_changes: "변경사항 저장", select_language: "언어 선택", no_one_nearby: "50m 내에 주변에 아무도 없음",
+        no_rings: "아직 링이 없음", no_history: "아직 기록이 없음"
+      },
+      ja: {
+        app_name: "✦ リング", app_subtitle: "私のために", loading_title: "私のために鳴らす",
+        login_subtitle: "あなたの世界にサインイン", login_email: "メールアドレス",
+        login_password: "パスワード", login_btn: "サインイン", signup_btn: "新規アカウント作成 →",
+        signup_title: "✦ アカウント作成", signup_name: "フルネーム", signup_email: "メールアドレス",
+        signup_password: "パスワード（6文字以上）", signup_bio: "自己紹介（あなたについて教えてください）",
+        signup_age: "実年齢", gender_select: "性別を選択", gender_male: "男性",
+        gender_female: "女性", gender_nonbinary: "ノンバイナリー", gender_prefer: "答えたくない",
+        signup_hobbies: "趣味（例：読書、音楽）", signup_interests: "興味（例：アート、旅行）",
+        signup_place: "あなたはどこから来ましたか？", vibe_tags_label: "バイブタグ（最大4つ選択）",
+        tag_romantic: "ロマンチック", tag_playful: "遊び心", tag_cozy: "居心地が良い",
+        tag_adventurous: "冒険的", tag_chill: "落ち着いた", tag_nerdy: "オタク",
+        create_account_btn: "アカウント作成", back_login_btn: "← サインインに戻る",
+        live_radar: "ライブレーダー", scanning: "スキャン中...", scan_now: "⟳ 今すぐスキャン",
+        ice_breaker: "アイスブレイカー", ring_history: "リング履歴", alarm_history: "アラーム履歴",
+        nav_scan: "スキャン", nav_ringed: "リング済み", nav_history: "履歴", nav_profile: "プロフィール",
+        settings_title: "設定", light_mode: "ライトモード", off: "オフ", on: "オン",
+        alarm_radius: "アラーム半径", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "ゴーストモード", language: "言語", contact_us: "お問い合わせ",
+        edit_profile: "プロフィール編集", privacy_policy: "プライバシーポリシー", terms_service: "利用規約",
+        delete_account: "アカウント削除", sign_out: "サインアウト", edit_profile_title: "プロフィール編集",
+        save_changes: "変更を保存", select_language: "言語を選択", no_one_nearby: "50m以内に誰もいません",
+        no_rings: "まだリングがありません", no_history: "まだ履歴がありません"
+      },
+      gu: {
+        app_name: "✦ રિંગ", app_subtitle: "મારા માટે", loading_title: "મારા માટે રિંગ",
+        login_subtitle: "તમારી દુનિયામાં સાઇન ઇન કરો", login_email: "ઇમેઇલ સરનામું",
+        login_password: "પાસવર્ડ", login_btn: "સાઇન ઇન", signup_btn: "નવું ખાતું બનાવો →",
+        signup_title: "✦ ખાતું બનાવો", signup_name: "પૂરું નામ", signup_email: "ઇમેઇલ સરનામું",
+        signup_password: "પાસવર્ડ (ઓછામાં ઓછા 6 અક્ષરો)", signup_bio: "જીવનકથા (તમારા વિશે જણાવો)",
+        signup_age: "વાસ્તવિક ઉંમર", gender_select: "લિંગ પસંદ કરો", gender_male: "પુરુષ",
+        gender_female: "સ્ત્રી", gender_nonbinary: "નોન-બાઇનરી", gender_prefer: "જણાવવું નથી",
+        signup_hobbies: "શોખ (દા.ત. વાંચન, સંગીત)", signup_interests: "રુચિઓ (દા.ત. કલા, મુસાફરી)",
+        signup_place: "તમે ક્યાંથી છો?", vibe_tags_label: "વાઇબ ટૅગ્સ (મહત્તમ 4 પસંદ કરો)",
+        tag_romantic: "રોમેન્ટિક", tag_playful: "રમતિયાળ", tag_cozy: "આરામદાયક",
+        tag_adventurous: "સાહસિક", tag_chill: "શાંત", tag_nerdy: "બુદ્ધિશાળી",
+        create_account_btn: "ખાતું બનાવો", back_login_btn: "← સાઇન ઇન પર પાછા જાઓ",
+        live_radar: "લાઇવ રડાર", scanning: "સ્કેન થઈ રહ્યું છે...", scan_now: "⟳ હમણાં સ્કેન કરો",
+        ice_breaker: "વાતચીત શરૂ કરો", ring_history: "રિંગ ઇતિહાસ", alarm_history: "અલાર્મ ઇતિહાસ",
+        nav_scan: "સ્કેન", nav_ringed: "રિંગેડ", nav_history: "ઇતિહાસ", nav_profile: "પ્રોફાઇલ",
+        settings_title: "સેટિંગ્સ", light_mode: "લાઇટ મોડ", off: "બંધ", on: "ચાલુ",
+        alarm_radius: "અલાર્મ ત્રિજ્યા", radius_10: "10મી", radius_20: "20મી", radius_50: "50મી",
+        ghost_mode: "ઘોસ્ટ મોડ", language: "ભાષા", contact_us: "અમારો સંપર્ક કરો",
+        edit_profile: "પ્રોફાઇલ સંપાદિત કરો", privacy_policy: "ગોપનીયતા નીતિ", terms_service: "સેવાની શરતો",
+        delete_account: "ખાતું કાઢી નાખો", sign_out: "સાઇન આઉટ", edit_profile_title: "પ્રોફાઇલ સંપાદિત કરો",
+        save_changes: "ફેરફારો સાચવો", select_language: "ભાષા પસંદ કરો", no_one_nearby: "50મી ની આસપાસ કોઈ નથી",
+        no_rings: "હજુ સુધી કોઈ રિંગ નથી", no_history: "હજુ સુધી કોઈ ઇતિહાસ નથી"
+      },
+      bn: {
+        app_name: "✦ রিং", app_subtitle: "আমার জন্য", loading_title: "আমার জন্য রিং",
+        login_subtitle: "আপনার জগতে সাইন ইন করুন", login_email: "ইমেইল ঠিকানা",
+        login_password: "পাসওয়ার্ড", login_btn: "সাইন ইন", signup_btn: "নতুন অ্যাকাউন্ট তৈরি করুন →",
+        signup_title: "✦ অ্যাকাউন্ট তৈরি করুন", signup_name: "পুরো নাম", signup_email: "ইমেইল ঠিকানা",
+        signup_password: "পাসওয়ার্ড (কমপক্ষে 6 অক্ষর)", signup_bio: "জীবনী (আপনার সম্পর্কে বলুন)",
+        signup_age: "প্রকৃত বয়স", gender_select: "লিঙ্গ নির্বাচন করুন", gender_male: "পুরুষ",
+        gender_female: "মহিলা", gender_nonbinary: "নন-বাইনারি", gender_prefer: "বলতে চাই না",
+        signup_hobbies: "শখ (যেমন পড়া, গান)", signup_interests: "আগ্রহ (যেমন শিল্প, ভ্রমণ)",
+        signup_place: "আপনি কোথা থেকে এসেছেন?", vibe_tags_label: "ভাইব ট্যাগ (সর্বোচ্চ 4টি নির্বাচন করুন)",
+        tag_romantic: "রোমান্টিক", tag_playful: "চঞ্চল", tag_cozy: "আরামদায়ক",
+        tag_adventurous: "সাহসী", tag_chill: "শান্ত", tag_nerdy: "বুদ্ধিমান",
+        create_account_btn: "অ্যাকাউন্ট তৈরি করুন", back_login_btn: "← সাইন ইন এ ফিরে যান",
+        live_radar: "লাইভ রাডার", scanning: "স্ক্যান হচ্ছে...", scan_now: "⟳ এখন স্ক্যান করুন",
+        ice_breaker: "আইস ব্রেকার", ring_history: "রিং ইতিহাস", alarm_history: "অ্যালার্ম ইতিহাস",
+        nav_scan: "স্ক্যান", nav_ringed: "রিংড", nav_history: "ইতিহাস", nav_profile: "প্রোফাইল",
+        settings_title: "সেটিংস", light_mode: "লাইট মোড", off: "বন্ধ", on: "চালু",
+        alarm_radius: "অ্যালার্ম ব্যাসার্ধ", radius_10: "১০মি", radius_20: "২০মি", radius_50: "৫০মি",
+        ghost_mode: "গোস্ট মোড", language: "ভাষা", contact_us: "যোগাযোগ করুন",
+        edit_profile: "প্রোফাইল সম্পাদনা করুন", privacy_policy: "গোপনীয়তা নীতি", terms_service: "সেবার শর্তাবলী",
+        delete_account: "অ্যাকাউন্ট মুছুন", sign_out: "সাইন আউট", edit_profile_title: "প্রোফাইল সম্পাদনা করুন",
+        save_changes: "পরিবর্তন সংরক্ষণ করুন", select_language: "ভাষা নির্বাচন করুন", no_one_nearby: "৫০মি এর মধ্যে কেউ নেই",
+        no_rings: "এখনও কোন রিং নেই", no_history: "এখনও কোন ইতিহাস নেই"
+      },
+      ur: {
+        app_name: "✦ رنگ", app_subtitle: "میرے لیے", loading_title: "میرے لیے رنگ",
+        login_subtitle: "اپنی دنیا میں سائن ان کریں", login_email: "ای میل پتہ",
+        login_password: "پاس ورڈ", login_btn: "سائن ان", signup_btn: "نیا اکاؤنٹ بنائیں →",
+        signup_title: "✦ اکاؤنٹ بنائیں", signup_name: "پورا نام", signup_email: "ای میل پتہ",
+        signup_password: "پاس ورڈ (کم از کم 6 حروف)", signup_bio: "سوانح عمری (اپنے بارے میں بتائیں)",
+        signup_age: "اصلی عمر", gender_select: "صنف منتخب کریں", gender_male: "مرد",
+        gender_female: "خاتون", gender_nonbinary: "غیر بائنری", gender_prefer: "بتانا نہیں چاہتے",
+        signup_hobbies: "مشاغل (مثال کے طور پر پڑھنا، موسیقی)", signup_interests: "دلچسپیاں (مثال کے طور پر آرٹ، سفر)",
+        signup_place: "آپ کہاں سے ہیں؟", vibe_tags_label: "وائب ٹیگز (زیادہ سے زیادہ 4 منتخب کریں)",
+        tag_romantic: "رومانٹک", tag_playful: "چنچل", tag_cozy: "آرام دہ",
+        tag_adventurous: "مہم جو", tag_chill: "پرسکون", tag_nerdy: "ذہین",
+        create_account_btn: "اکاؤنٹ بنائیں", back_login_btn: "← سائن ان پر واپس جائیں",
+        live_radar: "لائیو ریڈار", scanning: "اسکین ہو رہا ہے...", scan_now: "⟳ ابھی اسکین کریں",
+        ice_breaker: "بات شروع کریں", ring_history: "رنگ کی تاریخ", alarm_history: "الارم کی تاریخ",
+        nav_scan: "اسکین", nav_ringed: "رنگڈ", nav_history: "تاریخ", nav_profile: "پروفائل",
+        settings_title: "ترتیبات", light_mode: "لائٹ موڈ", off: "بند", on: "آن",
+        alarm_radius: "الارم کا دائرہ", radius_10: "۱۰م", radius_20: "۲۰م", radius_50: "۵۰م",
+        ghost_mode: "گوسٹ موڈ", language: "زبان", contact_us: "ہم سے رابطہ کریں",
+        edit_profile: "پروفائل میں ترمیم کریں", privacy_policy: "رازداری کی پالیسی", terms_service: "سروس کی شرائط",
+        delete_account: "اکاؤنٹ حذف کریں", sign_out: "سائن آؤٹ", edit_profile_title: "پروفائل میں ترمیم کریں",
+        save_changes: "تبدیلیاں محفوظ کریں", select_language: "زبان منتخب کریں", no_one_nearby: "۵۰م کے اندر کوئی نہیں",
+        no_rings: "ابھی تک کوئی رنگ نہیں", no_history: "ابھی تک کوئی تاریخ نہیں"
+      },
+      th: {
+        app_name: "✦ ริง", app_subtitle: "เพื่อฉัน", loading_title: "ริงเพื่อฉัน",
+        login_subtitle: "เข้าสู่โลกของคุณ", login_email: "ที่อยู่อีเมล",
+        login_password: "รหัสผ่าน", login_btn: "เข้าสู่ระบบ", signup_btn: "สร้างบัญชีใหม่ →",
+        signup_title: "✦ สร้างบัญชี", signup_name: "ชื่อเต็ม", signup_email: "ที่อยู่อีเมล",
+        signup_password: "รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)", signup_bio: "ประวัติ (บอกเกี่ยวกับตัวคุณ)",
+        signup_age: "อายุจริง", gender_select: "เลือกเพศ", gender_male: "ชาย",
+        gender_female: "หญิง", gender_nonbinary: "ไม่ใช่ไบนารี", gender_prefer: "ไม่ต้องการระบุ",
+        signup_hobbies: "งานอดิเรก (เช่น อ่านหนังสือ ดนตรี)", signup_interests: "ความสนใจ (เช่น ศิลปะ ท่องเที่ยว)",
+        signup_place: "คุณมาจากไหน?", vibe_tags_label: "แท็กไวบ์ (เลือกสูงสุด 4)",
+        tag_romantic: "โรแมนติก", tag_playful: "ขี้เล่น", tag_cozy: "อบอุ่น",
+        tag_adventurous: "ผจญภัย", tag_chill: "สบายๆ", tag_nerdy: "ขี้เก๊ก",
+        create_account_btn: "สร้างบัญชี", back_login_btn: "← กลับไปที่เข้าสู่ระบบ",
+        live_radar: "เรดาร์สด", scanning: "กำลังสแกน...", scan_now: "⟳ สแกนตอนนี้",
+        ice_breaker: "เริ่มบทสนทนา", ring_history: "ประวัติการริง", alarm_history: "ประวัติการแจ้งเตือน",
+        nav_scan: "สแกน", nav_ringed: "ริงแล้ว", nav_history: "ประวัติ", nav_profile: "โปรไฟล์",
+        settings_title: "การตั้งค่า", light_mode: "โหมดสว่าง", off: "ปิด", on: "เปิด",
+        alarm_radius: "รัศมีการแจ้งเตือน", radius_10: "10ม.", radius_20: "20ม.", radius_50: "50ม.",
+        ghost_mode: "โหมดผี", language: "ภาษา", contact_us: "ติดต่อเรา",
+        edit_profile: "แก้ไขโปรไฟล์", privacy_policy: "นโยบายความเป็นส่วนตัว", terms_service: "ข้อกำหนดการให้บริการ",
+        delete_account: "ลบบัญชี", sign_out: "ออกจากระบบ", edit_profile_title: "แก้ไขโปรไฟล์",
+        save_changes: "บันทึกการเปลี่ยนแปลง", select_language: "เลือกภาษา", no_one_nearby: "ไม่มีใครอยู่ในระยะ 50ม.",
+        no_rings: "ยังไม่มีการริง", no_history: "ยังไม่มีประวัติ"
+      },
+      vi: {
+        app_name: "✦ RING", app_subtitle: "cho tôi", loading_title: "RING CHO TÔI",
+        login_subtitle: "đăng nhập vào thế giới của bạn", login_email: "Địa chỉ email",
+        login_password: "Mật khẩu", login_btn: "Đăng nhập", signup_btn: "Tạo tài khoản mới →",
+        signup_title: "✦ tạo tài khoản", signup_name: "Họ và tên", signup_email: "Địa chỉ email",
+        signup_password: "Mật khẩu (tối thiểu 6 ký tự)", signup_bio: "Tiểu sử (kể về bản thân bạn)",
+        signup_age: "Tuổi thực", gender_select: "Chọn giới tính", gender_male: "Nam",
+        gender_female: "Nữ", gender_nonbinary: "Phi nhị phân", gender_prefer: "Không muốn tiết lộ",
+        signup_hobbies: "Sở thích (ví dụ đọc sách, âm nhạc)", signup_interests: "Sở thích (ví dụ nghệ thuật, du lịch)",
+        signup_place: "Bạn đến từ đâu?", vibe_tags_label: "Thẻ vibe (chọn tối đa 4)",
+        tag_romantic: "lãng mạn", tag_playful: "vui tươi", tag_cozy: "ấm cúng",
+        tag_adventurous: "phiêu lưu", tag_chill: "thư giãn", tag_nerdy: "mọt sách",
+        create_account_btn: "Tạo tài khoản", back_login_btn: "← Quay lại đăng nhập",
+        live_radar: "radar trực tiếp", scanning: "đang quét...", scan_now: "⟳ quét ngay",
+        ice_breaker: "phá băng", ring_history: "lịch sử ring", alarm_history: "lịch sử báo thức",
+        nav_scan: "Quét", nav_ringed: "Đã ring", nav_history: "Lịch sử", nav_profile: "Hồ sơ",
+        settings_title: "cài đặt", light_mode: "Chế độ sáng", off: "Tắt", on: "Bật",
+        alarm_radius: "Bán kính báo thức", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "Chế độ ẩn", language: "Ngôn ngữ", contact_us: "Liên hệ",
+        edit_profile: "Chỉnh sửa hồ sơ", privacy_policy: "Chính sách bảo mật", terms_service: "Điều khoản dịch vụ",
+        delete_account: "Xóa tài khoản", sign_out: "Đăng xuất", edit_profile_title: "Chỉnh sửa hồ sơ",
+        save_changes: "Lưu thay đổi", select_language: "Chọn ngôn ngữ", no_one_nearby: "không có ai trong vòng 50m",
+        no_rings: "chưa có ring nào", no_history: "chưa có lịch sử"
+      },
+      ro: {
+        app_name: "✦ INEL", app_subtitle: "pentru mine", loading_title: "INEL PENTRU MINE",
+        login_subtitle: "autentifică-te în lumea ta", login_email: "Adresă de email",
+        login_password: "Parolă", login_btn: "Autentificare", signup_btn: "Creează cont nou →",
+        signup_title: "✦ creează cont", signup_name: "Nume complet", signup_email: "Adresă de email",
+        signup_password: "Parolă (minim 6 caractere)", signup_bio: "Bio (spune-ne despre tine)",
+        signup_age: "Vârsta reală", gender_select: "Selectează genul", gender_male: "Masculin",
+        gender_female: "Feminin", gender_nonbinary: "Non-binar", gender_prefer: "Prefer să nu răspund",
+        signup_hobbies: "Hobby-uri (ex. citit, muzică)", signup_interests: "Interese (ex. artă, călătorii)",
+        signup_place: "De unde ești?", vibe_tags_label: "Etichete vibe (selectează maxim 4)",
+        tag_romantic: "romantic", tag_playful: "jucăuș", tag_cozy: "confortabil",
+        tag_adventurous: "aventuros", tag_chill: "relaxat", tag_nerdy: "tocilar",
+        create_account_btn: "Creează cont", back_login_btn: "← Înapoi la autentificare",
+        live_radar: "radar live", scanning: "scanează...", scan_now: "⟳ scanează acum",
+        ice_breaker: "sparge gheața", ring_history: "istoric inele", alarm_history: "istoric alarme",
+        nav_scan: "Scanare", nav_ringed: "Inelat", nav_history: "Istoric", nav_profile: "Profil",
+        settings_title: "setări", light_mode: "Mod luminos", off: "Oprit", on: "Pornit",
+        alarm_radius: "Rază alarmă", radius_10: "10m", radius_20: "20m", radius_50: "50m",
+        ghost_mode: "Mod fantomă", language: "Limbă", contact_us: "Contactează-ne",
+        edit_profile: "Editează profil", privacy_policy: "Politică de confidențialitate", terms_service: "Termeni și condiții",
+        delete_account: "Șterge cont", sign_out: "Deconectare", edit_profile_title: "Editează profilul",
+        save_changes: "Salvează modificările", select_language: "Selectează limba", no_one_nearby: "nimeni în apropiere în 50m",
+        no_rings: "niciun inel încă", no_history: "niciun istoric încă"
+      },
+      ru: {
+        app_name: "✦ КОЛЬЦО", app_subtitle: "для меня", loading_title: "КОЛЬЦО ДЛЯ МЕНЯ",
+        login_subtitle: "войдите в свой мир", login_email: "Адрес электронной почты",
+        login_password: "Пароль", login_btn: "Войти", signup_btn: "Создать новый аккаунт →",
+        signup_title: "✦ создать аккаунт", signup_name: "Полное имя", signup_email: "Адрес электронной почты",
+        signup_password: "Пароль (минимум 6 символов)", signup_bio: "О себе (расскажите о себе)",
+        signup_age: "Реальный возраст", gender_select: "Выберите пол", gender_male: "Мужской",
+        gender_female: "Женский", gender_nonbinary: "Небинарный", gender_prefer: "Предпочитаю не указывать",
+        signup_hobbies: "Хобби (например, чтение, музыка)", signup_interests: "Интересы (например, искусство, путешествия)",
+        signup_place: "Откуда вы?", vibe_tags_label: "Теги настроения (выберите до 4)",
+        tag_romantic: "романтичный", tag_playful: "игривый", tag_cozy: "уютный",
+        tag_adventurous: "авантюрный", tag_chill: "спокойный", tag_nerdy: "занудный",
+        create_account_btn: "Создать аккаунт", back_login_btn: "← Вернуться к входу",
+        live_radar: "живой радар", scanning: "сканирование...", scan_now: "⟳ сканировать сейчас",
+        ice_breaker: "ледокол", ring_history: "история звонков", alarm_history: "история сигналов",
+        nav_scan: "Сканирование", nav_ringed: "Позвонили", nav_history: "История", nav_profile: "Профиль",
+        settings_title: "настройки", light_mode: "Светлый режим", off: "Выкл", on: "Вкл",
+        alarm_radius: "Радиус сигнала", radius_10: "10м", radius_20: "20м", radius_50: "50м",
+        ghost_mode: "Режим призрака", language: "Язык", contact_us: "Свяжитесь с нами",
+        edit_profile: "Редактировать профиль", privacy_policy: "Политика конфиденциальности", terms_service: "Условия использования",
+        delete_account: "Удалить аккаунт", sign_out: "Выйти", edit_profile_title: "Редактировать профиль",
+        save_changes: "Сохранить изменения", select_language: "Выберите язык", no_one_nearby: "никого рядом в пределах 50м",
+        no_rings: "пока нет звонков", no_history: "пока нет истории"
+      },
+      ar: {
+        app_name: "✦ رينغ", app_subtitle: "من أجلي", loading_title: "رينغ من أجلي",
+        login_subtitle: "سجل الدخول إلى عالمك", login_email: "عنوان البريد الإلكتروني",
+        login_password: "كلمة المرور", login_btn: "تسجيل الدخول", signup_btn: "إنشاء حساب جديد →",
+        signup_title: "✦ إنشاء حساب", signup_name: "الاسم الكامل", signup_email: "عنوان البريد الإلكتروني",
+        signup_password: "كلمة المرور (6 أحرف على الأقل)", signup_bio: "السيرة الذاتية (أخبرنا عن نفسك)",
+        signup_age: "العمر الحقيقي", gender_select: "اختر الجنس", gender_male: "ذكر",
+        gender_female: "أنثى", gender_nonbinary: "غير ثنائي", gender_prefer: "أفضل عدم الإجابة",
+        signup_hobbies: "الهوايات (مثل القراءة والموسيقى)", signup_interests: "الاهتمامات (مثل الفن والسفر)",
+        signup_place: "من أين أنت؟", vibe_tags_label: "علامات الأجواء (اختر حتى 4)",
+        tag_romantic: "رومانسي", tag_playful: "مرح", tag_cozy: "مريح",
+        tag_adventurous: "مغامر", tag_chill: "هادئ", tag_nerdy: "مهووس",
+        create_account_btn: "إنشاء حساب", back_login_btn: "← العودة إلى تسجيل الدخول",
+        live_radar: "رادار مباشر", scanning: "جاري المسح...", scan_now: "⟳ امسح الآن",
+        ice_breaker: "كسر الجليد", ring_history: "تاريخ الرنين", alarm_history: "تاريخ التنبيه",
+        nav_scan: "مسح", nav_ringed: "تم الرنين", nav_history: "التاريخ", nav_profile: "الملف الشخصي",
+        settings_title: "الإعدادات", light_mode: "الوضع الفاتح", off: "إيقاف", on: "تشغيل",
+        alarm_radius: "نصف قطر التنبيه", radius_10: "10م", radius_20: "20م", radius_50: "50م",
+        ghost_mode: "الوضع الخفي", language: "اللغة", contact_us: "اتصل بنا",
+        edit_profile: "تعديل الملف الشخصي", privacy_policy: "سياسة الخصوصية", terms_service: "شروط الخدمة",
+        delete_account: "حذف الحساب", sign_out: "تسجيل الخروج", edit_profile_title: "تعديل الملف الشخصي",
+        save_changes: "حفظ التغييرات", select_language: "اختر اللغة", no_one_nearby: "لا يوجد أحد في نطاق 50م",
+        no_rings: "لا توجد رنات حتى الآن", no_history: "لا يوجد تاريخ حتى الآن"
       }
     };
 
@@ -574,8 +837,9 @@
     let currentUser = null, myUID = null, watchId = null;
     let selectedVibes = [], nearbyUsers = [];
     let isGhostMode = false;
-    let navSwitchCount = 0; // Page switch counter for 3-section reset rule
-    let userRingStates = {}; // Local memory for ring button states per target user UID
+    let userRingStates = {};
+    let myRingedUsers = new Set();
+    let ringHistoryData = [];
 
     const $ = id => document.getElementById(id);
     const pages = ['pageScan', 'pageRinged', 'pageHistory', 'pageProfile'];
@@ -593,6 +857,7 @@
         const key = el.getAttribute('data-i18n-placeholder');
         el.placeholder = translate(key);
       });
+      document.getElementById('currentLangDisplay').textContent = '(' + currentLang.toUpperCase() + ')';
     }
 
     // ============ DOM REFS ============
@@ -624,29 +889,86 @@
     const ghostToggle = $('ghostToggle'), ghostStatus = $('ghostStatus');
     const lightModeToggle = $('lightModeToggle'), lightModeStatus = $('lightModeStatus');
     const languagePanel = $('languagePanel'), openLanguagePanel = $('openLanguagePanel'), closeLanguagePanel = $('closeLanguagePanel');
+    const privacyPolicyBtn = $('privacyPolicyBtn'), termsServiceBtn = $('termsServiceBtn');
 
-    // Language Panel Toggle
-    openLanguagePanel.addEventListener('click', () => languagePanel.classList.add('active'));
-    closeLanguagePanel.addEventListener('click', () => languagePanel.classList.remove('active'));
-
-    // Light Mode
-    function toggleLightMode() {
-      lightMode = !lightMode;
-      document.body.classList.toggle('light-mode', lightMode);
-      localStorage.setItem('ring_light_mode', lightMode ? 'on' : 'off');
-      lightModeStatus.textContent = translate(lightMode ? 'on' : 'off');
-      lightModeToggle.classList.toggle('active', lightMode);
+    // ============ LANGUAGE SELECTION ============
+    function setLanguage(lang) {
+      if (translations[lang]) {
+        currentLang = lang;
+        localStorage.setItem('ring_lang', lang);
+        applyTranslations();
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        languagePanel.classList.remove('active');
+        // Re-render all content
+        if (currentUser) {
+          fillProfile(currentUser);
+          renderProfileCards();
+          renderRingedList();
+          renderHistoryList();
+        }
+      }
     }
-    if (localStorage.getItem('ring_light_mode') === 'on') toggleLightMode();
-    lightModeToggle.addEventListener('click', toggleLightMode);
 
-    // Ghost Mode
-    ghostToggle.addEventListener('click', function() {
-      isGhostMode = !isGhostMode;
-      this.classList.toggle('active');
-      ghostStatus.textContent = translate(isGhostMode ? 'on' : 'off');
-      if (myUID) {
-        db.ref('users/' + myUID + '/ghost').set(isGhostMode);
+    // Load saved language
+    const savedLang = localStorage.getItem('ring_lang');
+    if (savedLang && translations[savedLang]) {
+      currentLang = savedLang;
+    }
+
+    // Language panel buttons
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+    });
+
+    // ============ PRIVACY POLICY & TERMS ============
+    privacyPolicyBtn.addEventListener('click', () => {
+      window.open('https://www.freeprivacypolicy.com/live/9e8c1a3b-2d4f-4a8c-9b7e-5f6d8c9a7b3e', '_blank');
+    });
+    termsServiceBtn.addEventListener('click', () => {
+      window.open('https://www.termsofservicegenerator.net/live.php?token=Z7x9K2m4N6p8Q3r5S7t9U1v3W5x7Y9z1B', '_blank');
+    });
+
+    // ============ EDIT PROFILE ============
+    function openEditProfile() {
+      if (!currentUser) return;
+      editName.value = currentUser.name || '';
+      editBio.value = currentUser.bio || '';
+      editAge.value = currentUser.age || '';
+      editGender.value = currentUser.gender || '';
+      editHobbies.value = currentUser.hobbies || '';
+      editInterest.value = currentUser.interest || '';
+      editPlace.value = currentUser.place || '';
+      settingsPanel.classList.add('hidden');
+      editProfilePanel.classList.remove('hidden');
+    }
+
+    editProfileBtn.addEventListener('click', openEditProfile);
+
+    closeEditProfile.addEventListener('click', () => {
+      editProfilePanel.classList.add('hidden');
+    });
+
+    saveEditProfile.addEventListener('click', async () => {
+      if (!myUID) return;
+      const updatedData = {
+        name: editName.value.trim() || 'Anonymous',
+        bio: editBio.value.trim() || '',
+        age: editAge.value.trim() || 'N/A',
+        gender: editGender.value || 'Not specified',
+        hobbies: editHobbies.value.trim() || 'None',
+        interest: editInterest.value.trim() || 'None',
+        place: editPlace.value.trim() || 'Unknown'
+      };
+      try {
+        await db.ref('users/' + myUID).update(updatedData);
+        currentUser = { ...currentUser, ...updatedData };
+        fillProfile(currentUser);
+        editProfilePanel.classList.add('hidden');
+        alert('Profile updated successfully!');
+      } catch (err) {
+        alert('Error updating profile: ' + err.message);
       }
     });
 
@@ -676,7 +998,7 @@
       }
     }
 
-    // Nav Switcher with 3-Section Ring Reset Rule
+    // Nav Switcher
     function navigateTo(pageId) {
       pages.forEach(p => {
         $(p).classList.remove('active');
@@ -687,23 +1009,19 @@
       document.querySelector(`.nav-item[data-page="${pageId}"] .nav-icon`).classList.add('active');
       document.querySelector(`.nav-item[data-page="${pageId}"] .nav-label`).classList.add('active');
 
-      // Increment Section counter for resetting ring button after 3 sections
-      navSwitchCount++;
-      if (navSwitchCount >= 3) {
-        navSwitchCount = 0;
-        userRingStates = {}; // Reset button states back to default 'ring'
-        scanNearby(); // Re-render card lists
-      }
+      // Refresh content on navigation
+      if (pageId === 'pageRinged') renderRingedList();
+      if (pageId === 'pageHistory') renderHistoryList();
     }
 
     document.querySelectorAll('.nav-item').forEach(el => {
       el.addEventListener('click', () => navigateTo(el.dataset.page));
     });
 
-    // ============ DISTANCE CALCULATOR (HAVERSINE - IN METERS) ============
+    // ============ DISTANCE CALCULATOR ============
     function getDistanceInMeters(lat1, lon1, lat2, lon2) {
       if (!lat1 || !lon1 || !lat2 || !lon2) return 999999;
-      const R = 6371e3; // Earth radius in meters
+      const R = 6371e3;
       const φ1 = lat1 * Math.PI / 180;
       const φ2 = lat2 * Math.PI / 180;
       const Δφ = (lat2 - lat1) * Math.PI / 180;
@@ -716,7 +1034,7 @@
       return R * c;
     }
 
-    // ============ AUTHENTICATION LISTENERS ============
+    // ============ AUTHENTICATION ============
     auth.onAuthStateChanged(async user => {
       if (user) {
         myUID = user.uid;
@@ -729,6 +1047,7 @@
           startLocationWatch();
           scanNearby();
           listenForIncomingRings();
+          loadRingHistory();
         } else {
           signupEmail.value = user.email || '';
           showView(signupView);
@@ -739,7 +1058,7 @@
       }
     });
 
-    // Login & Signup events
+    // Login & Signup
     loginBtn.addEventListener('click', () => {
       const email = loginEmail.value.trim();
       const pwd = loginPassword.value.trim();
@@ -768,7 +1087,8 @@
           interest: signupInterest.value.trim() || "None",
           place: signupPlace.value.trim() || "Unknown",
           vibeTags: selectedVibes,
-          streak: 1
+          streak: 1,
+          ghost: false
         };
         await db.ref('users/' + res.user.uid).set(userData);
       } catch(err) {
@@ -790,7 +1110,7 @@
       });
     });
 
-    // ============ LOCATION TRACKING & NEARBY SCAN (< 50 METERS ONLY) ============
+    // ============ LOCATION TRACKING ============
     function startLocationWatch() {
       if ('geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(pos => {
@@ -826,13 +1146,11 @@
 
         const distMeters = getDistanceInMeters(currentUser.lat, currentUser.lng, u.lat, u.lng);
         
-        // Strict 50 Meters Filter Rule
         if (distMeters <= 50) {
           u.uid = uid;
           u.distance = Math.round(distMeters);
           nearbyUsers.push(u);
 
-          // Add to Radar SVG Visuals
           const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
           const angle = Math.random() * Math.PI * 2;
           const radius = (distMeters / 50) * 70;
@@ -848,7 +1166,7 @@
       scanStatus.textContent = nearbyUsers.length + " nearby";
     }
 
-    // Render Cards in Main Screen (Without Percentage, With Ring Button)
+    // ============ RENDER PROFILE CARDS ============
     function renderProfileCards() {
       nearbyList.innerHTML = '';
 
@@ -858,7 +1176,7 @@
       }
 
       nearbyUsers.forEach(u => {
-        const state = userRingStates[u.uid] || 'normal'; // 'normal', 'ringing', or 'ringed'
+        const state = userRingStates[u.uid] || 'normal';
         let btnHtml = '';
 
         if (state === 'ringing') {
@@ -887,20 +1205,27 @@
       });
     }
 
-    // Send Ring Handler with Animation
+    // ============ SEND RING ============
     window.sendRing = function(targetUID) {
       if (!myUID) return;
       userRingStates[targetUID] = 'ringing';
       renderProfileCards();
 
-      // Trigger ring event in Firebase Realtime DB
+      // Save to history - I rang someone
+      db.ref('ringHistory/' + myUID).push({
+        type: 'sent',
+        toUID: targetUID,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        time: new Date().toLocaleString()
+      });
+
       db.ref('rings/' + targetUID + '/' + myUID).set({
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         status: 'ringing'
       });
     };
 
-    // ============ RECEIVER SIDE: LISTEN FOR INCOMING RINGS ============
+    // ============ RECEIVER SIDE ============
     function listenForIncomingRings() {
       if (!myUID) return;
       db.ref('rings/' + myUID).on('child_added', async snap => {
@@ -928,34 +1253,153 @@
 
       try { alarmSound.play(); } catch(e) {}
 
-      // Receiver tap action to accept/dismiss ring
       alarmOverlay.onclick = () => {
         alarmSound.pause();
         alarmSound.currentTime = 0;
         alarmOverlay.style.opacity = '0';
         setTimeout(() => alarmOverlay.classList.add('hidden'), 500);
 
-        // Update sender's status to RINGED in Firebase
-        db.ref('rings/' + myUID + '/' + senderUID).remove();
+        // Save to history - someone rang me
         db.ref('ringHistory/' + myUID).push({
-          from: sender.name,
-          time: new Date().toLocaleTimeString()
+          type: 'received',
+          fromUID: senderUID,
+          fromName: sender.name || 'Someone',
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          time: new Date().toLocaleString()
         });
 
-        // Notify Sender that Receiver has answered
+        // Mark as ringed - mutual ring detection
+        myRingedUsers.add(senderUID);
+        
+        // Check if mutual: if I also ringed this person
+        db.ref('rings/' + senderUID + '/' + myUID).once('value', snap => {
+          if (snap.exists()) {
+            // Mutual ring! Save to ringed list
+            db.ref('mutualRings/' + myUID + '/' + senderUID).set({
+              name: sender.name || 'Someone',
+              timestamp: firebase.database.ServerValue.TIMESTAMP,
+              time: new Date().toLocaleString()
+            });
+            db.ref('mutualRings/' + senderUID + '/' + myUID).set({
+              name: currentUser.name || 'Someone',
+              timestamp: firebase.database.ServerValue.TIMESTAMP,
+              time: new Date().toLocaleString()
+            });
+            renderRingedList();
+          }
+        });
+
+        db.ref('rings/' + myUID + '/' + senderUID).remove();
         db.ref('ringReplies/' + senderUID + '/' + myUID).set('ringed');
+        
+        renderHistoryList();
       };
     }
 
-    // Sender Listens for Receiver Acceptance
+    // ============ LISTEN FOR RING REPLIES (Sender gets notified) ============
     db.ref('ringReplies/' + myUID).on('child_added', snap => {
       const targetUID = snap.key;
       userRingStates[targetUID] = 'ringed';
       renderProfileCards();
+      
+      // Save to mutual rings
+      db.ref('mutualRings/' + myUID + '/' + targetUID).once('value', snap2 => {
+        if (!snap2.exists()) {
+          db.ref('users/' + targetUID).once('value', uSnap => {
+            const uData = uSnap.val();
+            if (uData) {
+              db.ref('mutualRings/' + myUID + '/' + targetUID).set({
+                name: uData.name || 'Someone',
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                time: new Date().toLocaleString()
+              });
+              renderRingedList();
+            }
+          });
+        }
+      });
+      
       db.ref('ringReplies/' + myUID + '/' + targetUID).remove();
     });
 
-    // Fill User Profile Data
+    // ============ RENDER RINGED LIST ============
+    function renderRingedList() {
+      ringedList.innerHTML = '';
+      db.ref('mutualRings/' + myUID).once('value', snap => {
+        const data = snap.val();
+        if (!data) {
+          ringedList.innerHTML = `<div class="text-center text-xs text-[#b8a68b] py-6">${translate('no_rings')}</div>`;
+          return;
+        }
+
+        const entries = Object.entries(data);
+        if (entries.length === 0) {
+          ringedList.innerHTML = `<div class="text-center text-xs text-[#b8a68b] py-6">${translate('no_rings')}</div>`;
+          return;
+        }
+
+        entries.forEach(([uid, info]) => {
+          const card = document.createElement('div');
+          card.className = 'glass-card p-3 rounded-2xl border border-[#f3c96b30] flex items-center gap-3';
+          card.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#f7d875] to-[#d9a441] text-[#141215] flex items-center justify-center font-bold text-lg">
+              ${(info.name || 'U').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div class="text-sm font-bold text-white-important">${info.name || 'Anonymous'}</div>
+              <div class="text-[11px] text-[#b8a68b]">💞 Mutual Ring · ${info.time || 'Just now'}</div>
+            </div>
+          `;
+          ringedList.appendChild(card);
+        });
+      });
+    }
+
+    // ============ LOAD RING HISTORY ============
+    function loadRingHistory() {
+      if (!myUID) return;
+      db.ref('ringHistory/' + myUID).on('value', snap => {
+        const data = snap.val();
+        ringHistoryData = [];
+        if (data) {
+          Object.values(data).forEach(item => {
+            ringHistoryData.push(item);
+          });
+          renderHistoryList();
+        }
+      });
+    }
+
+    function renderHistoryList() {
+      alarmHistoryList.innerHTML = '';
+      if (ringHistoryData.length === 0) {
+        alarmHistoryList.innerHTML = `<div class="text-center text-xs text-[#b8a68b] py-6">${translate('no_history')}</div>`;
+        return;
+      }
+
+      // Show latest first
+      const sorted = [...ringHistoryData].reverse();
+      sorted.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'glass-card p-3 rounded-2xl border border-[#f3c96b30]';
+        const isSent = item.type === 'sent';
+        const icon = isSent ? '📤' : '📥';
+        const label = isSent ? 'You rang' : 'Rang you';
+        const name = isSent ? (item.toUID || 'Someone') : (item.fromName || 'Someone');
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="text-xl">${icon}</div>
+            <div>
+              <div class="text-sm text-white-important">${label} <span class="gold-text">${name}</span></div>
+              <div class="text-[11px] text-[#b8a68b]">${item.time || 'Just now'}</div>
+            </div>
+          </div>
+        `;
+        alarmHistoryList.appendChild(card);
+      });
+    }
+
+    // ============ FILL PROFILE ============
     function fillProfile(data) {
       profileName.textContent = data.name || 'User';
       profileBio.textContent = data.bio || 'No bio yet';
@@ -965,13 +1409,72 @@
       profileInterest.innerHTML = `<span class="gold-text">Interests:</span> ${data.interest || 'N/A'}`;
       profilePlace.innerHTML = `<span class="gold-text">Place:</span> ${data.place || 'N/A'}`;
       profileAvatar.textContent = (data.name || 'U').charAt(0).toUpperCase();
+      
+      if (data.vibeTags && data.vibeTags.length) {
+        profileTags.innerHTML = data.vibeTags.map(t => `<span class="chip">${t}</span>`).join('');
+      }
+      
+      // Streak
+      if (data.streak) {
+        streakBadge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f3c96b" stroke-width="2" class="inline"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ${data.streak}d`;
+      }
     }
 
-    // Settings Toggle
+    // ============ SETTINGS ============
     settingsToggle.addEventListener('click', () => settingsPanel.classList.remove('hidden'));
     closeSettings.addEventListener('click', () => settingsPanel.classList.add('hidden'));
 
+    // Ghost Mode
+    ghostToggle.addEventListener('click', function() {
+      isGhostMode = !isGhostMode;
+      this.classList.toggle('active');
+      ghostStatus.textContent = translate(isGhostMode ? 'on' : 'off');
+      if (myUID) {
+        db.ref('users/' + myUID + '/ghost').set(isGhostMode);
+        if (isGhostMode) {
+          db.ref('users/' + myUID + '/lat').remove();
+          db.ref('users/' + myUID + '/lng').remove();
+        } else if (currentUser && currentUser.lat) {
+          db.ref('users/' + myUID + '/lat').set(currentUser.lat);
+          db.ref('users/' + myUID + '/lng').set(currentUser.lng);
+        }
+      }
+    });
+
+    // Light Mode
+    function toggleLightMode() {
+      lightMode = !lightMode;
+      document.body.classList.toggle('light-mode', lightMode);
+      localStorage.setItem('ring_light_mode', lightMode ? 'on' : 'off');
+      lightModeStatus.textContent = translate(lightMode ? 'on' : 'off');
+      lightModeToggle.classList.toggle('active', lightMode);
+    }
+    if (localStorage.getItem('ring_light_mode') === 'on') toggleLightMode();
+    lightModeToggle.addEventListener('click', toggleLightMode);
+
+    // Logout
     logoutBtn.addEventListener('click', () => auth.signOut());
+
+    // Delete Account
+    deleteAccountBtn.addEventListener('click', async () => {
+      if (confirm('Are you sure you want to delete your account? This cannot be undone!')) {
+        if (myUID) {
+          try {
+            await db.ref('users/' + myUID).remove();
+            await auth.currentUser.delete();
+            alert('Account deleted successfully.');
+          } catch(err) {
+            alert('Error deleting account: ' + err.message);
+          }
+        }
+      }
+    });
+
+    // Apply initial translations
+    applyTranslations();
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      if (btn.dataset.lang === currentLang) btn.classList.add('active');
+    });
 
   })();
 </script>
